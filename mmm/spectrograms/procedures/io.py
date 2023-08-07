@@ -74,27 +74,29 @@ def load_or_compute(name, folder, load, function, extension='.pickle', verbose=T
 
 
 def write_signals(signals, paths, components):
+    audio_folder = paths['output_folder'] / 'audio'
+    audio_folder.mkdir(parents=True, exist_ok=True)
     if components['input']:
         x = signals['input']
-        input_path = paths['output_folder'] / 'input.wav'
+        input_path = audio_folder / 'input.wav'
         write_wav(input_path, x)
 
     if components['noise']:
         filtered_noise = signals['filtered_noise']
-        filtered_noise_path = paths['output_folder'] / 'filtered_noise.wav'
+        filtered_noise_path = audio_folder / 'filtered_noise.wav'
         write_wav(filtered_noise_path, filtered_noise)
 
     if components['sinusoids']:
         sinusoids = signals['sinusoids']
-        sinusoids_path = paths['output_folder'] / 'sinusoids.wav'
+        sinusoids_path = audio_folder / 'sinusoids.wav'
         write_wav(sinusoids_path, sinusoids)
 
     if components['transient']:
         transient = signals['transient']
-        transient_path = paths['output_folder'] / 'transient.wav'
+        transient_path = audio_folder / 'transient.wav'
         write_wav(transient_path, transient)
 
     if components['output']:
         output = signals['output']
-        output_path = paths['output_folder'] / 'output.wav'
+        output_path = audio_folder / 'output.wav'
         write_wav(output_path, output)
