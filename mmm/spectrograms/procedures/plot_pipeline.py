@@ -150,7 +150,8 @@ def plot_sinusoids(lines, spectrograms, plot, images_folder):
         filtered_lines_sinusoids = lines['filtered_sinusoids']
         spectrogram = spectrograms['input']
 
-        fig = plot_stft(spectrogram.cpu().numpy(), v_min=MIN_DB, v_max=0, c_map='afmhot', title='Input + lines')
+        fig = plot_stft(spectrogram.cpu().numpy(), v_min=MIN_DB, v_max=0, c_map='afmhot',
+                        title='Input + lines sinusoids')
 
         plot_lines(lines_sinusoids, fig=fig, color='b')
         plot_lines(filtered_lines_sinusoids, fig=fig, color='w')
