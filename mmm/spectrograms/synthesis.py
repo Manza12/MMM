@@ -35,6 +35,9 @@ def modulated_sinusoid(times, freqs, ampli, fs=FS, fade_out=None, fade_in=None):
     freqs_interp = np.interp(t, times, freqs)
     ampli_interp = np.interp(t, times, ampli)
 
+    fade_in = min(fade_in, freqs_interp.size // 2)
+    fade_out = min(fade_out, freqs_interp.size // 2)
+
     sinusoid = 2 * ampli_interp * np.sin(2 * np.pi * np.cumsum(freqs_interp) * ts)
 
     sinusoid[:fade_in] *= np.cos(np.pi * np.flip(np.arange(fade_in)) / (2 * fade_in)) ** 2

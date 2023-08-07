@@ -302,7 +302,7 @@ def plot_noise_phd(spectrograms, plot, images_folder):
 def plot_sinusoids_phd(lines, spectrograms, plot, images_folder):
     # Vertical thinning spectrogram
     if plot['vertical_thin']:
-        plot_compare(spectrograms['erosion_reconstruction'], spectrograms['vertical_thin'],
+        plot_compare(spectrograms['reconstruction_erosion'], spectrograms['vertical_thin'],
                      'vertical_thin', 'Vertical thinning', images_folder,
                      phd={'x_lim': (0.1, 0.25), 'y_lim': (250, 2000), 'name': 'vertical_thin'})
 

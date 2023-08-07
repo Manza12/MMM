@@ -16,9 +16,9 @@ name = 'woodblock'
 components = {
     'input': True,
     'noise': True,
-    'sinusoids': False,
-    'transient': False,
-    'output': False,
+    'sinusoids': True,
+    'transient': True,
+    'output': True,
 }
 
 operations = {
@@ -33,14 +33,14 @@ load = {
     'stft_layer': True,
 
     # Input
-    'spectrogram': False,
-    'reconstruction_erosion': False,
-    'erosion': False,
+    'spectrogram': True,
+    'reconstruction_erosion': True,
+    'erosion': True,
 
     # Noise
-    'white_noise': False,
-    'opening': False,
-    'filtered_noise': False,
+    'white_noise': True,
+    'opening': True,
+    'filtered_noise': True,
 
     # Sinusoids
     'erosion_reconstruction': True,
@@ -62,36 +62,36 @@ load = {
 
 plot = {
     # Input
-    'input': False,
-    'reconstruction_erosion': False,
-    'erosion': False,
+    'input': True,
+    'reconstruction_erosion': True,
+    'erosion': True,
 
     # Noise
-    'opening': False,
+    'opening': True,
     'white_noise': True,
-    'filtered_noise': False,
-    'input_noise': False,
+    'filtered_noise': True,
+    'input_noise': True,
 
     # Sinusoids
-    'erosion_reconstruction': False,
-    'vertical_thin': False,
-    'vertical_top_hat': False,
-    'vertical_threshold': False,
-    'horizontal_filtered': False,
-    'horizontal_link': False,
-    'lines_sinusoids': False,
-    'input_sinusoids': False,
+    'erosion_reconstruction': True,
+    'vertical_thin': True,
+    'vertical_top_hat': True,
+    'vertical_threshold': True,
+    'horizontal_filtered': True,
+    'horizontal_link': True,
+    'lines_sinusoids': True,
+    'input_sinusoids': True,
 
     # Transient
-    'horizontal_thin': False,
-    'horizontal_top_hat': False,
-    'horizontal_threshold': False,
-    'vertical_filtered': False,
-    'lines_transient': False,
+    'horizontal_thin': True,
+    'horizontal_top_hat': True,
+    'horizontal_threshold': True,
+    'vertical_filtered': True,
+    'lines_transient': True,
     'input_transient': True,
 
     # Output
-    'input_output': False,
+    'input_output': True,
 }
 
 # Paths
