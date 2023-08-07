@@ -63,30 +63,30 @@ load = {
 plot = {
     # Input
     'input': True,
-    'reconstruction_erosion': True,
-    'erosion': True,
+    'reconstruction_erosion': False,
+    'erosion': False,
 
     # Noise
-    'opening': True,
-    'white_noise': True,
-    'filtered_noise': True,
+    'opening': False,
+    'white_noise': False,
+    'filtered_noise': False,
     'input_noise': True,
 
     # Sinusoids
-    'erosion_reconstruction': True,
-    'vertical_thin': True,
-    'vertical_top_hat': True,
-    'vertical_threshold': True,
-    'horizontal_filtered': True,
-    'horizontal_link': True,
+    'erosion_reconstruction': False,
+    'vertical_thin': False,
+    'vertical_top_hat': False,
+    'vertical_threshold': False,
+    'horizontal_filtered': False,
+    'horizontal_link': False,
     'lines_sinusoids': True,
     'input_sinusoids': True,
 
     # Transient
-    'horizontal_thin': True,
-    'horizontal_top_hat': True,
-    'horizontal_threshold': True,
-    'vertical_filtered': True,
+    'horizontal_thin': False,
+    'horizontal_top_hat': False,
+    'horizontal_threshold': False,
+    'vertical_filtered': False,
     'lines_transient': True,
     'input_transient': True,
 
