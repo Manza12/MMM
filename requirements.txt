@@ -1,4 +1,7 @@
 # Python version == 3.7.7
-numpy==1.19.0
-scipy==1.5.1
+numpy==1.21.6
+scipy==1.7.3
 matplotlib==3.5.3
+nnAudio==0.3.2
+torch==1.12.1
+nnMorpho==2.2.3
