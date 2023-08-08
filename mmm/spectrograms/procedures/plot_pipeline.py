@@ -25,10 +25,11 @@ def plot_single(spectrogram, name, title, images_folder, v_min=MIN_DB, v_max=0, 
 def plot_compare(spectrogram_1, spectrogram_2, name, title, images_folder,
                  v_min_1=MIN_DB, v_max_1: Optional[int] = 0, v_min_2=MIN_DB, v_max_2: Optional[int] = 0,
                  c_map_1='afmhot', c_map_2='afmhot', phd=None):
+    fig_size = (8., 4.) if phd is None else phd.get('fig_size', (8., 4.))
     fig = plot_two_spectrogram(spectrogram_1.cpu().numpy(), spectrogram_2.cpu().numpy(),
                                v_min_1=v_min_1, v_max_1=v_max_1, v_min_2=v_min_2, v_max_2=v_max_2,
                                c_map_1=c_map_1, c_map_2=c_map_2, title=title,
-                               fig_size=phd.get('fig_size', (8., 4.)) if phd is not None else (8., 4.),
+                               fig_size=fig_size,
                                sharexy=phd.get('sharexy', False) if phd is not None else False,
                                cb_1=phd.get('cb_1', True) if phd is not None else True,
                                cb_2=phd.get('cb_2', True) if phd is not None else True,
@@ -49,9 +50,9 @@ def plot_compare(spectrogram_1, spectrogram_2, name, title, images_folder,
 
         dpi = 300
 
-        x_border = 4.
-        bbox_0 = mpl.transforms.Bbox([[0., 0.], [x_border, 4.]])
-        bbox_1 = mpl.transforms.Bbox([[x_border, 0.], [8., 4.]])
+        x_border = fig_size[0] / 2
+        bbox_0 = mpl.transforms.Bbox([[0., 0.], [x_border, fig_size[1]]])
+        bbox_1 = mpl.transforms.Bbox([[x_border, 0.], fig_size])
 
         fig.savefig(phd_folder / (phd['name'] + '_0.eps'), dpi=dpi, bbox_inches=bbox_0)
         fig.savefig(phd_folder / (phd['name'] + '_1.eps'), dpi=dpi, bbox_inches=bbox_1)
@@ -241,18 +242,18 @@ def plot_all(lines, signals, spectrograms, plot, components, paths):
 
 def plot_input_phd(spectrograms, plot, images_folder, settings):
     # Input spectrogram
-    if plot['input']:
+    if settings.get('input', None) is not None:
         plot_single(spectrograms['input'], 'input', 'Input', images_folder,
                     phd=settings['input'])
 
     # Reconstruction by erosion spectrogram
-    if plot['reconstruction_erosion']:
+    if settings.get('reconstruction_erosion', None) is not None:
         plot_compare(spectrograms['input'], spectrograms['reconstruction_erosion'], 'reconstruction_erosion',
                      'Reconstruction by erosion', images_folder,
                      phd=settings['reconstruction_erosion'])
 
     # Erosion spectrogram
-    if plot['erosion']:
+    if settings.get('erosion', None) is not None:
         plot_compare(spectrograms['reconstruction_erosion'], spectrograms['erosion'],
                      'erosion', 'Erosion', images_folder,
                      phd={'x_lim': (0.08, 0.16), 'y_lim': (500, 1000), 'name': 'erosion'})
@@ -260,13 +261,13 @@ def plot_input_phd(spectrograms, plot, images_folder, settings):
 
 def plot_noise_phd(spectrograms, plot, images_folder, settings):
     # Opening spectrogram
-    if plot['opening']:
+    if settings.get('opening', None) is not None:
         plot_compare(spectrograms['erosion'], spectrograms['opening'],
                      'opening', 'Opening', images_folder,
                      phd=settings['opening'])
 
     # White noise spectrogram
-    if plot['white_noise']:
+    if settings.get('white_noise', None) is not None:
         plot_single(spectrograms['white_noise'],
                     'white_noise', 'White Noise', images_folder,
                     v_min=-60, v_max=10,
@@ -291,7 +292,7 @@ def plot_noise_phd(spectrograms, plot, images_folder, settings):
                     phd=settings['white_noise_zoom'])
 
     # Filtered noise spectrogram
-    if plot['filtered_noise']:
+    if settings.get('filtered_noise', None) is not None:
         plot_compare(spectrograms['opening'], spectrograms['filtered_noise'],
                      'filtered_noise', 'Filtered noise', images_folder)
 
@@ -300,7 +301,7 @@ def plot_noise_phd(spectrograms, plot, images_folder, settings):
                      phd=settings['erosion_noise_zoom'])
 
     # Input - Noise spectrogram
-    if plot['input_noise']:
+    if settings.get('input_noise', None) is not None:
         plot_compare(spectrograms['input'], spectrograms['filtered_noise'],
                      'input_noise', 'Input - Noise', images_folder,
                      phd=settings['input_noise'])
@@ -308,37 +309,37 @@ def plot_noise_phd(spectrograms, plot, images_folder, settings):
 
 def plot_sinusoids_phd(lines, spectrograms, plot, images_folder, settings):
     # Vertical thinning spectrogram
-    if plot['vertical_thin']:
+    if settings.get('vertical_thin', None) is not None:
         plot_compare(spectrograms['reconstruction_erosion'], spectrograms['vertical_thin'],
                      'vertical_thin', 'Vertical thinning', images_folder,
                      phd=settings['vertical_thin'])
 
     # Vertical top-hat spectrogram
-    if plot['vertical_top_hat']:
+    if settings.get('vertical_top_hat', None) is not None:
         plot_compare(spectrograms['vertical_thin'], spectrograms['vertical_top_hat'],
                      'vertical_top_hat', 'Vertical top-hat', images_folder,
                      v_min_2=0, v_max_2=None, c_map_2='Greys',
                      phd=settings['vertical_top_hat'])
 
     # Vertical threshold spectrogram
-    if plot['vertical_threshold']:
+    if settings.get('vertical_threshold', None) is not None:
         plot_compare(spectrograms['vertical_top_hat'], spectrograms['vertical_threshold'], 'vertical_threshold',
                      'Vertical threshold', images_folder, v_min_1=0, v_max_1=None, c_map_1='Greys',
                      phd=settings['vertical_threshold'])
 
     # Horizontal filtered
-    if plot['horizontal_filtered']:
+    if settings.get('horizontal_filtered', None) is not None:
         plot_compare(spectrograms['vertical_threshold'], spectrograms['horizontal_filtered'], 'horizontal_filtered',
                      'Horizontal filtered', images_folder,
                      phd=settings['horizontal_filtered'])
 
     # Lines - Sinusoids
-    if plot['lines_sinusoids']:
+    if settings.get('lines_sinusoids', None) is not None:
         plot_input_lines(lines['sinusoids'], lines['filtered_sinusoids'], spectrograms['input'], images_folder,
                          phd=settings['lines_sinusoids'])
 
     # Input - Sinusoids spectrogram
-    if plot['input_sinusoids']:
+    if settings.get('input_sinusoids', None) is not None:
         plot_compare(spectrograms['input'], spectrograms['sinusoids'],
                      'input_sinusoids', 'Input - Sinusoids', images_folder,
                      phd=settings['input_sinusoids'])
@@ -346,46 +347,47 @@ def plot_sinusoids_phd(lines, spectrograms, plot, images_folder, settings):
 
 def plot_transient_phd(lines, spectrograms, plot, images_folder, settings):
     # Horizontal thinning spectrogram
-    if plot['horizontal_thin']:
+    if settings.get('horizontal_thin', None) is not None:
         plot_compare(spectrograms['reconstruction_erosion'], spectrograms['horizontal_thin'],
                      'horizontal_thin', 'Horizontal thinning', images_folder,
                      phd=settings['horizontal_thin'])
 
     # Horizontal top-hat spectrogram
-    if plot['horizontal_top_hat']:
+    if settings.get('horizontal_top_hat', None) is not None:
         plot_compare(spectrograms['horizontal_thin'], spectrograms['horizontal_top_hat'],
                      'horizontal_top_hat', 'Horizontal top-hat', images_folder,
                      v_min_2=0, v_max_2=None, c_map_2='Greys',
                      phd=settings['horizontal_top_hat'])
 
     # Horizontal threshold spectrogram
-    if plot['horizontal_threshold']:
+    if settings.get('horizontal_threshold', None) is not None:
         plot_compare(spectrograms['horizontal_top_hat'], spectrograms['horizontal_threshold'], 'horizontal_threshold',
                      'Horizontal threshold', images_folder, v_min_1=0, v_max_1=None, c_map_1='Greys',
                      phd=settings['horizontal_threshold'])
 
     # Vertical filtered
-    if plot['vertical_filtered']:
+    if settings.get('vertical_filtered', None) is not None:
         plot_compare(spectrograms['horizontal_threshold'], spectrograms['vertical_filtered'], 'vertical_filtered',
                      'Vertical filtered', images_folder,
                      phd=settings['vertical_filtered'])
 
     # Lines - Transient
-    if plot['lines_transient']:
+    if settings.get('lines_transient', None) is not None:
         plot_input_lines(lines['transient'], lines['filtered_transient'], spectrograms['input'], images_folder,
                          phd=settings['lines_transient'])
 
     # Input - Transient spectrogram
-    if plot['input_transient']:
+    if settings.get('input_transient', None) is not None:
         plot_compare(spectrograms['input'], spectrograms['transient'],
                      'input_transient', 'Input - Transient', images_folder,
                      phd=settings['input_transient'])
 
 
-def plot_output_phd(spectrograms, plot, images_folder):
+def plot_output_phd(spectrograms, plot, images_folder, settings):
     # Input - Output spectrogram
-    if plot['input_output']:
-        plot_compare(spectrograms['input'], spectrograms['output'], 'input_output', 'Input - Output', images_folder)
+    if settings.get('input_output', None) is not None:
+        plot_compare(spectrograms['input'], spectrograms['output'], 'input_output', 'Input - Output', images_folder,
+                     phd=settings['input_output'])
 
 
 def plot_phd(lines, spectrograms, plot, components, paths, settings):
@@ -398,6 +400,6 @@ def plot_phd(lines, spectrograms, plot, components, paths, settings):
     if components['transient']:
         plot_transient_phd(lines, spectrograms, plot, paths['images_folder'], settings)
     if components['output']:
-        plot_output_phd(spectrograms, plot, paths['images_folder'])
+        plot_output_phd(spectrograms, plot, paths['images_folder'], settings)
 
     plt.show()
