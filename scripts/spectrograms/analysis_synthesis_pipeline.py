@@ -11,14 +11,14 @@ from mmm.spectrograms.procedures.synthesis import synthesize_signals
 
 # Parameters
 phd = True
-name = 'piano_60'
+name = 'marimba_60'
 
 components = {
     'input': True,
-    'noise': False,
-    'sinusoids': False,
+    'noise': True,
+    'sinusoids': True,
     'transient': True,
-    'output': False,
+    'output': True,
 }
 
 operations = {
