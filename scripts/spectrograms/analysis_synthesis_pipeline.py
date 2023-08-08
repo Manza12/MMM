@@ -11,14 +11,14 @@ from mmm.spectrograms.procedures.synthesis import synthesize_signals
 
 # Parameters
 phd = True
-name = 'piano_60'
+name = 'woodblock'
 
 components = {
     'input': True,
-    'noise': True,
-    'sinusoids': True,
+    'noise': False,
+    'sinusoids': False,
     'transient': True,
-    'output': True,
+    'output': False,
 }
 
 operations = {
@@ -83,10 +83,10 @@ plot = {
     'input_sinusoids': True,
 
     # Transient
-    'horizontal_thin': False,
-    'horizontal_top_hat': False,
-    'horizontal_threshold': False,
-    'vertical_filtered': False,
+    'horizontal_thin': True,
+    'horizontal_top_hat': True,
+    'horizontal_threshold': True,
+    'vertical_filtered': True,
     'lines_transient': True,
     'input_transient': True,
 
@@ -170,6 +170,7 @@ sys.stdout.close()
 # Plots
 if operations['plots']:
     if phd:
-        plot_phd(lines, spectrograms, plot, components, paths)
+        from mmm.spectrograms.phd_settings import settings
+        plot_phd(lines, spectrograms, plot, components, paths, settings[name])
     else:
         plot_all(lines, signals, spectrograms, plot, components, paths)
