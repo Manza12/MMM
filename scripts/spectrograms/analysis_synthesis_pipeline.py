@@ -11,7 +11,7 @@ from mmm.spectrograms.procedures.synthesis import synthesize_signals
 
 # Parameters
 phd = True
-name = 'gong'
+name = 'piano'
 
 components = {
     'input': True,

@@ -207,10 +207,46 @@ violin_vibrato = {
     },
 }
 
+
+piano = {
+    'input_sinusoids': {
+        'x_lim': (0.3, 1.3),
+        'y_lim': (0, 5000),
+        'cb_1': False,
+        'sharexy': 'all',
+        'fig_size': (6, 3),
+        'name': 'input_sinusoids'
+    },
+    'input_noise': {
+        'x_lim': (0.3, 1.3),
+        'y_lim': (0, 5000),
+        'cb_1': False,
+        'sharexy': 'all',
+        'fig_size': (6, 3),
+        'name': 'input_noise'
+    },
+    'input_transient': {
+        'x_lim': (0.3, 1.3),
+        'y_lim': (0, 5000),
+        'cb_1': False,
+        'fig_size': (6, 3),
+        'sharexy': 'all',
+        'name': 'input_transient'
+    },
+    'input_output': {
+        'x_lim': (0.3, 1.3),
+        'y_lim': (0, 5000),
+        'cb_1': False,
+        'sharexy': 'all',
+        'name': 'input_output'
+    },
+}
+
 settings = {
     'woodblock': woodblock,
     'marimba': marimba,
     'gong': gong,
     'violin': violin,
     'violin_vibrato': violin_vibrato,
+    'piano': piano,
 }
