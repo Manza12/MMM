@@ -56,10 +56,11 @@ def plot_compare(spectrogram_1, spectrogram_2, name, title, images_folder,
 
 
 def plot_input_lines(lines, filtered_lines, spectrogram, images_folder, phd=None):
-    fig = plot_stft(spectrogram.cpu().numpy(), v_min=MIN_DB, v_max=0, c_map='afmhot', title='Input + lines')
+    fig = plot_stft(spectrogram.cpu().numpy(), v_min=MIN_DB, v_max=0, c_map='afmhot', title='Input + lines',
+                    full_screen=False)
 
-    plot_lines(lines, fig, 'b', label='Lines')
-    plot_lines(filtered_lines, fig, 'c', label='Filtered lines')
+    plot_lines(lines, fig, 'b', full_screen=phd.get('full_screen', True), label='Lines')
+    plot_lines(filtered_lines, fig, 'c', full_screen=phd.get('full_screen', True), label='Filtered lines')
 
     plt.legend()
 

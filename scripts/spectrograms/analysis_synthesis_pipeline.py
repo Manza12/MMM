@@ -15,10 +15,10 @@ name = 'marimba_60'
 
 components = {
     'input': True,
-    'noise': True,
-    'sinusoids': True,
+    'noise': False,
+    'sinusoids': False,
     'transient': True,
-    'output': True,
+    'output': False,
 }
 
 operations = {

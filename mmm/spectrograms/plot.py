@@ -300,7 +300,7 @@ def plot_pixels(x_list, label_list, m, n, show=True, v_min=None, v_max=None):
         plt.show()
 
 
-def plot_lines(lines, fig=None, *args, **kwargs):
+def plot_lines(lines, fig=None, *args, full_screen=True, **kwargs):
     if fig is None:
         fig, ax = plt.subplots(1, 1, figsize=(10, 5))
     else:
@@ -315,10 +315,11 @@ def plot_lines(lines, fig=None, *args, **kwargs):
         kwargs.pop('label', None)
 
     # Full screen
-    if mpl.get_backend() == 'QtAgg':
-        fig.canvas.manager.window.showMaximized()
-    elif mpl.get_backend() == 'TkAgg':
-        manager = fig.canvas.manager
-        manager.resize(*manager.window.maxsize())
+    if full_screen:
+        if mpl.get_backend() == 'QtAgg':
+            fig.canvas.manager.window.showMaximized()
+        elif mpl.get_backend() == 'TkAgg':
+            manager = fig.canvas.manager
+            manager.resize(*manager.window.maxsize())
 
     return fig

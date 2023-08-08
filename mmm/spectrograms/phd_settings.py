@@ -176,6 +176,7 @@ marimba_60 = {
         'x_lim': (0., 2.),
         'y_lim': (0, 22050),
         'sharexy': 'all',
+        'full_screen': False,
         'name': 'lines_transient'
     },
     'input_transient': {
