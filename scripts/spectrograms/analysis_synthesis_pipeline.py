@@ -11,7 +11,7 @@ from mmm.spectrograms.procedures.synthesis import synthesize_signals
 
 # Parameters
 phd = True
-name = 'woodblock'
+name = 'piano_60'
 
 components = {
     'input': True,

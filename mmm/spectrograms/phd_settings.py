@@ -96,6 +96,52 @@ woodblock = {
     }
 }
 
+piano_60 = {
+    'input': {
+        'x_lim': (0.4, 2.884),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'input'
+    },
+    'horizontal_thin': {
+        'x_lim': (0.4, 2.884),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'horizontal_thin'
+    },
+    'horizontal_top_hat': {
+        'x_lim': (0.4, 2.884),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'horizontal_top_hat'
+    },
+    'horizontal_threshold': {
+        'x_lim': (0.4, 2.884),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'horizontal_threshold'
+    },
+    'vertical_filtered': {
+        'x_lim': (0.4, 2.884),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'vertical_filtered'
+    },
+    'lines_transient': {
+        'x_lim': (0.4, 2.884),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'lines_transient'
+    },
+    'input_transient': {
+        'x_lim': (0.4, 2.884),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'input_transient'
+    },
+}
+
 settings = {
     'woodblock': woodblock,
+    'piano_60': piano_60
 }

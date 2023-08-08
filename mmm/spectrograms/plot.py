@@ -210,14 +210,14 @@ def plot_tfst(spectrogram: np.ndarray, tfst_layer: TFST, v_min: float, v_max: fl
 def plot_two_spectrogram(spectrogram_1: np.ndarray, spectrogram_2: np.ndarray,
                          v_min_1=None, v_max_1=None, v_min_2=None, v_max_2=None, c_map_1='afmhot', c_map_2='afmhot',
                          fig_size: (float, float) = (12, 8), title: str = '',
-                         phd=False, full_screen=False):
+                         sharexy=False, full_screen=False):
     time_vector = create_time_vector(spectrogram_1.shape[1])
     frequency_vector = create_frequency_vector()
 
-    if phd:
-        fig, axs = plt.subplots(1, 2, figsize=fig_size)
-    else:
+    if sharexy:
         fig, axs = plt.subplots(1, 2, sharex='all', sharey='all', figsize=fig_size)
+    else:
+        fig, axs = plt.subplots(1, 2, figsize=fig_size)
 
     fig.canvas.manager.set_window_title(title)
 

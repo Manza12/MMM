@@ -28,7 +28,7 @@ def plot_compare(spectrogram_1, spectrogram_2, name, title, images_folder,
     fig = plot_two_spectrogram(spectrogram_1.cpu().numpy(), spectrogram_2.cpu().numpy(),
                                v_min_1=v_min_1, v_max_1=v_max_1, v_min_2=v_min_2, v_max_2=v_max_2,
                                c_map_1=c_map_1, c_map_2=c_map_2, title=title, fig_size=(8., 4.),
-                               phd=phd is not None, full_screen=False)
+                               sharexy=phd.get('sharexy', False), full_screen=False)
     fig.savefig(images_folder / (name + '.png'), dpi=300)
 
     if phd is not None:
