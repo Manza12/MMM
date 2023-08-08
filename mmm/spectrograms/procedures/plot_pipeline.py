@@ -27,8 +27,12 @@ def plot_compare(spectrogram_1, spectrogram_2, name, title, images_folder,
                  c_map_1='afmhot', c_map_2='afmhot', phd=None):
     fig = plot_two_spectrogram(spectrogram_1.cpu().numpy(), spectrogram_2.cpu().numpy(),
                                v_min_1=v_min_1, v_max_1=v_max_1, v_min_2=v_min_2, v_max_2=v_max_2,
-                               c_map_1=c_map_1, c_map_2=c_map_2, title=title, fig_size=(8., 4.),
-                               sharexy=phd.get('sharexy', False), full_screen=False)
+                               c_map_1=c_map_1, c_map_2=c_map_2, title=title,
+                               fig_size=phd.get('fig_size', (8., 4.)),
+                               sharexy=phd.get('sharexy', False) if phd is not None else False,
+                               cb_1=phd.get('cb_1', True) if phd is not None else True,
+                               cb_2=phd.get('cb_2', True) if phd is not None else True,
+                               full_screen=False)
     fig.savefig(images_folder / (name + '.png'), dpi=300)
 
     if phd is not None:
@@ -57,10 +61,11 @@ def plot_compare(spectrogram_1, spectrogram_2, name, title, images_folder,
 
 def plot_input_lines(lines, filtered_lines, spectrogram, images_folder, phd=None):
     fig = plot_stft(spectrogram.cpu().numpy(), v_min=MIN_DB, v_max=0, c_map='afmhot', title='Input + lines',
-                    full_screen=False)
+                    full_screen=False, fig_size=phd.get('fig_size', (6., 4.)),
+                    cb=phd.get('cb', True) if phd is not None else True)
 
-    plot_lines(lines, fig, 'b', full_screen=phd.get('full_screen', True), label='Lines')
-    plot_lines(filtered_lines, fig, 'c', full_screen=phd.get('full_screen', True), label='Filtered lines')
+    plot_lines(lines, fig, 'b', phd=phd, label='Lines')
+    plot_lines(filtered_lines, fig, 'c', phd=phd, label='Filtered lines')
 
     plt.legend()
 
@@ -330,12 +335,13 @@ def plot_sinusoids_phd(lines, spectrograms, plot, images_folder, settings):
     # Lines - Sinusoids
     if plot['lines_sinusoids']:
         plot_input_lines(lines['sinusoids'], lines['filtered_sinusoids'], spectrograms['input'], images_folder,
-                         phd={'x_lim': (0.1, 0.5), 'y_lim': (250, 2000), 'name': 'lines_sinusoids'})
+                         phd=settings['lines_sinusoids'])
 
     # Input - Sinusoids spectrogram
     if plot['input_sinusoids']:
         plot_compare(spectrograms['input'], spectrograms['sinusoids'],
-                     'input_sinusoids', 'Input - Sinusoids', images_folder)
+                     'input_sinusoids', 'Input - Sinusoids', images_folder,
+                     phd=settings['input_sinusoids'])
 
 
 def plot_transient_phd(lines, spectrograms, plot, images_folder, settings):

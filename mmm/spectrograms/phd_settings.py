@@ -148,6 +148,55 @@ marimba_60 = {
         'sharexy': 'all',
         'name': 'input'
     },
+    'erosion_reconstruction': {
+        'x_lim': (0., 2.),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'erosion_reconstruction'
+    },
+    'vertical_thin': {
+        'x_lim': (0., 2.),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'vertical_thin'
+    },
+    'vertical_top_hat': {
+        'x_lim': (0., 2.),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'vertical_top_hat'
+    },
+    'vertical_threshold': {
+        'x_lim': (0., 2.),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'vertical_threshold'
+    },
+    'horizontal_filtered': {
+        'x_lim': (0., 2.),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'horizontal_filtered'
+    },
+    'horizontal_link': {
+        'x_lim': (0., 2.),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'horizontal_link'
+    },
+    'lines_sinusoids': {
+        'x_lim': (0.05, 0.6),
+        'y_lim': (0, 3200),
+        'sharexy': 'all',
+        'full_screen': False,
+        'name': 'lines_sinusoids'
+    },
+    'input_sinusoids': {
+        'x_lim': (0.05, 0.6),
+        'y_lim': (0, 3200),
+        'sharexy': 'all',
+        'name': 'input_sinusoids'
+    },
     'horizontal_thin': {
         'x_lim': (0., 2.),
         'y_lim': (0, 22050),
@@ -173,15 +222,20 @@ marimba_60 = {
         'name': 'vertical_filtered'
     },
     'lines_transient': {
-        'x_lim': (0., 2.),
+        'x_lim': (0.05, 0.35),
         'y_lim': (0, 22050),
         'sharexy': 'all',
+        'cb': False,
+        'fig_size': (3., 4.),
         'full_screen': False,
         'name': 'lines_transient'
     },
     'input_transient': {
-        'x_lim': (0., 2.),
+        'x_lim': (0., 0.2),
         'y_lim': (0, 22050),
+        'fig_size': (4., 4.),
+        'cb_1': False,
+        'cb_2': True,
         'sharexy': 'all',
         'name': 'input_transient'
     },

@@ -16,7 +16,7 @@ name = 'marimba_60'
 components = {
     'input': True,
     'noise': False,
-    'sinusoids': False,
+    'sinusoids': True,
     'transient': True,
     'output': False,
 }
@@ -83,10 +83,10 @@ plot = {
     'input_sinusoids': True,
 
     # Transient
-    'horizontal_thin': True,
-    'horizontal_top_hat': True,
-    'horizontal_threshold': True,
-    'vertical_filtered': True,
+    'horizontal_thin': False,
+    'horizontal_top_hat': False,
+    'horizontal_threshold': False,
+    'vertical_filtered': False,
     'lines_transient': True,
     'input_transient': True,
 
