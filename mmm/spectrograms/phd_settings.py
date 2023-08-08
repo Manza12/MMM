@@ -241,8 +241,224 @@ marimba_60 = {
     },
 }
 
+gong = {
+    'input': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'input'
+    },
+    'erosion_reconstruction': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'erosion_reconstruction'
+    },
+    'input_noise': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'full_screen': False,
+        'name': 'input_noise'
+    },
+    'vertical_thin': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'vertical_thin'
+    },
+    'vertical_top_hat': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'vertical_top_hat'
+    },
+    'vertical_threshold': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'vertical_threshold'
+    },
+    'horizontal_filtered': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'horizontal_filtered'
+    },
+    'horizontal_link': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'horizontal_link'
+    },
+    'lines_sinusoids': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'full_screen': False,
+        'name': 'lines_sinusoids'
+    },
+    'input_sinusoids': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'input_sinusoids'
+    },
+    'horizontal_thin': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'horizontal_thin'
+    },
+    'horizontal_top_hat': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'horizontal_top_hat'
+    },
+    'horizontal_threshold': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'horizontal_threshold'
+    },
+    'vertical_filtered': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'vertical_filtered'
+    },
+    'lines_transient': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'cb': False,
+        'fig_size': (3., 4.),
+        'full_screen': False,
+        'name': 'lines_transient'
+    },
+    'input_transient': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'fig_size': (4., 4.),
+        'cb_1': False,
+        'cb_2': True,
+        'sharexy': 'all',
+        'name': 'input_transient'
+    },
+}
+
+violin = {
+    'input': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'input'
+    },
+    'erosion_reconstruction': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'erosion_reconstruction'
+    },
+    'input_noise': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 10000),
+        'sharexy': 'all',
+        'full_screen': False,
+        'name': 'input_noise'
+    },
+    'vertical_thin': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'vertical_thin'
+    },
+    'vertical_top_hat': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'vertical_top_hat'
+    },
+    'vertical_threshold': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'vertical_threshold'
+    },
+    'horizontal_filtered': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'horizontal_filtered'
+    },
+    'horizontal_link': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'horizontal_link'
+    },
+    'lines_sinusoids': {
+        'x_lim': (0., 0.6),
+        'y_lim': (0, 5500),
+        'sharexy': 'all',
+        'full_screen': False,
+        'name': 'lines_sinusoids'
+    },
+    'input_sinusoids': {
+        'x_lim': (0., 0.6),
+        'y_lim': (0, 5500),
+        'sharexy': 'all',
+        'name': 'input_sinusoids'
+    },
+    'horizontal_thin': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'horizontal_thin'
+    },
+    'horizontal_top_hat': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'horizontal_top_hat'
+    },
+    'horizontal_threshold': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'horizontal_threshold'
+    },
+    'vertical_filtered': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'name': 'vertical_filtered'
+    },
+    'lines_transient': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'sharexy': 'all',
+        'cb': False,
+        'fig_size': (3., 4.),
+        'full_screen': False,
+        'name': 'lines_transient'
+    },
+    'input_transient': {
+        'x_lim': (0., 1.75),
+        'y_lim': (0, 22050),
+        'fig_size': (4., 4.),
+        'cb_1': False,
+        'cb_2': True,
+        'sharexy': 'all',
+        'name': 'input_transient'
+    },
+}
+
 settings = {
     'woodblock': woodblock,
     'piano_60': piano_60,
     'marimba_60': marimba_60,
+    'gong': gong,
+    'violin': violin,
 }
