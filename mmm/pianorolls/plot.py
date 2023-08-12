@@ -170,6 +170,8 @@ def plot_piano_roll(piano_roll: PianoRoll, note_names: bool = True, time_shift: 
                     marker_color='r',
                     tight_frame=True,
                     **kwargs):
+    if time_label == 'Time (m, b)':
+        TimePoint.__str__ = lambda self: f'({self.measure}, {self.beat})'
     if time_vector is None:
         time_vector = np.arange(piano_roll.extension.time.start,
                                 piano_roll.extension.time.end + piano_roll.tatum,

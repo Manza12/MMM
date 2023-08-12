@@ -1,4 +1,5 @@
 from .. import *
+import time
 import scipy.io.wavfile as wav
 import numbers
 import warnings
@@ -15,5 +16,5 @@ import scipy.signal as sig
 import scipy.fft as fft
 
 _ = [wav, np, numbers, warnings, torch, stft, cqt, pickle, plt, tick, mpl, wid, func, win, greyscale, image,
-     sig, fft, binary]
+     sig, fft, binary, time]
 _ = [Union, List, Optional, Tuple]

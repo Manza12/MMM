@@ -2,11 +2,11 @@ from . import *
 from .utils import gcd
 
 from .music import PianoRoll, TimeFrequency, TimeShift, FrequencyShift
-from .generation import ActivationTable
+from .generation import Activations
 
 
 def dilate_sparse(activation_table, block):
-    activation_table: ActivationTable
+    activation_table: Activations
     block: PianoRoll
 
     # Change tatum

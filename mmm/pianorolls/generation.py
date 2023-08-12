@@ -181,8 +181,8 @@ class Harmony(List):
 
 
 # Time-Frequency
-class ActivationTable(PianoRoll, list):
-    def __init__(self, activations: List[TimeFrequency]):
+class Activations(PianoRoll, list):
+    def __init__(self, *activations: TimeFrequency):
         list.__init__(self, activations)
         frequency_nature = nature_of_list([a.frequency.nature for a in activations])
         time_nature = nature_of_list([a.time.nature for a in activations])
@@ -258,7 +258,7 @@ class ChordTexture(HarmonicTexture):
 
 class HarmonicTextureSequence(PianoRoll, list):
     def __init__(self,
-                 activations_sequence: List[ActivationTable],
+                 activations_sequence: List[Activations],
                  texture_sequence: List[Texture],
                  harmony_sequence: List[Harmony]):
         assert len(activations_sequence) == len(texture_sequence) == len(harmony_sequence)
@@ -271,7 +271,7 @@ class HarmonicTextureSequence(PianoRoll, list):
         PianoRoll.__init__(self)
 
         for activations, texture, harmony in zip(activations_sequence, texture_sequence, harmony_sequence):
-            activations: ActivationTable
+            activations: Activations
             harmonic_texture = HarmonicTexture(texture, harmony)
             d = activations + harmonic_texture
             self.combine(d, True)
@@ -279,7 +279,7 @@ class HarmonicTextureSequence(PianoRoll, list):
 
 class ChordTextureSequence(PianoRoll, list):
     def __init__(self,
-                 activations_sequence: List[ActivationTable],
+                 activations_sequence: List[Activations],
                  texture_sequence: List[Texture],
                  harmony: Harmony):
         assert len(activations_sequence) == len(texture_sequence) == len(harmony)
@@ -292,14 +292,14 @@ class ChordTextureSequence(PianoRoll, list):
         PianoRoll.__init__(self)
 
         for activations, texture, chord in zip(activations_sequence, texture_sequence, harmony):
-            activations: ActivationTable
+            activations: Activations
             chord_texture = ChordTexture(texture, chord)
             d = activations + chord_texture
             self.combine(d, True)
 
 
 class Component(PianoRoll, list):
-    def __init__(self, activation_tables: List[ActivationTable] = (), PianoRolls: List[PianoRoll] = (),
+    def __init__(self, activation_tables: List[Activations] = (), PianoRolls: List[PianoRoll] = (),
                  dynamics=None):
         list.__init__(self, list(zip(activation_tables, PianoRolls)))
         time_nature = nature_of_sum(nature_of_list([a.time_nature for a in activation_tables]),
@@ -309,12 +309,12 @@ class Component(PianoRoll, list):
         PianoRoll.__init__(self, time_nature=time_nature, frequency_nature=frequency_nature, dynamics=dynamics)
 
         for a, b in self:
-            a: ActivationTable
+            a: Activations
             b: PianoRoll
             d = a + b
             self.combine(d, True)
 
-    def append(self, pair: Tuple[ActivationTable, PianoRoll]) -> None:
+    def append(self, pair: Tuple[Activations, PianoRoll]) -> None:
         a, b = pair
         d = a + b
         self.combine(d, True)
@@ -322,7 +322,7 @@ class Component(PianoRoll, list):
 
 
 class Score(Component):
-    def __init__(self, activation_tables: List[ActivationTable] = (), PianoRolls: List[PianoRoll] = (),
+    def __init__(self, activation_tables: List[Activations] = (), PianoRolls: List[PianoRoll] = (),
                  dynamics=None, **metadata):
         Component.__init__(self, activation_tables, PianoRolls, dynamics=dynamics)
         self.metadata = metadata

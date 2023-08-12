@@ -1,9 +1,7 @@
 from __future__ import annotations
-import numpy as np
+
+from . import *
 from abc import ABC
-from typing import Tuple, Optional, Dict, Any
-from fractions import Fraction as frac
-from multimethod import multimethod
 from .utils import midi_number_to_pitch, midi_numbers_to_chromas, gcd
 
 
@@ -61,11 +59,37 @@ class TimePoint(Time, ABC):
     nature = 'point'
 
     def __new__(cls, *args, **kwargs):
-        kwargs.pop('time_signature', None)
-        return Time.__new__(cls, *args, **kwargs)
+        if len(args) == 1:
+            return Time.__new__(cls, *args)
+        elif len(args) == 2:
+            return Time.__new__(cls, '%s/%s' % args)
+        elif len(args) in [3, 4]:
+            measure, beat, offset = args[:3]
+            if len(args) == 4:
+                time_signature = TimeSignature(*args[3])
+            else:
+                time_signature = TimeSignature(*kwargs['time_signature'])
+            value = (measure - 1) * time_signature.duration
+            value += (beat - 1) * TimeShift(1, time_signature.denominator)
+            value += TimeShift(offset)
+            return Time.__new__(cls, value)
 
-    def __init__(self, *args, time_signature: TimeSignature = TimeSignature(4, 4)):
-        super().__init__(*args)
+    @multimethod
+    def __init__(self, value: Union[int, frac, float, str, Time], time_signature: TimeSignature = TimeSignature(4, 4)):
+        super().__init__(frac(value))
+        self.time_signature = time_signature
+
+    @multimethod
+    def __init__(self, numerator: int, denominator: int, time_signature: TimeSignature = TimeSignature(4, 4)):
+        super().__init__(frac(numerator, denominator))
+        self.time_signature = time_signature
+
+    @multimethod
+    def __init__(self, measure: int, beat: int, offset: Union[str, int], time_signature: Tuple[int, int] = (4, 4)):
+        offset = TimeShift(offset)
+        time_signature = TimeSignature(*time_signature)
+        value = measure * time_signature.duration + (beat - 1) * TimeShift(1, time_signature.denominator) + offset
+        super().__init__(value)
         self.time_signature = time_signature
 
     @property
@@ -75,7 +99,7 @@ class TimePoint(Time, ABC):
     @property
     def beat(self):
         remaining = self - (self.measure - 1) * self.time_signature.duration
-        return remaining // TimeShift(1, self.time_signature.denominator) + 1
+        return remaining // TimeShift(frac(1, self.time_signature.denominator)) + 1
 
     @property
     def offset(self):
@@ -242,6 +266,18 @@ class TimeFrequency:
         self.frequency = frequency
 
     @multimethod
+    def __init__(self, time: Time, frequency: int, frequency_nature: str = 'shift'):
+        self.__init__([time.numerator, time.denominator], frequency, time.nature, frequency_nature)
+
+    @multimethod
+    def __init__(self, time: str, frequency: Frequency, time_nature: str = 'shift'):
+        self.__init__('%s/%s' % time, frequency, time_nature, frequency.nature)
+
+    @multimethod
+    def __init__(self, time: Tuple[int, int], frequency: Frequency, time_nature: str = 'shift'):
+        self.__init__(time, frequency, time_nature, frequency.nature)
+
+    @multimethod
     def __init__(self, time: str, frequency: int,
                  time_nature: str = 'shift', frequency_nature: str = 'shift'):
         # Time
@@ -335,6 +371,9 @@ class PianoRoll:
         self.frequency_nature = kwargs.get('frequency_nature', None)
 
         self.dynamics: Optional[Dict[Any, int]] = kwargs.get('dynamics', None)
+        self.time_signature: TimeSignature = TimeSignature(4, 4)
+        if 'time_signature' in kwargs:
+            self.time_signature = TimeSignature(*kwargs['time_signature'])
 
         assert isinstance(self.tatum, TimeShift)
         assert isinstance(self.step, FrequencyShift)
@@ -360,9 +399,9 @@ class PianoRoll:
 
     @multimethod
     def __init__(self, array: np.ndarray, origin: Tuple[int, int], tatum: TimeShift, step: FrequencyShift,
-                 time_nature: Optional[str], frequency_nature: Optional[str]):
+                 time_nature: Optional[str], frequency_nature: Optional[str], **kwargs):
         PianoRoll.__init__(self, array=array, origin=origin, tatum=tatum, step=step,
-                           time_nature=time_nature, frequency_nature=frequency_nature)
+                           time_nature=time_nature, frequency_nature=frequency_nature, **kwargs)
 
     def __eq__(self, other):
         assert isinstance(other, PianoRoll)
@@ -383,7 +422,9 @@ class PianoRoll:
 
     def __add__(self, other):
         assert isinstance(other, PianoRoll)
-        return PianoRoll.supremum(self, other)
+        result = PianoRoll.supremum(self, other)
+        result.reduce(inplace=True)
+        return result
 
     @property
     def resolution(self):
@@ -395,8 +436,10 @@ class PianoRoll:
             time_extension = TimeExtension(-self.origin[1] * self.tatum,
                                            (self.array.shape[-1] - self.origin[1]) * self.tatum)
         else:
-            time_extension = TimeExtension(TimePoint(-self.origin[1] * self.tatum),
-                                           TimePoint((self.array.shape[-1] - self.origin[1]) * self.tatum))
+            time_extension = TimeExtension(TimePoint(-self.origin[1] * self.tatum,
+                                                     time_signature=self.time_signature),
+                                           TimePoint((self.array.shape[-1] - self.origin[1]) * self.tatum,
+                                                     time_signature=self.time_signature))
 
         if self.frequency_nature == 'shift':
             frequency_extension = FrequencyExtension(
@@ -531,7 +574,7 @@ class PianoRoll:
                          self.tatum, self.step, self.time_nature, self.frequency_nature)
 
     @staticmethod
-    def supremum(block_1, block_2):
+    def supremum(block_1: PianoRoll, block_2: PianoRoll):
         # Check types
         assert isinstance(block_1, PianoRoll) and isinstance(block_2, PianoRoll), 'Combine is made between blocks.'
         if block_1.time_nature is None:
