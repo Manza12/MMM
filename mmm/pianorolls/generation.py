@@ -7,10 +7,15 @@ from .dictionaries import roman_numeral_to_factors_dict
 
 # Time
 class Hit:
-    def __init__(self, start: Time, duration: TimeShift):
-        self.nature = start.nature
-        self.start = start
-        self.duration = duration
+    def __init__(self, start: str, duration: str, nature: str = 'shift'):
+        self.nature = nature
+
+        if nature == 'shift':
+            self.start = TimeShift(start)
+        elif nature == 'point':
+            self.start = TimePoint(start)
+
+        self.duration = TimeShift(duration)
 
     @property
     def end(self):
@@ -21,29 +26,8 @@ class Hit:
 
 
 class Rhythm(PianoRoll):
-    @multimethod
-    def __init__(self, array: np.ndarray, origin: int, tatum: TimeShift, nature: str = 'shift'):
-        assert len(array.shape) == 2, 'Array should be 2-dimensional.'
-        assert array.shape[0] == 1, 'Array should have only one row.'
-        assert array.dtype == np.uint8, 'Array should be of type uint8.'
-
-        hits = []
-        on = False
-        s: Optional[Time] = None
-        for i, value in enumerate(array[0]):
-            if value == 2:
-                s = (i - origin) * tatum
-                on = True
-            elif value == 0 and on:
-                e = (i - origin) * tatum
-                d: TimeShift = e - s
-                hits.append(Hit(s, d))
-
-        PianoRoll.__init__(self, array, (0, origin), tatum, time_nature=nature)
-
-    @multimethod
-    def __init__(self, hits: List[Hit]):
-        self.hits: Optional[List[Hit]] = hits
+    def __init__(self, *hits: Hit):
+        self.hits: Optional[List[Hit]] = list(hits)
 
         nature = nature_of_list([h.nature for h in hits])
 
@@ -87,7 +71,7 @@ class Rhythm(PianoRoll):
 
 
 class Texture(list):
-    def __init__(self, rhythms: List[Rhythm] = ()):
+    def __init__(self, *rhythms: Rhythm):
         self.nature = nature_of_list([r.nature for r in rhythms])
         super().__init__(rhythms)
 
@@ -124,17 +108,7 @@ class Texture(list):
 
 # Frequency
 class Chord(PianoRoll):
-    @classmethod
-    def from_degree(cls, degree: str, factors: List[Dict[str, str]]):
-        degree_dict = roman_numeral_to_factors_dict[degree]
-        note_numbers = []
-        for factor in factors:
-            note_numbers.append(degree_dict[factor['value']] + 12 * int(factor.get('octave', 0)))
-        return cls(note_numbers, 'shift')
-
-    @multimethod
-    def __init__(self, frequencies: List[Frequency]):
-        nature = nature_of_list([f.nature for f in frequencies])
+    def __init__(self, *frequencies: int, nature: str = 'shift'):
         self.frequencies = sorted(frequencies)
 
         # Creation of the PianoRoll
@@ -152,22 +126,13 @@ class Chord(PianoRoll):
 
             PianoRoll.__init__(self, array, (origin, 0), TimeShift(0, 1), FrequencyShift(1), 'shift', nature)
 
-    @multimethod
-    def __init__(self, frequencies: List[int], nature: str):
-        if nature == 'point':
-            self.__init__([FrequencyPoint(f) for f in frequencies])
-        elif nature == 'shift':
-            self.__init__([FrequencyShift(f) for f in frequencies])
-        else:
-            raise ValueError("Parameter 'nature' should be one of 'point' and 'shift'.")
-
-    @multimethod
-    def __init__(self, frequencies: Set[int], nature: str):
-        self.__init__(list(frequencies), nature)
-
-    @multimethod
-    def __init__(self, array: np.ndarray, origin: int, nature: str):
-        self.__init__(list(np.nonzero(array)[0] - origin), nature)
+    @classmethod
+    def from_degree(cls, degree: str, factors: List[Dict[str, str]]):
+        degree_dict = roman_numeral_to_factors_dict[degree]
+        note_numbers = []
+        for factor in factors:
+            note_numbers.append(degree_dict[factor['value']] + 12 * int(factor.get('octave', 0)))
+        return cls(*note_numbers, nature='shift')
 
     @property
     def nature(self):
@@ -189,11 +154,11 @@ class Chord(PianoRoll):
     def supremum(self, chord: Chord):
         assert isinstance(chord, Chord), 'Supremum should be done between two Chords.'
         assert self.nature == chord.nature, 'Supremum should be done between two Chords of the same nature.'
-        return Chord(set(self.frequencies).union(chord.frequencies), self.nature)
+        return Chord(*set(self.frequencies).union(chord.frequencies), self.nature)
 
 
 class Harmony(List):
-    def __init__(self, chords: List[Chord] = ()):
+    def __init__(self, *chords: Chord):
         self.nature = nature_of_list([c.nature for c in chords])
         super().__init__(chords)
 
@@ -287,7 +252,7 @@ class HarmonicTexture(PianoRoll):
 class ChordTexture(HarmonicTexture):
     def __init__(self, texture: Texture, chord: Chord):
         self.chord = chord
-        harmony = Harmony([Chord([c]) for c in chord.frequencies])
+        harmony = Harmony(*[Chord(c) for c in chord.frequencies])
         HarmonicTexture.__init__(self, texture, harmony)
 
 
