@@ -1,7 +1,6 @@
 from .. import *
 
 import scipy.io.wavfile as wav
-import numpy as np
 import numbers
 import warnings
 import torch
@@ -19,9 +18,6 @@ import nnMorpho.binary_operators as binary
 import scipy.ndimage as image
 import scipy.signal as sig
 import scipy.fft as fft
-
-
-from typing import Union, List, Optional, Tuple
 
 _ = [wav, np, numbers, warnings, torch, stft, cqt, pickle, plt, tick, mpl, wid, func, win, greyscale, image,
      sig, fft, binary]
