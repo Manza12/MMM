@@ -1,5 +1,4 @@
 from .. import *
-
 import scipy.io.wavfile as wav
 import numbers
 import warnings
@@ -7,10 +6,6 @@ import torch
 import pickle
 import nnAudio.features.stft as stft
 import nnAudio.features.cqt as cqt
-import matplotlib.pyplot as plt
-import matplotlib.ticker as tick
-import matplotlib as mpl
-import matplotlib.widgets as wid
 import torch.nn.functional as func
 import scipy.signal.windows as win
 import nnMorpho.greyscale_operators as greyscale

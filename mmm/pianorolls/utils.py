@@ -34,16 +34,26 @@ def gcd(*list_numbers):
     return result
 
 
+def round_half_up(n, decimals=0):
+    multiplier = 10 ** decimals
+    return math.floor(n*multiplier + 0.5) / multiplier
+
+
+def round_half_down(n, decimals=0):
+    multiplier = 10 ** decimals
+    return math.ceil(n*multiplier - 0.5) / multiplier
+
+
 def midi_number_to_pitch(number: Optional[int], language: str = 'english') -> Optional[str]:
     if number is None:
         return None
-    chroma = number_to_chroma(number % 12, language=language)
+    chroma = midi_number_to_chroma(number % 12, language=language)
     octave = number // 12 - 1
 
     return chroma + str(octave)
 
 
-def number_to_chroma(number: int, language: str = 'english') -> str:
+def midi_number_to_chroma(number: int, language: str = 'english') -> str:
     if number is None:
         return 'Rest'
 
@@ -57,6 +67,15 @@ def number_to_chroma(number: int, language: str = 'english') -> str:
         raise ValueError("Variable language should be one of\n- spanish\n- french\n- english")
 
 
+def midi_numbers_to_pitches(midi_numbers):
+    pitches_vector = []
+
+    for midi_number in midi_numbers:
+        pitches_vector.append(midi_number_to_pitch(midi_number))
+
+    return pitches_vector
+
+
 def midi_numbers_to_chromas(midi_numbers):
     chromas_vector = []
 
@@ -64,7 +83,7 @@ def midi_numbers_to_chromas(midi_numbers):
         if midi_number is None:
             chromas_vector.append(None)
         else:
-            chromas_vector.append(number_to_chroma(midi_number % 12))
+            chromas_vector.append(midi_number_to_chroma(midi_number % 12))
 
     return chromas_vector
 

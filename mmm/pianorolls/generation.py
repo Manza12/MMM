@@ -75,7 +75,7 @@ class Texture(list):
         self.nature = nature_of_list([r.nature for r in rhythms])
         super().__init__(rhythms)
 
-    def __mul__(self, other):
+    def __mul__(self, other) -> PianoRoll:
         if isinstance(other, Harmony):
             return HarmonicTexture(self, other)
         elif isinstance(other, Chord):

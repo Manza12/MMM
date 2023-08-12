@@ -589,7 +589,7 @@ class PianoRoll:
                        (extension.time.end - extension_2.time.end) // new_tatum))
         array_2 = np.pad(new_block_2.array, pad_width_2)
 
-        # Create new block
+        # Create new piano_roll
         new_origin = (-(extension.frequency.lower // new_step), -(extension.time.start // new_tatum))
         new_array = np.maximum(array_1, array_2)
 
