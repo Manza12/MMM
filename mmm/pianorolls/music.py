@@ -1,48 +1,174 @@
 from __future__ import annotations
 
 from . import *
-from abc import ABC
 from .utils import midi_number_to_pitch, midi_numbers_to_chromas, gcd
 
 
-# Time
-class Time(frac, ABC):
+class Time:
     nature: Optional[str] = None
 
-    def __init__(self, *args):
+    @multimethod
+    def __init__(self, value: frac):
         if type(self) == Time:
             raise ValueError('Time is an abstract class.')
+        else:
+            self.value = value
+
+    @multimethod
+    def __init__(self, value: int):
+        if type(self) == Time:
+            raise ValueError('Time is an abstract class.')
+        else:
+            self.__init__(frac(value))
+
+    @multimethod
+    def __init__(self, value: str):
+        if type(self) == Time:
+            raise ValueError('Time is an abstract class.')
+        else:
+            self.__init__(frac(value))
+
+    @multimethod
+    def __init__(self, numerator: int, denominator: int):
+        if type(self) == Time:
+            raise ValueError('Time is an abstract class.')
+        else:
+            self.__init__(frac(numerator, denominator))
+
+    @property
+    def numerator(self):
+        return self.value.numerator
+
+    @property
+    def denominator(self):
+        return self.value.denominator
+
+    def __eq__(self, other):
+        raise NotImplementedError
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __neg__(self) -> Time:
+        raise NotImplementedError
+
+    def __add__(self, other) -> Time:
+        raise NotImplementedError
+
+    def __sub__(self, other) -> Time:
+        raise NotImplementedError
+
+    def __mul__(self, other):
+        raise NotImplementedError
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+    def __lt__(self, other):
+        raise NotImplementedError
+
+    def __le__(self, other):
+        raise NotImplementedError
+
+    def __gt__(self, other):
+        raise NotImplementedError
+
+    def __ge__(self, other):
+        raise NotImplementedError
+
+    def __truediv__(self, other):
+        raise NotImplementedError
+
+    def __floordiv__(self, other):
+        raise NotImplementedError
+
+    @staticmethod
+    def zero():
+        raise NotImplementedError
 
 
-class TimeShift(Time, ABC):
+class TimeShift(Time):
     nature = 'shift'
 
-    def __new__(cls, *args, **kwargs):
-        return Time.__new__(cls, *args, **kwargs)
+    def __init__(self, *args):
+        super().__init__(*args)
 
     def __eq__(self, other):
         if isinstance(other, TimeShift):
-            return super().__eq__(other)
+            return self.value == other.value
         else:
             return False
+
+    def __neg__(self):
+        return TimeShift(-self.value)
 
     def __add__(self, other):
         assert isinstance(other, TimeShift) or isinstance(other, TimePoint)
         if isinstance(other, TimeShift):
-            return TimeShift(Time.__add__(self, other))
+            return TimeShift(self.value + other.value)
         else:
-            return TimePoint(Time.__add__(self, other))
+            return TimePoint(self.value + other.value)
 
     def __sub__(self, other):
         assert isinstance(other, TimeShift)
-        return TimeShift(Time.__sub__(self, other))
+        return TimeShift(self.value - other.value)
 
     def __mul__(self, other):
         assert isinstance(other, int)
-        return TimeShift(Time.__mul__(self, other))
+        return TimeShift(self.value * other)
 
     def __rmul__(self, other):
         return self * other
+
+    def __truediv__(self, other):
+        assert isinstance(other, TimeShift) or isinstance(other, int)
+        if isinstance(other, TimeShift):
+            return self.value / other.value
+        else:
+            return TimeShift(self.value / other)
+
+    def __floordiv__(self, other):
+        assert isinstance(other, TimeShift) or isinstance(other, int)
+        if isinstance(other, TimeShift):
+            return self.value // other.value
+        else:
+            return TimeShift(self.value // other)
+
+    def __lt__(self, other):
+        assert isinstance(other, TimeShift), 'TimeShift is only comparable with TimeShift.'
+        return self.value < other.value
+
+    def __le__(self, other):
+        assert isinstance(other, TimeShift), 'TimeShift is only comparable with TimeShift.'
+        return self.value <= other.value
+
+    def __gt__(self, other):
+        assert isinstance(other, TimeShift), 'TimeShift is only comparable with TimeShift.'
+        return self.value > other.value
+
+    def __ge__(self, other):
+        assert isinstance(other, TimeShift), 'TimeShift is only comparable with TimeShift.'
+        return self.value >= other.value
+
+    def __str__(self):
+        return str(self.value)
+
+    @staticmethod
+    def zero():
+        return TimeShift(0)
+
+    def gcd(self, *others):
+        if len(others) == 0:
+            return self
+        if len(others) == 1:
+            assert isinstance(others[0], TimeShift)
+            return TimeShift(gcd(self.value, others[0].value))
+
+        result = self
+        for other in others:
+            assert isinstance(other, TimeShift), 'TimeShift.gcd() only accepts TimeShifts as arguments.'
+            result = result.gcd(other)
+        return result
 
 
 class TimeSignature:
@@ -55,51 +181,60 @@ class TimeSignature:
         return str(self.numerator) + '/' + str(self.denominator)
 
 
-class TimePoint(Time, ABC):
+class TimePoint(Time):
     nature = 'point'
 
-    def __new__(cls, *args, **kwargs):
-        if len(args) == 1:
-            return Time.__new__(cls, *args)
-        elif len(args) == 2:
-            return Time.__new__(cls, '%s/%s' % args)
-        elif len(args) in [3, 4]:
-            measure, beat, offset = args[:3]
-            if len(args) == 4:
-                time_signature = TimeSignature(*args[3])
-            else:
-                time_signature = TimeSignature(*kwargs['time_signature'])
-            value = (measure - 1) * time_signature.duration
-            value += (beat - 1) * TimeShift(1, time_signature.denominator)
-            value += TimeShift(offset)
-            return Time.__new__(cls, value)
-
     @multimethod
-    def __init__(self, value: Union[int, frac, float, str, Time], time_signature: TimeSignature = TimeSignature(4, 4)):
-        super().__init__(frac(value))
-        self.time_signature = time_signature
-
-    @multimethod
-    def __init__(self, numerator: int, denominator: int, time_signature: TimeSignature = TimeSignature(4, 4)):
-        super().__init__(frac(numerator, denominator))
-        self.time_signature = time_signature
-
-    @multimethod
-    def __init__(self, measure: int, beat: int, offset: Union[str, int], time_signature: Tuple[int, int] = (4, 4)):
-        offset = TimeShift(offset)
-        time_signature = TimeSignature(*time_signature)
-        value = measure * time_signature.duration + (beat - 1) * TimeShift(1, time_signature.denominator) + offset
+    def __init__(self, value: frac, time_signature: Union[Tuple[int, int], TimeSignature] = (4, 4)):
         super().__init__(value)
-        self.time_signature = time_signature
+        if isinstance(time_signature, TimeSignature):
+            self.time_signature = time_signature
+        else:
+            self.time_signature = TimeSignature(*time_signature)
+
+    @multimethod
+    def __init__(self, value: int, time_signature: Union[Tuple[int, int], TimeSignature] = (4, 4)):
+        super().__init__(value)
+        if isinstance(time_signature, TimeSignature):
+            self.time_signature = time_signature
+        else:
+            self.time_signature = TimeSignature(*time_signature)
+
+    @multimethod
+    def __init__(self, value: str, time_signature: Union[Tuple[int, int], TimeSignature] = (4, 4)):
+        super().__init__(value)
+        if isinstance(time_signature, TimeSignature):
+            self.time_signature = time_signature
+        else:
+            self.time_signature = TimeSignature(*time_signature)
+
+    @multimethod
+    def __init__(self, numerator: int, denominator: int,
+                 time_signature: Union[Tuple[int, int], TimeSignature] = (4, 4)):
+        super().__init__(numerator, denominator)
+        if isinstance(time_signature, TimeSignature):
+            self.time_signature = time_signature
+        else:
+            self.time_signature = TimeSignature(*time_signature)
+
+    @multimethod
+    def __init__(self, measure: int, beat: int, offset: Union[str, int],
+                 time_signature: Union[Tuple[int, int], TimeSignature] = (4, 4)):
+        self.time_signature = TimeSignature(*time_signature)
+        measure_duration = self.time_signature.duration
+        beat_duration = TimeShift(1, self.time_signature.denominator)
+        offset = TimeShift(offset)
+        time_point = (measure - 1) * measure_duration + (beat - 1) * beat_duration + offset
+        super().__init__(time_point.value)
 
     @property
     def measure(self):
-        return self // self.time_signature.duration + 1
+        return self.value // self.time_signature.duration.value + 1
 
     @property
     def beat(self):
-        remaining = self - (self.measure - 1) * self.time_signature.duration
-        return remaining // TimeShift(frac(1, self.time_signature.denominator)) + 1
+        remaining = self.value - (self.measure - 1) * self.time_signature.duration.value
+        return remaining // TimeShift(frac(1, self.time_signature.denominator)).value + 1
 
     @property
     def offset(self):
@@ -108,24 +243,58 @@ class TimePoint(Time, ABC):
 
     def __eq__(self, other):
         if isinstance(other, TimePoint):
-            return super().__eq__(other)
+            return self.value == other.value
         else:
             return False
 
+    def __neg__(self):
+        raise ValueError('TimePoint cannot be negated.')
+
     def __add__(self, other: TimeShift):
         assert isinstance(other, TimeShift), 'TimePoint can only be added with TimeShift.'
-        return TimePoint(super().__add__(other), time_signature=self.time_signature)
+        return TimePoint(self.value + other.value, time_signature=self.time_signature)
 
     def __sub__(self, other):
         assert isinstance(other, TimePoint) or isinstance(other, TimeShift), \
             "Substraction is made between TimePoint and TimePoint or TimePoint and TimeShift"
         if isinstance(other, TimePoint):
-            return TimeShift(super().__sub__(other))
+            return TimeShift(self.value - other.value)
         else:
-            return TimePoint(super().__sub__(other), time_signature=self.time_signature)
+            return TimePoint(self.value - other.value, time_signature=self.time_signature)
 
-    def __str__(self, time_signature: TimeShift = TimeShift(4, 4)):
+    def __mul__(self, other):
+        raise ValueError('TimePoint cannot be multiplied.')
+
+    def __truediv__(self, other):
+        assert isinstance(other, TimeShift), 'TimePoint can only be divided by TimeShift.'
+        return self.value / other.value
+
+    def __floordiv__(self, other):
+        assert isinstance(other, TimeShift), 'TimePoint can only be floordivided by TimeShift.'
+        return self.value // other.value
+
+    def __lt__(self, other):
+        assert isinstance(other, TimePoint), 'TimePoint is only comparable with TimePoint.'
+        return self.value < other.value
+
+    def __le__(self, other):
+        assert isinstance(other, TimePoint), 'TimePoint is only comparable with TimePoint.'
+        return self.value <= other.value
+
+    def __gt__(self, other):
+        assert isinstance(other, TimePoint), 'TimePoint is only comparable with TimePoint.'
+        return self.value > other.value
+
+    def __ge__(self, other):
+        assert isinstance(other, TimePoint), 'TimePoint is only comparable with TimePoint.'
+        return self.value >= other.value
+
+    def __str__(self):
         return '(%s, %s, %s)' % (self.measure, self.beat, self.offset)
+
+    @staticmethod
+    def zero(time_signature=(4, 4)):
+        return TimePoint(0, time_signature=time_signature)
 
 
 class TimeExtension:
@@ -136,7 +305,7 @@ class TimeExtension:
         self.end = end
 
     @property
-    def duration(self):
+    def duration(self) -> TimeShift:
         result = self.end - self.start
         if isinstance(result, TimeShift):
             return result
@@ -152,83 +321,194 @@ class TimeExtension:
         return self.duration == other.duration
 
     def __str__(self):
-        return '%s - %s (%s)' % (self.start, self.end, frac(self.duration))
+        return '%s - %s (%s)' % (self.start, self.end, self.duration.value)
 
 
 # Frequency
-class Frequency(int):
+class Frequency:
     nature: Optional[str] = None
 
-    def __init__(self, _):
+    def __init__(self, value):
         if type(self) == Frequency:
             raise ValueError('Time is an abstract class.')
+        else:
+            self.value = value
+
+    def __eq__(self, other):
+        raise NotImplementedError
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __neg__(self) -> Frequency:
+        raise NotImplementedError
+
+    def __add__(self, other) -> Frequency:
+        raise NotImplementedError
+
+    def __sub__(self, other) -> Frequency:
+        raise NotImplementedError
+
+    def __mul__(self, other):
+        raise NotImplementedError
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+    def __truediv__(self, other):
+        raise NotImplementedError
+
+    def __floordiv__(self, other):
+        raise NotImplementedError
+
+    def __lt__(self, other):
+        raise NotImplementedError
+
+    def __gt__(self, other):
+        raise NotImplementedError
+
+    def __le__(self, other):
+        raise NotImplementedError
+
+    def __ge__(self, other):
+        raise NotImplementedError
+
+    @staticmethod
+    def zero():
+        raise NotImplementedError
 
 
 class FrequencyShift(Frequency):
     nature = 'shift'
-
-    def __new__(cls, *args, **kwargs):
-        return Frequency.__new__(cls, *args, **kwargs)
 
     def __init__(self, shift: int):
         super().__init__(shift)
 
     def __eq__(self, other):
         if isinstance(other, FrequencyShift):
-            return super().__eq__(other)
+            return self.value == other.value
         else:
             return False
+
+    def __neg__(self):
+        return FrequencyShift(-self.value)
 
     def __add__(self, other):
         assert isinstance(other, FrequencyShift) or isinstance(other, FrequencyPoint)
         if isinstance(other, FrequencyShift):
-            return FrequencyShift(super().__add__(other))
+            return FrequencyShift(self.value + other.value)
         else:
-            return FrequencyPoint(super().__add__(other))
+            return FrequencyPoint(self.value + other.value)
 
     def __mul__(self, other):
-        return FrequencyShift(int(self) * other)
+        return FrequencyShift(self.value * other)
 
     def __rmul__(self, other):
         return FrequencyShift.__mul__(self, other)
 
+    def __truediv__(self, other):
+        assert isinstance(other, FrequencyShift) or isinstance(other, int)
+        if isinstance(other, FrequencyShift):
+            return self.value / other.value
+        else:
+            return FrequencyShift(self.value / other)
+
+    def __floordiv__(self, other):
+        assert isinstance(other, FrequencyShift) or isinstance(other, int)
+        if isinstance(other, FrequencyShift):
+            return self.value // other.value
+        else:
+            return FrequencyShift(self.value // other)
+
     def __sub__(self, other):
         assert isinstance(other, FrequencyShift)
-        return FrequencyShift(super().__sub__(other))
+        return FrequencyShift(self.value - other.value)
+
+    def __lt__(self, other):
+        assert isinstance(other, FrequencyShift), 'FrequencyShift is only comparable with FrequencyShift.'
+        return self.value < other.value
+
+    def __le__(self, other):
+        assert isinstance(other, FrequencyShift), 'FrequencyShift is only comparable with FrequencyShift.'
+        return self.value <= other.value
+
+    def __gt__(self, other):
+        assert isinstance(other, FrequencyShift), 'FrequencyShift is only comparable with FrequencyShift.'
+        return self.value > other.value
+
+    def __ge__(self, other):
+        assert isinstance(other, FrequencyShift), 'FrequencyShift is only comparable with FrequencyShift.'
+        return self.value >= other.value
+
+    def __str__(self):
+        return '%s' % self.value
 
     def __hash__(self):
-        return hash((int(self), self.nature))
+        return hash((self.value, self.nature))
+
+    @staticmethod
+    def zero():
+        return FrequencyShift(0)
 
 
 class FrequencyPoint(Frequency):
     nature = 'point'
-
-    def __new__(cls, *args, **kwargs):
-        return Frequency.__new__(cls, *args, **kwargs)
 
     def __init__(self, midi_number: int):
         super().__init__(midi_number)
 
     def __eq__(self, other):
         if isinstance(other, FrequencyPoint):
-            return super().__eq__(other)
+            return self.value == other.value
         else:
             return False
 
+    def __neg__(self):
+        raise ValueError('FrequencyPoint cannot be negated.')
+
     def __add__(self, other: FrequencyShift):
         assert isinstance(other, FrequencyShift), 'FrequencyPoint can only be added with FrequencyShift.'
-        return FrequencyPoint(super().__add__(other))
+        return FrequencyPoint(self.value + other.value)
 
     def __sub__(self, other):
         assert isinstance(self, FrequencyPoint) or isinstance(self, FrequencyShift), \
             "Subtraction is made between FrequencyPoint and FrequencyPoint or FrequencyPoint and FrequencyShift"
         if isinstance(self, FrequencyPoint):
-            return FrequencyShift(super().__sub__(other))
+            return FrequencyShift(self.value - other.value)
         else:
-            return FrequencyPoint(super().__sub__(other))
+            return FrequencyPoint(self.value - other.value)
+
+    def __mul__(self, other):
+        raise ValueError('FrequencyPoint cannot be multiplied.')
+
+    def __truediv__(self, other):
+        raise ValueError('FrequencyPoint cannot be truedivided.')
+
+    def __floordiv__(self, other):
+        raise ValueError('FrequencyPoint cannot be floordivided.')
+
+    def __lt__(self, other):
+        assert isinstance(other, FrequencyPoint), 'FrequencyPoint is only comparable with FrequencyPoint.'
+        return self.value < other.value
+
+    def __le__(self, other):
+        assert isinstance(other, FrequencyPoint), 'FrequencyPoint is only comparable with FrequencyPoint.'
+        return self.value <= other.value
+
+    def __gt__(self, other):
+        assert isinstance(other, FrequencyPoint), 'FrequencyPoint is only comparable with FrequencyPoint.'
+        return self.value > other.value
+
+    def __ge__(self, other):
+        assert isinstance(other, FrequencyPoint), 'FrequencyPoint is only comparable with FrequencyPoint.'
+        return self.value >= other.value
 
     def __str__(self):
-        return midi_number_to_pitch(self)
+        return midi_number_to_pitch(self.value)
+
+    @staticmethod
+    def zero():
+        return FrequencyPoint(0)
 
 
 class FrequencyExtension:
@@ -239,7 +519,7 @@ class FrequencyExtension:
         self.higher = higher
 
     @property
-    def range(self):
+    def range(self) -> FrequencyShift:
         result = self.higher - self.lower
         if isinstance(result, FrequencyShift):
             return result
@@ -255,51 +535,51 @@ class FrequencyExtension:
         return self.range == other.range
 
     def __str__(self):
-        return '%s - %s (%d)' % (self.lower, self.higher, self.range)
+        return '%s - %s (%s)' % (self.lower, self.higher, self.range)
 
 
 # Time-Frequency
 class TimeFrequency:
-    @multimethod
+    # @multimethod
     def __init__(self, time: Time, frequency: Frequency):
         self.time = time
         self.frequency = frequency
 
-    @multimethod
-    def __init__(self, time: Time, frequency: int, frequency_nature: str = 'shift'):
-        self.__init__([time.numerator, time.denominator], frequency, time.nature, frequency_nature)
-
-    @multimethod
-    def __init__(self, time: str, frequency: Frequency, time_nature: str = 'shift'):
-        self.__init__('%s/%s' % time, frequency, time_nature, frequency.nature)
-
-    @multimethod
-    def __init__(self, time: Tuple[int, int], frequency: Frequency, time_nature: str = 'shift'):
-        self.__init__(time, frequency, time_nature, frequency.nature)
-
-    @multimethod
-    def __init__(self, time: str, frequency: int,
-                 time_nature: str = 'shift', frequency_nature: str = 'shift'):
-        # Time
-        if time_nature == 'shift':
-            self.time = TimeShift(time)
-        elif time_nature == 'point':
-            self.time = TimePoint(time)
-        else:
-            raise ValueError("Parameter 'time_nature' should be one of 'shift' and 'point'.")
-
-        # Frequency
-        if frequency_nature == 'shift':
-            self.frequency = FrequencyShift(frequency)
-        elif frequency_nature == 'point':
-            self.frequency = FrequencyPoint(frequency)
-        else:
-            raise ValueError("Parameter 'frequency_nature' should be one of 'shift' and 'point'.")
-
-    @multimethod
-    def __init__(self, time: Tuple[int, int], frequency: int,
-                 time_nature: str = 'shift', frequency_nature: str = 'shift'):
-        self.__init__('%s/%s' % time, frequency, time_nature, frequency_nature)
+    # @multimethod
+    # def __init__(self, time: Time, frequency: int, frequency_nature: str = 'shift'):
+    #     self.__init__([time.numerator, time.denominator], frequency, time.nature, frequency_nature)
+    #
+    # @multimethod
+    # def __init__(self, time: str, frequency: Frequency, time_nature: str = 'shift'):
+    #     self.__init__('%s/%s' % time, frequency, time_nature, frequency.nature)
+    #
+    # @multimethod
+    # def __init__(self, time: Tuple[int, int], frequency: Frequency, time_nature: str = 'shift'):
+    #     self.__init__(time, frequency, time_nature, frequency.nature)
+    #
+    # @multimethod
+    # def __init__(self, time: str, frequency: int,
+    #              time_nature: str = 'shift', frequency_nature: str = 'shift'):
+    #     # Time
+    #     if time_nature == 'shift':
+    #         self.time = TimeShift(time)
+    #     elif time_nature == 'point':
+    #         self.time = TimePoint(time)
+    #     else:
+    #         raise ValueError("Parameter 'time_nature' should be one of 'shift' and 'point'.")
+    #
+    #     # Frequency
+    #     if frequency_nature == 'shift':
+    #         self.frequency = FrequencyShift(frequency)
+    #     elif frequency_nature == 'point':
+    #         self.frequency = FrequencyPoint(frequency)
+    #     else:
+    #         raise ValueError("Parameter 'frequency_nature' should be one of 'shift' and 'point'.")
+    #
+    # @multimethod
+    # def __init__(self, time: Tuple[int, int], frequency: int,
+    #              time_nature: str = 'shift', frequency_nature: str = 'shift'):
+    #     self.__init__('%s/%s' % time, frequency, time_nature, frequency_nature)
 
     def __eq__(self, other):
         if isinstance(other, TimeFrequency):
@@ -311,9 +591,9 @@ class TimeFrequency:
         assert isinstance(other, TimeFrequency)
         return TimeFrequency(self.time + other.time, self.frequency + other.frequency)
 
-    @classmethod
-    def zero(cls):
-        return cls('0', 0)
+    # @classmethod
+    # def zero(cls):
+    #     return cls('0', 0)
 
     def __str__(self):
         return '(%s, %s)' % (self.time, self.frequency)
@@ -435,20 +715,23 @@ class PianoRoll:
         if self.time_nature == 'shift':
             time_extension = TimeExtension(-self.origin[1] * self.tatum,
                                            (self.array.shape[-1] - self.origin[1]) * self.tatum)
+        elif self.time_nature == 'point':
+            zero = TimePoint(0, time_signature=self.time_signature)
+            time_extension = TimeExtension(zero - self.origin[1] * self.tatum,
+                                           zero + (self.array.shape[-1] - self.origin[1]) * self.tatum)
         else:
-            time_extension = TimeExtension(TimePoint(-self.origin[1] * self.tatum,
-                                                     time_signature=self.time_signature),
-                                           TimePoint((self.array.shape[-1] - self.origin[1]) * self.tatum,
-                                                     time_signature=self.time_signature))
+            raise ValueError('Time nature must be either "shift" or "point"')
 
         if self.frequency_nature == 'shift':
             frequency_extension = FrequencyExtension(
-                FrequencyShift(-self.origin[0] * self.step),
-                FrequencyShift((self.array.shape[-2] - self.origin[0] - 1) * self.step))
+                -self.origin[0] * self.step,
+                (self.array.shape[-2] - self.origin[0] - 1) * self.step
+            )
         else:
             frequency_extension = FrequencyExtension(
-                FrequencyPoint(-self.origin[0] * self.step),
-                FrequencyPoint((self.array.shape[-2] - self.origin[0] - 1) * self.step))
+                FrequencyPoint(0) - self.origin[0] * self.step,
+                FrequencyPoint(0) + (self.array.shape[-2] - self.origin[0] - 1) * self.step
+            )
 
         return Extension(time_extension, frequency_extension)
 
@@ -601,7 +884,7 @@ class PianoRoll:
                              time_nature=time_nature, frequency_nature=frequency_nature)
 
         # Tatum
-        new_tatum = TimeShift(gcd(block_1.tatum, block_2.tatum))
+        new_tatum = block_1.tatum.gcd(block_2.tatum)
         new_block_1 = block_1.change_tatum(new_tatum)
         new_block_2 = block_2.change_tatum(new_tatum)
 
@@ -633,7 +916,8 @@ class PianoRoll:
         array_2 = np.pad(new_block_2.array, pad_width_2)
 
         # Create new piano_roll
-        new_origin = (-(extension.frequency.lower // new_step), -(extension.time.start // new_tatum))
+        zero = type(block_1.time_vector[0]).zero()
+        new_origin = (-(extension.frequency.lower // new_step), -((extension.time.start - zero) // new_tatum))
         new_array = np.maximum(array_1, array_2)
 
         return PianoRoll(new_array, new_origin, new_tatum, new_step, time_nature, frequency_nature)

@@ -1,7 +1,6 @@
 from . import *
-from .utils import gcd
 
-from .music import PianoRoll, TimeFrequency, TimeShift, FrequencyShift
+from .music import PianoRoll, TimeFrequency, FrequencyShift
 from .generation import Activations
 
 
@@ -9,8 +8,10 @@ def dilate_sparse(activation_table, block):
     activation_table: Activations
     block: PianoRoll
 
+    step = activation_table.step
+
     # Change tatum
-    tatum = TimeShift(gcd(activation_table.tatum, block.tatum))
+    tatum = activation_table.tatum.gcd(block.tatum)
     ratio = int(activation_table.tatum / tatum)
     new_shape = (activation_table.array.shape[0], activation_table.array.shape[1] * (activation_table.tatum // tatum))
     array = np.zeros(new_shape, dtype=block.array.dtype)
@@ -24,7 +25,7 @@ def dilate_sparse(activation_table, block):
     for tf in activation_table:
         tf: TimeFrequency
 
-        f_0 = int(tf.frequency - activation_table.extension.frequency.lower)
+        f_0 = (tf.frequency - activation_table.extension.frequency.lower) // step
         f_1 = f_0 + str_el.shape[0]
 
         t_0 = (tf.time - activation_table.extension.time.start) // tatum

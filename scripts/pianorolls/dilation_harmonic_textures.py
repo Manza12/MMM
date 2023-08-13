@@ -45,6 +45,9 @@ b_4 = a_7_2_prime
 b_5 = d_m_1
 b_6 = a_m_1
 
+# t = TimePoint(1, 1, 0, time_signature=(3, 8))
+# f = FrequencyShift(0)
+# tf = TimeFrequency(t, f)
 a_1 = Activations(
     TimeFrequency(TimePoint(1, 1, 0, time_signature=(3, 8)), FrequencyShift(0)),
     TimeFrequency(TimePoint(2, 1, 0, time_signature=(3, 8)), FrequencyShift(0)),

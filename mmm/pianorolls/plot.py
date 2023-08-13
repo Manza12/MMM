@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 from . import *
-from .music import Time, TimePoint, TimeShift
+from .music import Time, TimePoint, TimeShift, FrequencyShift
 from .generation import PianoRoll, ChromaRoll
 from .utils import midi_numbers_to_chromas, midi_numbers_to_pitches, round_half_up
 
@@ -184,8 +184,9 @@ def plot_piano_roll(piano_roll: PianoRoll, note_names: bool = True, time_shift: 
         time_vector += time_shift
 
     if freq_vector is None:
-        freq_vector = np.arange(int(piano_roll.extension.frequency.lower),
-                                int(piano_roll.extension.frequency.higher) + 1, 1)
+        freq_vector = np.arange(piano_roll.extension.frequency.lower.value,
+                                (piano_roll.extension.frequency.higher + FrequencyShift(1)).value,
+                                piano_roll.step.value)
         if note_names:
             if isinstance(piano_roll, ChromaRoll) or note_names == 'chroma':
                 freq_vector = midi_numbers_to_chromas(freq_vector)
@@ -222,9 +223,11 @@ def plot_piano_roll(piano_roll: PianoRoll, note_names: bool = True, time_shift: 
     if x_tick_step is not None:
         if x_tick_start is None:
             x_tick_start = TimePoint(0, 1)
-        plt.xticks(np.arange((x_tick_start - piano_roll.extension.time.start) / piano_roll.tatum,
-                             (piano_roll.extension.time.end / piano_roll.tatum) + 1,
-                             x_tick_step / piano_roll.tatum) - 0.5)
+        ticks = np.arange((x_tick_start - piano_roll.extension.time.start) / piano_roll.tatum,
+                          (piano_roll.extension.time.end / piano_roll.tatum) + 1,
+                          x_tick_step / piano_roll.tatum)
+        ticks -= 0.5
+        plt.xticks(ticks)
     else:
         # Update the ticks
         x_ticks = plt.xticks()[0]

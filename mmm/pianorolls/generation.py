@@ -1,5 +1,4 @@
 from __future__ import annotations
-from . import *
 from .music import *
 from .utils import gcd, nature_of_sum, nature_of_list
 from .dictionaries import roman_numeral_to_factors_dict
@@ -34,7 +33,7 @@ class Rhythm(PianoRoll):
         # Tatum
         tatum = TimeShift(0, 1)
         for hit in hits:
-            tatum = TimeShift(gcd(tatum, hit.start, hit.duration))
+            tatum = tatum.gcd(hit.start, hit.duration)
 
         # Array size
         if len(hits) > 0:
@@ -188,12 +187,22 @@ class Activations(PianoRoll, list):
         time_nature = nature_of_list([a.time.nature for a in activations])
 
         # Time
-        value = gcd(*[a.time for a in activations])
-        tatum = TimeShift(value) if value != 0 else TimeShift('1')
+        if time_nature == 'shift':
+            zero = TimeShift(0)
+        elif time_nature == 'point':
+            zero = TimePoint(0)
+        else:
+            raise AssertionError('Time nature should be either shift or point.')
+        tatum = TimeShift.gcd(*[(a.time - zero) for a in activations])
+        if tatum == zero:
+            tatum = TimeShift(1)
+
         earlier_activation = min([a.time for a in activations])
-        earlier_index = earlier_activation // tatum
+        earlier_index = (earlier_activation - zero) // tatum
+
         later_activation = max([a.time for a in activations])
-        later_index = later_activation // tatum
+        later_index = (later_activation - zero) // tatum
+
         duration = later_index - earlier_index
         origin_time = -earlier_index
 
@@ -202,14 +211,15 @@ class Activations(PianoRoll, list):
         lower_frequency = min([a.frequency for a in activations])
         higher_frequency = max([a.frequency for a in activations])
         ambitus = higher_frequency - lower_frequency
-        origin_frequency = -lower_frequency
+        lower_index = lower_frequency // step
+        origin_frequency = -lower_index
 
         # Time-Frequency
         origin = (origin_frequency, origin_time)
-        array = np.zeros((int(ambitus) + 1, duration + 1), dtype=bool)
+        array = np.zeros((ambitus // step + 1, duration + 1), dtype=bool)
         for a in activations:
-            idx_t = a.time // tatum - earlier_index
-            idx_f = a.frequency // step - lower_frequency
+            idx_t = (a.time - zero) // tatum - earlier_index
+            idx_f = a.frequency // step - lower_index
             array[idx_f, idx_t] = True
 
         # PianoRoll

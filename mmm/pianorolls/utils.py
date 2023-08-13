@@ -29,8 +29,11 @@ def gcd(*list_numbers):
             number_numerator = number.numerator * common_denominator // number.denominator
             result_numerator = result.numerator * common_denominator // result.denominator
             result = frac(math.gcd(result_numerator, number_numerator), common_denominator)
-        else:
+        elif isinstance(number, int):
+            assert isinstance(result, int), 'Cannot combine integers with other types'
             result = math.gcd(result, number)
+        else:
+            raise ValueError('Invalid type')
     return result
 
 
