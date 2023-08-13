@@ -2,39 +2,24 @@ from __future__ import annotations
 
 from . import *
 from .dictionaries import roman_numeral_to_factors_dict
-from .utils import midi_number_to_pitch, midi_numbers_to_chromas, gcd, nature_of_list
+from .utils import midi_number_to_pitch, midi_numbers_to_chromas, gcd
+
+
+class WrongNature(Exception):
+    def __init__(self, msg: str = 'Wrong nature'):
+        super().__init__(msg)
 
 
 class Time:
-    nature: Optional[str] = None
-
-    @multimethod
     def __init__(self, value: frac):
         if type(self) == Time:
-            raise ValueError('Time is an abstract class.')
+            raise TypeError('Time is an abstract class.')
         else:
             self.value = value
 
-    @multimethod
-    def __init__(self, value: int):
-        if type(self) == Time:
-            raise ValueError('Time is an abstract class.')
-        else:
-            self.__init__(frac(value))
-
-    @multimethod
-    def __init__(self, value: str):
-        if type(self) == Time:
-            raise ValueError('Time is an abstract class.')
-        else:
-            self.__init__(frac(value))
-
-    @multimethod
-    def __init__(self, numerator: int, denominator: int):
-        if type(self) == Time:
-            raise ValueError('Time is an abstract class.')
-        else:
-            self.__init__(frac(numerator, denominator))
+    @property
+    def nature(self) -> str:
+        raise NotImplementedError
 
     @property
     def numerator(self):
@@ -89,10 +74,17 @@ class Time:
 
 
 class TimeShift(Time):
-    nature = 'shift'
+    @multimethod
+    def __init__(self, value: Union[frac, int, str]):
+        super().__init__(frac(value))
 
-    def __init__(self, *args):
-        super().__init__(*args)
+    @multimethod
+    def __init__(self, numerator: int, denominator: int):
+        super().__init__(frac(numerator, denominator))
+
+    @property
+    def nature(self):
+        return 'shift'
 
     def __eq__(self, other):
         if isinstance(other, TimeShift):
@@ -162,48 +154,39 @@ class TimeShift(Time):
         if len(others) == 0:
             return self
         if len(others) == 1:
-            assert isinstance(others[0], TimeShift)
+            assert isinstance(others[0], Time)
             return TimeShift(gcd(self.value, others[0].value))
 
         result = self
         for other in others:
-            assert isinstance(other, TimeShift), 'TimeShift.gcd() only accepts TimeShifts as arguments.'
+            assert isinstance(other, Time), 'GCD only accepts Time as arguments.'
             result = result.gcd(other)
         return result
 
 
 class TimeSignature:
+    @multimethod
     def __init__(self, numerator: int, denominator: int):
         self.numerator: int = numerator
         self.denominator: int = denominator
         self.duration: TimeShift = TimeShift(numerator, denominator)
+
+    @multimethod
+    def __init__(self, time_signature: TimeSignature):
+        self.__init__(time_signature.numerator, time_signature.denominator)
+
+    @multimethod
+    def __init__(self, value: Tuple[int, int]):
+        self.__init__(*value)
 
     def __str__(self):
         return str(self.numerator) + '/' + str(self.denominator)
 
 
 class TimePoint(Time):
-    nature = 'point'
-
     @multimethod
-    def __init__(self, value: frac, time_signature: Union[Tuple[int, int], TimeSignature] = (4, 4)):
-        super().__init__(value)
-        if isinstance(time_signature, TimeSignature):
-            self.time_signature = time_signature
-        else:
-            self.time_signature = TimeSignature(*time_signature)
-
-    @multimethod
-    def __init__(self, value: int, time_signature: Union[Tuple[int, int], TimeSignature] = (4, 4)):
-        super().__init__(value)
-        if isinstance(time_signature, TimeSignature):
-            self.time_signature = time_signature
-        else:
-            self.time_signature = TimeSignature(*time_signature)
-
-    @multimethod
-    def __init__(self, value: str, time_signature: Union[Tuple[int, int], TimeSignature] = (4, 4)):
-        super().__init__(value)
+    def __init__(self, value: Union[frac, int, str], time_signature: Union[Tuple[int, int], TimeSignature] = (4, 4)):
+        super().__init__(frac(value))
         if isinstance(time_signature, TimeSignature):
             self.time_signature = time_signature
         else:
@@ -212,21 +195,25 @@ class TimePoint(Time):
     @multimethod
     def __init__(self, numerator: int, denominator: int,
                  time_signature: Union[Tuple[int, int], TimeSignature] = (4, 4)):
-        super().__init__(numerator, denominator)
+        super().__init__(frac(numerator, denominator))
         if isinstance(time_signature, TimeSignature):
             self.time_signature = time_signature
         else:
             self.time_signature = TimeSignature(*time_signature)
 
     @multimethod
-    def __init__(self, measure: int, beat: int, offset: Union[str, int],
+    def __init__(self, measure: int, beat: int, offset: Union[frac, str, int],
                  time_signature: Union[Tuple[int, int], TimeSignature] = (4, 4)):
-        self.time_signature = TimeSignature(*time_signature)
+        self.time_signature = TimeSignature(time_signature)
         measure_duration = self.time_signature.duration
         beat_duration = TimeShift(1, self.time_signature.denominator)
         offset = TimeShift(offset)
-        time_point = (measure - 1) * measure_duration + (beat - 1) * beat_duration + offset
-        super().__init__(time_point.value)
+        time_shift = (measure - 1) * measure_duration + (beat - 1) * beat_duration + offset
+        super().__init__(time_shift.value)
+
+    @property
+    def nature(self):
+        return 'point'
 
     @property
     def measure(self):
@@ -331,7 +318,7 @@ class Frequency:
 
     def __init__(self, value):
         if type(self) == Frequency:
-            raise ValueError('Time is an abstract class.')
+            raise TypeError('Time is an abstract class.')
         else:
             self.value = value
 
@@ -541,46 +528,25 @@ class FrequencyExtension:
 
 # Time-Frequency
 class TimeFrequency:
-    # @multimethod
+    @multimethod
     def __init__(self, time: Time, frequency: Frequency):
         self.time = time
         self.frequency = frequency
 
-    # @multimethod
-    # def __init__(self, time: Time, frequency: int, frequency_nature: str = 'shift'):
-    #     self.__init__([time.numerator, time.denominator], frequency, time.nature, frequency_nature)
-    #
-    # @multimethod
-    # def __init__(self, time: str, frequency: Frequency, time_nature: str = 'shift'):
-    #     self.__init__('%s/%s' % time, frequency, time_nature, frequency.nature)
-    #
-    # @multimethod
-    # def __init__(self, time: Tuple[int, int], frequency: Frequency, time_nature: str = 'shift'):
-    #     self.__init__(time, frequency, time_nature, frequency.nature)
-    #
-    # @multimethod
-    # def __init__(self, time: str, frequency: int,
-    #              time_nature: str = 'shift', frequency_nature: str = 'shift'):
-    #     # Time
-    #     if time_nature == 'shift':
-    #         self.time = TimeShift(time)
-    #     elif time_nature == 'point':
-    #         self.time = TimePoint(time)
-    #     else:
-    #         raise ValueError("Parameter 'time_nature' should be one of 'shift' and 'point'.")
-    #
-    #     # Frequency
-    #     if frequency_nature == 'shift':
-    #         self.frequency = FrequencyShift(frequency)
-    #     elif frequency_nature == 'point':
-    #         self.frequency = FrequencyPoint(frequency)
-    #     else:
-    #         raise ValueError("Parameter 'frequency_nature' should be one of 'shift' and 'point'.")
-    #
-    # @multimethod
-    # def __init__(self, time: Tuple[int, int], frequency: int,
-    #              time_nature: str = 'shift', frequency_nature: str = 'shift'):
-    #     self.__init__('%s/%s' % time, frequency, time_nature, frequency_nature)
+    @multimethod
+    def __init__(self, time: Union[frac, str, int], frequency: int, time_nature: str, frequency_nature: str):
+        if time_nature == 'point':
+            self.time = TimePoint(time)
+        elif time_nature == 'shift':
+            self.time = TimeShift(time)
+        else:
+            raise ValueError('Time nature should be either point or shift.')
+        if frequency_nature == 'point':
+            self.frequency = FrequencyPoint(frequency)
+        elif frequency_nature == 'shift':
+            self.frequency = FrequencyShift(frequency)
+        else:
+            raise ValueError('Frequency nature should be either point or shift.')
 
     def __eq__(self, other):
         if isinstance(other, TimeFrequency):
@@ -645,11 +611,9 @@ class PianoRoll:
     @multimethod
     def __init__(self, **kwargs):
         self.array: np.ndarray = kwargs.get('array', np.zeros((0, 0), dtype=np.int8))
-        self.origin: Tuple[int, int] = kwargs.get('origin', (0, 0))
+        self.origin: TimeFrequency = kwargs.get('origin', TimeFrequency(TimeShift(0), FrequencyShift(0)))
         self.tatum: TimeShift = kwargs.get('tatum', TimeShift(0))
         self.step: FrequencyShift = kwargs.get('step', FrequencyShift(1))
-        self.time_nature = kwargs.get('time_nature', None)
-        self.frequency_nature = kwargs.get('frequency_nature', None)
 
         self.dynamics: Optional[Dict[Any, int]] = kwargs.get('dynamics', None)
         self.time_signature: TimeSignature = TimeSignature(4, 4)
@@ -658,7 +622,6 @@ class PianoRoll:
 
         assert isinstance(self.tatum, TimeShift)
         assert isinstance(self.step, FrequencyShift)
-        assert self.time_nature in [None, 'shift', 'point'] and self.frequency_nature in [None, 'shift', 'point']
 
         self._time_vector = None
 
@@ -667,22 +630,20 @@ class PianoRoll:
         PianoRoll.__init__(self, array=array, **kwargs)
 
     @multimethod
-    def __init__(self, array: np.ndarray, origin: Tuple[int, int], **kwargs):
+    def __init__(self, array: np.ndarray, origin: TimeFrequency, **kwargs):
         PianoRoll.__init__(self, array=array, origin=origin, **kwargs)
 
     @multimethod
-    def __init__(self, array: np.ndarray, origin: Tuple[int, int], tatum: TimeShift, **kwargs):
+    def __init__(self, array: np.ndarray, origin: TimeFrequency, tatum: TimeShift, **kwargs):
         PianoRoll.__init__(self, array=array, origin=origin, tatum=tatum, **kwargs)
 
     @multimethod
-    def __init__(self, array: np.ndarray, origin: Tuple[int, int], resolution: TimeFrequency, **kwargs):
+    def __init__(self, array: np.ndarray, origin: TimeFrequency, resolution: TimeFrequency, **kwargs):
         PianoRoll.__init__(self, array=array, origin=origin, tatum=resolution.time, step=resolution.frequency, **kwargs)
 
     @multimethod
-    def __init__(self, array: np.ndarray, origin: Tuple[int, int], tatum: TimeShift, step: FrequencyShift,
-                 time_nature: Optional[str], frequency_nature: Optional[str], **kwargs):
-        PianoRoll.__init__(self, array=array, origin=origin, tatum=tatum, step=step,
-                           time_nature=time_nature, frequency_nature=frequency_nature, **kwargs)
+    def __init__(self, array: np.ndarray, origin: TimeFrequency, tatum: TimeShift, step: FrequencyShift, **kwargs):
+        PianoRoll.__init__(self, array=array, origin=origin, tatum=tatum, step=step, **kwargs)
 
     def __eq__(self, other):
         assert isinstance(other, PianoRoll)
@@ -694,17 +655,71 @@ class PianoRoll:
             same_tatum = self_reduced.tatum == other_reduced.tatum
             same_step = self_reduced.step == other_reduced.step
             same_resolution = same_tatum and same_step
-            same_time_nature = self_reduced.time_nature == other_reduced.time_nature
-            same_frequency_nature = self_reduced.frequency_nature == other_reduced.frequency_nature
+            same_time_nature = self_reduced.origin.time.nature == other_reduced.origin.time.nature
+            same_frequency_nature = self_reduced.origin.frequency.nature == other_reduced.origin.frequency.nature
             same_nature = same_time_nature and same_frequency_nature
             return same_array and same_origin and same_resolution and same_nature
         else:
             return False
 
     def __add__(self, other):
-        assert isinstance(other, PianoRoll)
-        result = PianoRoll.supremum(self, other)
+        # Check types
+        assert isinstance(other, PianoRoll), 'Combine is made between blocks.'
+
+        # Check trivial cases
+        if self.array.size == 0:
+            return PianoRoll(other.array, other.origin, other.resolution)
+        if other.array.size == 0:
+            return PianoRoll(self.array, self.origin, self.resolution)
+
+        # Tatum
+        new_tatum = self.tatum.gcd(other.tatum)
+        new_block_1 = self.change_tatum(new_tatum)
+        new_block_2 = other.change_tatum(new_tatum)
+
+        # Step
+        if self.step != other.step:
+            raise NotImplementedError('Supremum between blocks with different step is not implemented.')
+        else:
+            new_step = self.step
+
+        # Compute extensions
+        extension_1 = new_block_1.extension
+        extension_2 = new_block_2.extension
+        extension = Extension(TimeExtension(min(extension_1.time.start, extension_2.time.start),
+                                            max(extension_1.time.end, extension_2.time.end)),
+                              FrequencyExtension(min(extension_1.frequency.lower, extension_2.frequency.lower),
+                                                 max(extension_1.frequency.higher, extension_2.frequency.higher)))
+
+        # Pad blocks
+        pad_width_1 = (((extension_1.frequency.lower - extension.frequency.lower) // new_step,
+                       (extension.frequency.higher - extension_1.frequency.higher) // new_step),
+                       ((extension_1.time.start - extension.time.start) // new_tatum,
+                       (extension.time.end - extension_1.time.end) // new_tatum))
+        array_1 = np.pad(new_block_1.array, pad_width_1)
+
+        pad_width_2 = (((extension_2.frequency.lower - extension.frequency.lower) // new_step,
+                       (extension.frequency.higher - extension_2.frequency.higher) // new_step),
+                       ((extension_2.time.start - extension.time.start) // new_tatum,
+                       (extension.time.end - extension_2.time.end) // new_tatum))
+        array_2 = np.pad(new_block_2.array, pad_width_2)
+
+        # Create new piano_roll
+        time_type = type(self.time_vector[0])
+        frequency_type = type(self.frequency_vector[0])
+
+        zero_time = time_type.zero()
+        zero_frequency = frequency_type.zero()
+
+        new_origin = TimeFrequency(
+            time_type((extension.time.start - zero_time) // new_tatum),
+            frequency_type((extension.frequency.lower - zero_frequency) // new_step)
+        )
+        new_array = np.maximum(array_1, array_2)
+
+        result = PianoRoll(new_array, new_origin, new_tatum, new_step)
         result.reduce(inplace=True)
+
         return result
 
     @property
@@ -713,26 +728,14 @@ class PianoRoll:
 
     @property
     def extension(self):
-        if self.time_nature == 'shift':
-            time_extension = TimeExtension(-self.origin[1] * self.tatum,
-                                           (self.array.shape[-1] - self.origin[1]) * self.tatum)
-        elif self.time_nature == 'point':
-            zero = TimePoint(0, time_signature=self.time_signature)
-            time_extension = TimeExtension(zero - self.origin[1] * self.tatum,
-                                           zero + (self.array.shape[-1] - self.origin[1]) * self.tatum)
-        else:
-            raise ValueError('Time nature must be either "shift" or "point"')
-
-        if self.frequency_nature == 'shift':
-            frequency_extension = FrequencyExtension(
-                -self.origin[0] * self.step,
-                (self.array.shape[-2] - self.origin[0] - 1) * self.step
-            )
-        else:
-            frequency_extension = FrequencyExtension(
-                FrequencyPoint(0) - self.origin[0] * self.step,
-                FrequencyPoint(0) + (self.array.shape[-2] - self.origin[0] - 1) * self.step
-            )
+        time_extension = TimeExtension(
+            self.origin.time,
+            self.origin.time + self.array.shape[-1] * self.tatum
+        )
+        frequency_extension = FrequencyExtension(
+            self.origin.frequency,
+            self.origin.frequency + self.array.shape[-2] * self.step
+        )
 
         return Extension(time_extension, frequency_extension)
 
@@ -748,9 +751,6 @@ class PianoRoll:
                 ratio_int = int(1 / ratio)
                 assert ratio_int == 1 / ratio
 
-                # Change origin
-                new_origin = (self.origin[0], self.origin[1] // ratio_int)
-
                 # Change array
                 new_shape = (self.array.shape[0], self.array.shape[1] // ratio_int)
                 new_array = np.zeros(new_shape, dtype=self.array.dtype)
@@ -763,9 +763,6 @@ class PianoRoll:
             else:
                 ratio_int = int(ratio)
                 assert ratio_int == ratio
-
-                # Change origin
-                new_origin = (self.origin[0], self.origin[1] * ratio_int)
 
                 # Change array
                 new_shape = (self.array.shape[0], self.array.shape[1] * ratio_int)
@@ -783,21 +780,18 @@ class PianoRoll:
 
             if inplace:
                 self.array = new_array
-                self.origin = new_origin
                 self.tatum = new_tatum
             else:
-                return PianoRoll(new_array, new_origin, new_tatum, self.step, self.time_nature, self.frequency_nature)
+                return PianoRoll(new_array, self.origin, new_tatum, self.step)
         else:
             if not inplace:
-                return PianoRoll(self.array, self.origin, self.tatum, self.step, self.time_nature,
-                                 self.frequency_nature)
+                return PianoRoll(self.array, self.origin, self.tatum, self.step)
 
     def change_type(self, new_type: np.dtype, inplace: bool = False):
         if inplace:
             self.array = self.array.astype(new_type)
         else:
-            new_block = PianoRoll(self.array.astype(new_type), self.origin, self.tatum, self.step,
-                                  self.time_nature, self.frequency_nature)
+            new_block = PianoRoll(self.array.astype(new_type), self.origin, self.tatum, self.step)
             return new_block
 
     def reduce(self, inplace: bool = False):
@@ -828,108 +822,28 @@ class PianoRoll:
 
         if inplace:
             self.array = self.array[low: self.array.shape[0] - high, early: self.array.shape[1] - later]
-            self.origin = (self.origin[0] - low, self.origin[1] - early)
+            self.origin = TimeFrequency(self.origin.time + low * self.tatum, self.origin.frequency + early * self.step)
         else:
             return PianoRoll(self.array[low: self.array.shape[0] - high, early: self.array.shape[1] - later],
-                             (self.origin[0] - low, self.origin[1] - early),
-                             self.tatum, self.step, self.time_nature, self.frequency_nature)
+                             TimeFrequency(self.origin.time + low * self.tatum,
+                                           self.origin.frequency + early * self.step),
+                             self.tatum, self.step)
 
-    def combine(self, other, inplace: bool = False):
+    def combine(self, other: PianoRoll, inplace: bool = False):
         if inplace:
-            new_block = PianoRoll.supremum(self, other)
+            new_block = self + other
             self.array = new_block.array
             self.origin = new_block.origin
             self.tatum = new_block.tatum
             self.step = new_block.step
-            self.time_nature = new_block.time_nature
-            self.frequency_nature = new_block.frequency_nature
             del new_block
         else:
-            return PianoRoll.supremum(self, other)
-
-    def subblock(self, start: Time, end: Time):
-        assert start <= end, 'Start should be before end.'
-        assert start >= self.extension.time.start, 'Start should be positive.'
-        assert end <= self.extension.time.end, 'End should be smaller than duration.'
-
-        start_index = start // self.tatum
-        end_index = end // self.tatum
-        return PianoRoll(self.array[:, start_index: end_index], (self.origin[0], self.origin[1] + start_index),
-                         self.tatum, self.step, self.time_nature, self.frequency_nature)
-
-    @staticmethod
-    def supremum(block_1: PianoRoll, block_2: PianoRoll):
-        # Check types
-        assert isinstance(block_1, PianoRoll) and isinstance(block_2, PianoRoll), 'Combine is made between blocks.'
-        if block_1.time_nature is None:
-            time_nature = block_2.time_nature
-        elif block_2.time_nature is None:
-            time_nature = block_1.time_nature
-        else:
-            assert block_1.time_nature == block_2.time_nature, 'Combine should have the same time nature.'
-            time_nature = block_1.time_nature
-        if block_1.frequency_nature is None:
-            frequency_nature = block_2.frequency_nature
-        elif block_2.frequency_nature is None:
-            frequency_nature = block_1.frequency_nature
-        else:
-            assert block_1.frequency_nature == block_2.frequency_nature, 'Combine should have the same time nature.'
-            frequency_nature = block_1.frequency_nature
-
-        # Check trivial cases
-        if block_1.array.size == 0:
-            return PianoRoll(block_2.array, block_2.origin, block_2.resolution,
-                             time_nature=time_nature, frequency_nature=frequency_nature)
-        if block_2.array.size == 0:
-            return PianoRoll(block_1.array, block_1.origin, block_1.resolution,
-                             time_nature=time_nature, frequency_nature=frequency_nature)
-
-        # Tatum
-        new_tatum = block_1.tatum.gcd(block_2.tatum)
-        new_block_1 = block_1.change_tatum(new_tatum)
-        new_block_2 = block_2.change_tatum(new_tatum)
-
-        # Step
-        if block_1.step != block_2.step:
-            raise NotImplementedError('Supremum between blocks with different step is not implemented.')
-        else:
-            new_step = block_1.step
-
-        # Compute extensions
-        extension_1 = new_block_1.extension
-        extension_2 = new_block_2.extension
-        extension = Extension(TimeExtension(min(extension_1.time.start, extension_2.time.start),
-                                            max(extension_1.time.end, extension_2.time.end)),
-                              FrequencyExtension(min(extension_1.frequency.lower, extension_2.frequency.lower),
-                                                 max(extension_1.frequency.higher, extension_2.frequency.higher)))
-
-        # Pad blocks
-        pad_width_1 = (((extension_1.frequency.lower - extension.frequency.lower) // new_step,
-                       (extension.frequency.higher - extension_1.frequency.higher) // new_step),
-                       ((extension_1.time.start - extension.time.start) // new_tatum,
-                       (extension.time.end - extension_1.time.end) // new_tatum))
-        array_1 = np.pad(new_block_1.array, pad_width_1)
-
-        pad_width_2 = (((extension_2.frequency.lower - extension.frequency.lower) // new_step,
-                       (extension.frequency.higher - extension_2.frequency.higher) // new_step),
-                       ((extension_2.time.start - extension.time.start) // new_tatum,
-                       (extension.time.end - extension_2.time.end) // new_tatum))
-        array_2 = np.pad(new_block_2.array, pad_width_2)
-
-        # Create new piano_roll
-        zero_time = type(block_1.time_vector[0]).zero()
-        zero_frequency = type(block_1.frequency_vector[0]).zero()
-        new_origin = (-((extension.frequency.lower - zero_frequency) // new_step),
-                      -((extension.time.start - zero_time) // new_tatum))
-        new_array = np.maximum(array_1, array_2)
-
-        return PianoRoll(new_array, new_origin, new_tatum, new_step, time_nature, frequency_nature)
+            return self + other
 
     @classmethod
     def empty_like(cls, block):
         block: PianoRoll
-        new_block = cls(np.zeros_like(block.array), block.origin,
-                        block.tatum, block.step, block.time_nature, block.frequency_nature)
+        new_block = cls(np.zeros_like(block.array), block.origin, block.tatum, block.step)
         return new_block
 
     @property
@@ -972,41 +886,37 @@ class PianoRoll:
         if inplace:
             self.array = self.array > 0
         else:
-            return PianoRoll(self.array > 0, self.origin, self.tatum, self.step, self.time_nature,
-                             self.frequency_nature)
+            return PianoRoll(self.array > 0, self.origin, self.tatum, self.step)
 
 
 class ChromaRoll(PianoRoll):
     @multimethod
-    def __init__(self, array: np.ndarray, origin: Tuple[int, int], tatum: TimeShift, step: FrequencyShift,
-                 time_nature: Optional[str], frequency_nature: Optional[str]):
-        super().__init__(array, origin, tatum, step, time_nature, frequency_nature)
+    def __init__(self, array: np.ndarray, origin: TimeFrequency, tatum: TimeShift, step: FrequencyShift):
+        super().__init__(array, origin, tatum, step)
 
     @multimethod
     def __init__(self, block: PianoRoll):
         array = np.zeros((12, block.array.shape[1]), block.array.dtype)
-        origin = (0, block.origin[1])
+        origin = TimeFrequency(block.origin.time, type(block.origin.frequency)(0))
         for i in range(12):
-            idx = (i + block.origin[0]) % 12
+            idx = (i + block.origin.frequency.value) % 12
             try:
                 array[i, :] = np.max(block.array[idx::12, :], 0)
             except ValueError:
                 pass
-        self.__init__(array, origin, block.tatum, block.step, block.time_nature, block.frequency_nature)
+        self.__init__(array, origin, block.tatum, block.step)
 
     def change_type(self, new_type: np.dtype, inplace: bool = False):
         if inplace:
             self.array = self.array.astype(new_type)
         else:
-            new_block = ChromaRoll(self.array.astype(new_type), self.origin, self.tatum, self.step,
-                                   self.time_nature, self.frequency_nature)
+            new_block = ChromaRoll(self.array.astype(new_type), self.origin, self.tatum, self.step)
             return new_block
 
     @classmethod
     def empty_like(cls, block):
         block: ChromaRoll
-        new_block = cls(np.zeros_like(block.array), block.origin,
-                        block.tatum, block.step, block.time_nature, block.frequency_nature)
+        new_block = cls(np.zeros_like(block.array), block.origin, block.tatum, block.step)
         return new_block
 
     @property
@@ -1035,9 +945,9 @@ class Hit:
 
 class Rhythm(PianoRoll):
     def __init__(self, *hits: Hit):
-        self.hits: Optional[List[Hit]] = list(hits)
-
-        nature = nature_of_list([h.nature for h in hits])
+        self.hits: List[Hit] = list(hits)
+        if len({type(hit.start) for hit in hits}) > 1:
+            raise WrongNature('Hits must be of the same nature')
 
         # Tatum
         tatum = TimeShift(0, 1)
@@ -1048,90 +958,93 @@ class Rhythm(PianoRoll):
         if len(hits) > 0:
             extension = ()
             for h, hit in enumerate(hits):
-                start_int = hit.start // tatum
-                end_int = (hit.start + hit.duration) // tatum
+                start_idx = hit.start // tatum
+                end_idx = (hit.start + hit.duration) // tatum
                 if h == 0:
-                    extension = (start_int, end_int)
+                    extension = (start_idx, end_idx)
                 else:
-                    extension = (min(extension[0], start_int), max(extension[1], end_int))
+                    extension = (min(extension[0], start_idx), max(extension[1], end_idx))
             size = (1, extension[1] - extension[0])
-            origin = - extension[0]
+            time_origin = extension[0] * tatum
         else:
             size = (1, 0)
-            origin = 0
+            time_origin = TimeShift(0)
             tatum = TimeShift(1, 1)
 
         # Create and fill array
         array = np.zeros(size, dtype=np.uint8)
         for hit in hits:
-            start_int = hit.start // tatum
-            end_int = (hit.start + hit.duration) // tatum
-            array[:, start_int + origin: end_int + origin] = \
-                np.maximum(array[:, start_int + origin: end_int + origin], 1)
-            array[:, start_int + origin] = np.maximum(array[:, start_int + origin], 2)
+            start_idx = (hit.start - time_origin) // tatum
+            end_idx = (hit.end - time_origin) // tatum
+            array[:, start_idx: end_idx] = np.maximum(array[:, start_idx: end_idx], 1)
+            array[:, start_idx] = np.maximum(array[:, start_idx], 2)
 
         # Create object
-        PianoRoll.__init__(self, array, (0, origin), tatum, time_nature=nature)
+        PianoRoll.__init__(self, array, TimeFrequency(time_origin, FrequencyShift(0)), tatum)
 
     @property
     def nature(self):
-        return self.time_nature
+        if len(self.hits) == 0:
+            return 'shift'
+        else:
+            return self.hits[0].nature
 
 
 class Texture(list):
     def __init__(self, *rhythms: Rhythm):
-        self.nature = nature_of_list([r.nature for r in rhythms])
+        if len({type(rhythm.nature) for rhythm in rhythms}) > 1:
+            raise WrongNature('Rhythms must be of the same nature')
         super().__init__(rhythms)
 
-    def __mul__(self, other) -> PianoRoll:
-        if isinstance(other, Harmony):
-            return HarmonicTexture(self, other)
-        elif isinstance(other, Chord):
-            return ChordTexture(self, other)
-        else:
-            raise AssertionError('Product should be done between a Texture and a Harmony.')
-
-    def __rmul__(self, other):
-        assert isinstance(other, Harmony), 'Product should be done between a Texture and a Harmony.'
-        return HarmonicTexture(self, other)
-
     @property
-    def extension(self):
+    def nature(self):
         if len(self) == 0:
-            return None
-        result: Extension = self[0].extension
-        for r in self[1:]:
-            result = result.union(r.extension)
-        return result
+            return 'shift'
+        else:
+            return self[0].nature
+
+    @multimethod
+    def __mul__(self, harmony: Harmony) -> PianoRoll:
+        return HarmonicTexture(self, harmony)
+
+    @multimethod
+    def __mul__(self, chord: Chord) -> PianoRoll:
+        return ChordTexture(self, chord)
 
     @property
     def tatum(self):
         if len(self) == 0:
-            return None
-        result = self[0].tatum
-        for r in self[1:]:
-            result = TimeShift(gcd(result, r.tatum))
-        return result
+            return TimeShift(0)
+        return self[0].gcd(*self[1:])
 
 
 class Chord(PianoRoll):
     def __init__(self, *frequencies: int, nature: str = 'shift'):
         self.frequencies = sorted(frequencies)
+        self.nature = nature
 
         # Creation of the PianoRoll
         if len(frequencies) == 0:
-            PianoRoll.__init__(self, np.zeros((0, 1), dtype=np.uint8), (0, 0),
-                               TimeShift(0, 1), FrequencyShift(1), 'shift', nature)
+            PianoRoll.__init__(self, np.zeros((0, 1), dtype=np.uint8), TimeFrequency(),
+                               TimeShift(0, 1), FrequencyShift(1))
         else:
             min_freq = min(frequencies)
             ambitus = max(frequencies) - min_freq
-            origin = -min_freq
-            size = int(ambitus) + 1
+
+            if nature == 'shift':
+                frequency_origin = FrequencyShift(min_freq)
+            elif nature == 'point':
+                frequency_origin = FrequencyPoint(min_freq)
+            else:
+                raise WrongNature('Chord nature must be either "shift" or "point"')
+
+            size = ambitus + 1
             array = np.zeros((size, 1), dtype=np.uint8)
             for p in frequencies:
                 array[p - min_freq] = 1
 
-            PianoRoll.__init__(self, array, (origin, 0), TimeShift(0, 1), FrequencyShift(1), 'shift', nature)
+            PianoRoll.__init__(self, array, TimeFrequency(TimeShift(0), frequency_origin),
+                               TimeShift(0, 1), FrequencyShift(1))
 
     @classmethod
     def from_degree(cls, degree: str, factors: List[Dict[str, str]]):
@@ -1140,10 +1053,6 @@ class Chord(PianoRoll):
         for factor in factors:
             note_numbers.append(degree_dict[factor['value']] + 12 * int(factor.get('octave', 0)))
         return cls(*note_numbers, nature='shift')
-
-    @property
-    def nature(self):
-        return self.frequency_nature
 
     def __len__(self):
         return len(self.frequencies)
@@ -1161,13 +1070,22 @@ class Chord(PianoRoll):
     def supremum(self, chord: Chord):
         assert isinstance(chord, Chord), 'Supremum should be done between two Chords.'
         assert self.nature == chord.nature, 'Supremum should be done between two Chords of the same nature.'
-        return Chord(*set(self.frequencies).union(chord.frequencies), self.nature)
+        new_frequencies = list(set(self.frequencies).union(chord.frequencies))
+        return Chord(*new_frequencies, nature=self.nature)
 
 
 class Harmony(List):
     def __init__(self, *chords: Chord):
-        self.nature = nature_of_list([c.nature for c in chords])
+        if len({chord.nature for chord in chords}) > 1:
+            raise WrongNature('Chords must be of the same nature')
         super().__init__(chords)
+
+    @property
+    def nature(self):
+        if len(self) == 0:
+            return 'shift'
+        else:
+            return self[0].nature
 
     def __mul__(self, other):
         assert isinstance(other, Texture), 'Product should be done between a Texture and a Harmony.'
@@ -1195,14 +1113,13 @@ class HarmonicTexture(PianoRoll):
         self.texture: Texture = texture
         self.harmony: Harmony = harmony
 
-        PianoRoll.__init__(self, time_nature=texture.nature, frequency_nature=harmony.nature)
+        PianoRoll.__init__(self)
         for rhythm, chord in zip(texture, harmony):
             rhythm: Rhythm
             chord: Chord
             tensor_product = PianoRoll(chord.array * rhythm.array,
-                                       (chord.origin[0], rhythm.origin[1]),
-                                       rhythm.tatum, chord.step,
-                                       rhythm.nature, chord.nature)
+                                       TimeFrequency(rhythm.origin.time, chord.origin.frequency),
+                                       rhythm.tatum, chord.step)
             self.combine(tensor_product, inplace=True)
 
     def __len__(self):
@@ -1218,9 +1135,12 @@ class ChordTexture(HarmonicTexture):
 
 class Activations(PianoRoll, list):
     def __init__(self, *values: TimeFrequency):
+        if len({type(v.time) for v in values}) > 1:
+            raise WrongNature('Activations must be of the same time type')
+        if len({type(v.frequency) for v in values}) > 1:
+            raise WrongNature('Activations must be of the same frequency type')
+
         list.__init__(self, values)
-        frequency_nature = nature_of_list([a.frequency.nature for a in values])
-        time_nature = nature_of_list([a.time.nature for a in values])
 
         # Time
         zero_time = type(values[0].time).zero()
@@ -1250,7 +1170,7 @@ class Activations(PianoRoll, list):
         origin_frequency = -lower_index
 
         # Time-Frequency
-        origin = (origin_frequency, origin_time)
+        origin = TimeFrequency(origin_time, origin_frequency, values[0].time.nature, values[0].frequency.nature)
         array = np.zeros((ambitus // step + 1, duration + 1), dtype=bool)
         for a in values:
             idx_t = (a.time - zero_time) // tatum - earlier_index
@@ -1258,7 +1178,7 @@ class Activations(PianoRoll, list):
             array[idx_f, idx_t] = True
 
         # PianoRoll
-        PianoRoll.__init__(self, array, origin, tatum, step, time_nature, frequency_nature)
+        PianoRoll.__init__(self, array, origin, tatum, step)
 
     def change_tatum(self, new_tatum: TimeShift, inplace=False, null=True):
         if inplace:

@@ -33,6 +33,8 @@ def dilate_sparse(activation_table, block):
         array[f_0: f_1, t_0: t_1] = np.maximum(array[f_0: f_1, t_0: t_1], str_el)
 
     # Create piano_roll
+    origin = TimeFrequency(activation_table.origin.time - block.origin.time,
+                           activation_table.origin.frequency - block.origin.frequency)
     origin = (activation_table.origin[0] + block.origin[0],
               activation_table.origin[1] * ratio + block.origin[1])
     if activation_table.time_nature == 'point':

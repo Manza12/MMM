@@ -1,12 +1,11 @@
 import numpy as np
 from pathlib import Path
-from typing import Union, List, Optional, Tuple, Set, Iterable, Dict, Any
+from typing import Union, List, Optional, Tuple, Set, Iterable, Dict, Any, Type
 import matplotlib as mpl
-
-plt = mpl.pyplot
-tick = mpl.ticker
-wid = mpl.widgets
+import matplotlib.pyplot as plt
+import matplotlib.ticker as tick
+import matplotlib.widgets as wid
 
 _ = [np]
-_ = [Path, Union, List, Optional, Tuple, Set, Iterable, Dict, Any]
+_ = [Path, Union, List, Optional, Tuple, Set, Iterable, Dict, Any, Type]
 _ = [mpl, plt, tick, wid]

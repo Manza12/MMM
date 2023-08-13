@@ -91,18 +91,6 @@ def midi_numbers_to_chromas(midi_numbers):
     return chromas_vector
 
 
-def nature_of_list(x: List[str]) -> Optional[str]:
-    nature = None
-    for e in x:
-        if nature is None:
-            nature = e
-        else:
-            if e is not None:
-                assert nature == e, 'List should be of same nature.'
-    else:
-        return nature
-
-
 def nature_of_sum(a: Optional[str], b: Optional[str]) -> Optional[str]:
     if a is None:
         assert b is None
