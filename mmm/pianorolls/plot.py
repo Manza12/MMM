@@ -1,8 +1,7 @@
 import matplotlib.pyplot as plt
 
 from . import *
-from .music import Time, TimePoint, TimeShift, FrequencyShift
-from .generation import PianoRoll, ChromaRoll
+from .music import Time, TimePoint, TimeShift, FrequencyShift, PianoRoll, ChromaRoll
 from .utils import midi_numbers_to_chromas, midi_numbers_to_pitches, round_half_up
 
 

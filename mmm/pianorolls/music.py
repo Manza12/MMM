@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from . import *
-from .utils import midi_number_to_pitch, midi_numbers_to_chromas, gcd
+from .dictionaries import roman_numeral_to_factors_dict
+from .utils import midi_number_to_pitch, midi_numbers_to_chromas, gcd, nature_of_list
 
 
 class Time:
@@ -925,7 +926,7 @@ class PianoRoll:
         return PianoRoll(new_array, new_origin, new_tatum, new_step, time_nature, frequency_nature)
 
     @classmethod
-    def empty_block_like(cls, block):
+    def empty_like(cls, block):
         block: PianoRoll
         new_block = cls(np.zeros_like(block.array), block.origin,
                         block.tatum, block.step, block.time_nature, block.frequency_nature)
@@ -1002,7 +1003,7 @@ class ChromaRoll(PianoRoll):
             return new_block
 
     @classmethod
-    def empty_block_like(cls, block):
+    def empty_like(cls, block):
         block: ChromaRoll
         new_block = cls(np.zeros_like(block.array), block.origin,
                         block.tatum, block.step, block.time_nature, block.frequency_nature)
@@ -1011,3 +1012,282 @@ class ChromaRoll(PianoRoll):
     @property
     def frequency_vector(self):
         return midi_numbers_to_chromas([i for i in range(12)])
+
+
+class Hit:
+    def __init__(self, start: str, duration: str, nature: str = 'shift'):
+        self.nature = nature
+
+        if nature == 'shift':
+            self.start = TimeShift(start)
+        elif nature == 'point':
+            self.start = TimePoint(start)
+
+        self.duration = TimeShift(duration)
+
+    @property
+    def end(self):
+        return self.start + self.duration
+
+    def __str__(self):
+        return '(%s, %s)' % (self.start, self.duration)
+
+
+class Rhythm(PianoRoll):
+    def __init__(self, *hits: Hit):
+        self.hits: Optional[List[Hit]] = list(hits)
+
+        nature = nature_of_list([h.nature for h in hits])
+
+        # Tatum
+        tatum = TimeShift(0, 1)
+        for hit in hits:
+            tatum = tatum.gcd(hit.start, hit.duration)
+
+        # Array size
+        if len(hits) > 0:
+            extension = ()
+            for h, hit in enumerate(hits):
+                start_int = hit.start // tatum
+                end_int = (hit.start + hit.duration) // tatum
+                if h == 0:
+                    extension = (start_int, end_int)
+                else:
+                    extension = (min(extension[0], start_int), max(extension[1], end_int))
+            size = (1, extension[1] - extension[0])
+            origin = - extension[0]
+        else:
+            size = (1, 0)
+            origin = 0
+            tatum = TimeShift(1, 1)
+
+        # Create and fill array
+        array = np.zeros(size, dtype=np.uint8)
+        for hit in hits:
+            start_int = hit.start // tatum
+            end_int = (hit.start + hit.duration) // tatum
+            array[:, start_int + origin: end_int + origin] = \
+                np.maximum(array[:, start_int + origin: end_int + origin], 1)
+            array[:, start_int + origin] = np.maximum(array[:, start_int + origin], 2)
+
+        # Create object
+        PianoRoll.__init__(self, array, (0, origin), tatum, time_nature=nature)
+
+    @property
+    def nature(self):
+        return self.time_nature
+
+
+class Texture(list):
+    def __init__(self, *rhythms: Rhythm):
+        self.nature = nature_of_list([r.nature for r in rhythms])
+        super().__init__(rhythms)
+
+    def __mul__(self, other) -> PianoRoll:
+        if isinstance(other, Harmony):
+            return HarmonicTexture(self, other)
+        elif isinstance(other, Chord):
+            return ChordTexture(self, other)
+        else:
+            raise AssertionError('Product should be done between a Texture and a Harmony.')
+
+    def __rmul__(self, other):
+        assert isinstance(other, Harmony), 'Product should be done between a Texture and a Harmony.'
+        return HarmonicTexture(self, other)
+
+    @property
+    def extension(self):
+        if len(self) == 0:
+            return None
+        result: Extension = self[0].extension
+        for r in self[1:]:
+            result = result.union(r.extension)
+        return result
+
+    @property
+    def tatum(self):
+        if len(self) == 0:
+            return None
+        result = self[0].tatum
+        for r in self[1:]:
+            result = TimeShift(gcd(result, r.tatum))
+        return result
+
+
+class Chord(PianoRoll):
+    def __init__(self, *frequencies: int, nature: str = 'shift'):
+        self.frequencies = sorted(frequencies)
+
+        # Creation of the PianoRoll
+        if len(frequencies) == 0:
+            PianoRoll.__init__(self, np.zeros((0, 1), dtype=np.uint8), (0, 0),
+                               TimeShift(0, 1), FrequencyShift(1), 'shift', nature)
+        else:
+            min_freq = min(frequencies)
+            ambitus = max(frequencies) - min_freq
+            origin = -min_freq
+            size = int(ambitus) + 1
+            array = np.zeros((size, 1), dtype=np.uint8)
+            for p in frequencies:
+                array[p - min_freq] = 1
+
+            PianoRoll.__init__(self, array, (origin, 0), TimeShift(0, 1), FrequencyShift(1), 'shift', nature)
+
+    @classmethod
+    def from_degree(cls, degree: str, factors: List[Dict[str, str]]):
+        degree_dict = roman_numeral_to_factors_dict[degree]
+        note_numbers = []
+        for factor in factors:
+            note_numbers.append(degree_dict[factor['value']] + 12 * int(factor.get('octave', 0)))
+        return cls(*note_numbers, nature='shift')
+
+    @property
+    def nature(self):
+        return self.frequency_nature
+
+    def __len__(self):
+        return len(self.frequencies)
+
+    def __str__(self):
+        result = '['
+        for i, p in enumerate(self.frequencies):
+            if i == 0:
+                result += '%s' % p
+            else:
+                result += ', %s' % p
+        result += ']'
+        return result
+
+    def supremum(self, chord: Chord):
+        assert isinstance(chord, Chord), 'Supremum should be done between two Chords.'
+        assert self.nature == chord.nature, 'Supremum should be done between two Chords of the same nature.'
+        return Chord(*set(self.frequencies).union(chord.frequencies), self.nature)
+
+
+class Harmony(List):
+    def __init__(self, *chords: Chord):
+        self.nature = nature_of_list([c.nature for c in chords])
+        super().__init__(chords)
+
+    def __mul__(self, other):
+        assert isinstance(other, Texture), 'Product should be done between a Texture and a Harmony.'
+        return HarmonicTexture(other, self)
+
+    def __rmul__(self, other):
+        assert isinstance(other, Texture), 'Product should be done between a Texture and a Harmony.'
+        return HarmonicTexture(other, self)
+
+    @property
+    def extension(self):
+        if len(self) == 0:
+            return None
+        result: Extension = self[0].extension
+        for c in self[1:]:
+            result = result.union(c.extension)
+        return result
+
+
+class HarmonicTexture(PianoRoll):
+    def __init__(self, texture: Texture, harmony: Harmony):
+        assert isinstance(texture, Texture)
+        assert isinstance(harmony, Harmony)
+        assert len(texture) == len(harmony)
+        self.texture: Texture = texture
+        self.harmony: Harmony = harmony
+
+        PianoRoll.__init__(self, time_nature=texture.nature, frequency_nature=harmony.nature)
+        for rhythm, chord in zip(texture, harmony):
+            rhythm: Rhythm
+            chord: Chord
+            tensor_product = PianoRoll(chord.array * rhythm.array,
+                                       (chord.origin[0], rhythm.origin[1]),
+                                       rhythm.tatum, chord.step,
+                                       rhythm.nature, chord.nature)
+            self.combine(tensor_product, inplace=True)
+
+    def __len__(self):
+        return len(self.texture)
+
+
+class ChordTexture(HarmonicTexture):
+    def __init__(self, texture: Texture, chord: Chord):
+        self.chord = chord
+        harmony = Harmony(*[Chord(c) for c in chord.frequencies])
+        HarmonicTexture.__init__(self, texture, harmony)
+
+
+class Activations(PianoRoll, list):
+    def __init__(self, *activations: TimeFrequency):
+        list.__init__(self, activations)
+        frequency_nature = nature_of_list([a.frequency.nature for a in activations])
+        time_nature = nature_of_list([a.time.nature for a in activations])
+
+        # Time
+        zero_time = type(activations[0].time).zero()
+        tatum = TimeShift.gcd(*[(a.time - zero_time) for a in activations])
+        if tatum == zero_time:
+            tatum = TimeShift(1)
+
+        earlier_activation = min([a.time for a in activations])
+        earlier_index = (earlier_activation - zero_time) // tatum
+
+        later_activation = max([a.time for a in activations])
+        later_index = (later_activation - zero_time) // tatum
+
+        duration = later_index - earlier_index
+        origin_time = -earlier_index
+
+        # Frequency
+        zero_frequency = type(activations[0].frequency).zero()
+        step = FrequencyShift(1)
+
+        lower_frequency = min([a.frequency for a in activations])
+        higher_frequency = max([a.frequency for a in activations])
+
+        ambitus = higher_frequency - lower_frequency
+
+        lower_index = (lower_frequency - zero_frequency) // step
+        origin_frequency = -lower_index
+
+        # Time-Frequency
+        origin = (origin_frequency, origin_time)
+        array = np.zeros((ambitus // step + 1, duration + 1), dtype=bool)
+        for a in activations:
+            idx_t = (a.time - zero_time) // tatum - earlier_index
+            idx_f = (a.frequency - zero_frequency) // step - lower_index
+            array[idx_f, idx_t] = True
+
+        # PianoRoll
+        PianoRoll.__init__(self, array, origin, tatum, step, time_nature, frequency_nature)
+
+    def change_tatum(self, new_tatum: TimeShift, inplace=False, null=True):
+        if inplace:
+            PianoRoll.change_tatum(self, new_tatum, inplace, True)
+        else:
+            return PianoRoll.change_tatum(self, new_tatum, inplace, True)
+
+    def __add__(self, other):
+        assert isinstance(other, PianoRoll)
+        from .morphology import dilate_sparse
+        return dilate_sparse(self, other)
+
+
+class ScoreTree:
+    def __init__(self, components: List[Tuple[Activations, Union[HarmonicTexture, ScoreTree]]]):
+        self.components = components
+
+    def to_piano_roll(self):
+        result = None
+        for a, b in self.components:
+            if isinstance(b, ScoreTree):
+                b = b.to_piano_roll()
+
+            if result is None:
+                result = a + b
+            else:
+                d = a + b
+                result = result + d
+
+        result.reduce(True)
+
+        return result

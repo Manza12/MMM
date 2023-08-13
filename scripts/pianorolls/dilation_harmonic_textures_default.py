@@ -1,8 +1,8 @@
 from pathlib import Path
 import matplotlib.pyplot as plt
 
-from mmm.pianorolls.generation import Hit, Rhythm, Texture, Chord, Activations
-from mmm.pianorolls.music import TimeFrequency, TimePoint, FrequencyPoint, TimeShift, TimeSignature
+from mmm.pianorolls.music import TimeFrequency, TimePoint, FrequencyPoint, TimeShift, TimeSignature,\
+    Hit, Rhythm, Texture, Chord, Activations
 from mmm.pianorolls.plot import plot_piano_roll
 
 t_1 = Texture(

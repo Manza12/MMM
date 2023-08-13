@@ -1,7 +1,6 @@
 from . import *
 
-from .music import PianoRoll, TimeFrequency, FrequencyShift
-from .generation import Activations
+from .music import PianoRoll, TimeFrequency, FrequencyShift, Activations
 
 
 def dilate_sparse(activation_table, block):
