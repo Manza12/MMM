@@ -187,39 +187,38 @@ class Activations(PianoRoll, list):
         time_nature = nature_of_list([a.time.nature for a in activations])
 
         # Time
-        if time_nature == 'shift':
-            zero = TimeShift(0)
-        elif time_nature == 'point':
-            zero = TimePoint(0)
-        else:
-            raise AssertionError('Time nature should be either shift or point.')
-        tatum = TimeShift.gcd(*[(a.time - zero) for a in activations])
-        if tatum == zero:
+        zero_time = type(activations[0].time).zero()
+        tatum = TimeShift.gcd(*[(a.time - zero_time) for a in activations])
+        if tatum == zero_time:
             tatum = TimeShift(1)
 
         earlier_activation = min([a.time for a in activations])
-        earlier_index = (earlier_activation - zero) // tatum
+        earlier_index = (earlier_activation - zero_time) // tatum
 
         later_activation = max([a.time for a in activations])
-        later_index = (later_activation - zero) // tatum
+        later_index = (later_activation - zero_time) // tatum
 
         duration = later_index - earlier_index
         origin_time = -earlier_index
 
         # Frequency
+        zero_frequency = type(activations[0].frequency).zero()
         step = FrequencyShift(1)
+
         lower_frequency = min([a.frequency for a in activations])
         higher_frequency = max([a.frequency for a in activations])
+
         ambitus = higher_frequency - lower_frequency
-        lower_index = lower_frequency // step
+
+        lower_index = (lower_frequency - zero_frequency) // step
         origin_frequency = -lower_index
 
         # Time-Frequency
         origin = (origin_frequency, origin_time)
         array = np.zeros((ambitus // step + 1, duration + 1), dtype=bool)
         for a in activations:
-            idx_t = (a.time - zero) // tatum - earlier_index
-            idx_f = a.frequency // step - lower_index
+            idx_t = (a.time - zero_time) // tatum - earlier_index
+            idx_f = (a.frequency - zero_frequency) // step - lower_index
             array[idx_f, idx_t] = True
 
         # PianoRoll

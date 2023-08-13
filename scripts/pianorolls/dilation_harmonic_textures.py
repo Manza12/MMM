@@ -26,24 +26,24 @@ t_2_prime = Texture(
     Rhythm(Hit('-2/16', '1/16')),
 )
 
-d_min = Chord(69, 74, 76, 77, nature='point')
-d_m = Chord(50, 57, 62, 65, nature='point')
-a_7 = Chord(69, 76, 77, 79, nature='point')
-a_m = Chord(45, 57, 61, 64, nature='point')
+Dmin = Chord(69, 74, 76, 77, nature='point')
+Dm = Chord(50, 57, 62, 65, nature='point')
+A7 = Chord(69, 76, 77, 79, nature='point')
+AM = Chord(45, 57, 61, 64, nature='point')
 
-d_min_2 = t_2 * d_min
-d_min_2_prime = t_2_prime * d_min
-a_7_2 = t_2 * a_7
-a_7_2_prime = t_2_prime * a_7
-d_m_1 = t_1 * d_m
-a_m_1 = t_1 * a_m
+Dmin_2 = t_2 * Dmin
+Dmin_2_prime = t_2_prime * Dmin
+A7_2 = t_2 * A7
+A7_2_prime = t_2_prime * A7
+Dm_1 = t_1 * Dm
+AM_1 = t_1 * AM
 
-b_1 = d_min_2
-b_2 = d_min_2_prime
-b_3 = a_7_2
-b_4 = a_7_2_prime
-b_5 = d_m_1
-b_6 = a_m_1
+b_1 = Dmin_2
+b_2 = Dmin_2_prime
+b_3 = A7_2
+b_4 = A7_2_prime
+b_5 = Dm_1
+b_6 = AM_1
 
 # t = TimePoint(1, 1, 0, time_signature=(3, 8))
 # f = FrequencyShift(0)

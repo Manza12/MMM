@@ -473,7 +473,7 @@ class FrequencyPoint(Frequency):
     def __sub__(self, other):
         assert isinstance(self, FrequencyPoint) or isinstance(self, FrequencyShift), \
             "Subtraction is made between FrequencyPoint and FrequencyPoint or FrequencyPoint and FrequencyShift"
-        if isinstance(self, FrequencyPoint):
+        if isinstance(other, FrequencyPoint):
             return FrequencyShift(self.value - other.value)
         else:
             return FrequencyPoint(self.value - other.value)
@@ -916,8 +916,10 @@ class PianoRoll:
         array_2 = np.pad(new_block_2.array, pad_width_2)
 
         # Create new piano_roll
-        zero = type(block_1.time_vector[0]).zero()
-        new_origin = (-(extension.frequency.lower // new_step), -((extension.time.start - zero) // new_tatum))
+        zero_time = type(block_1.time_vector[0]).zero()
+        zero_frequency = type(block_1.frequency_vector[0]).zero()
+        new_origin = (-((extension.frequency.lower - zero_frequency) // new_step),
+                      -((extension.time.start - zero_time) // new_tatum))
         new_array = np.maximum(array_1, array_2)
 
         return PianoRoll(new_array, new_origin, new_tatum, new_step, time_nature, frequency_nature)
