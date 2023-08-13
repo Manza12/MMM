@@ -1217,32 +1217,32 @@ class ChordTexture(HarmonicTexture):
 
 
 class Activations(PianoRoll, list):
-    def __init__(self, *activations: TimeFrequency):
-        list.__init__(self, activations)
-        frequency_nature = nature_of_list([a.frequency.nature for a in activations])
-        time_nature = nature_of_list([a.time.nature for a in activations])
+    def __init__(self, *values: TimeFrequency):
+        list.__init__(self, values)
+        frequency_nature = nature_of_list([a.frequency.nature for a in values])
+        time_nature = nature_of_list([a.time.nature for a in values])
 
         # Time
-        zero_time = type(activations[0].time).zero()
-        tatum = TimeShift.gcd(*[(a.time - zero_time) for a in activations])
+        zero_time = type(values[0].time).zero()
+        tatum = TimeShift.gcd(*[(a.time - zero_time) for a in values])
         if tatum == zero_time:
             tatum = TimeShift(1)
 
-        earlier_activation = min([a.time for a in activations])
+        earlier_activation = min([a.time for a in values])
         earlier_index = (earlier_activation - zero_time) // tatum
 
-        later_activation = max([a.time for a in activations])
+        later_activation = max([a.time for a in values])
         later_index = (later_activation - zero_time) // tatum
 
         duration = later_index - earlier_index
         origin_time = -earlier_index
 
         # Frequency
-        zero_frequency = type(activations[0].frequency).zero()
+        zero_frequency = type(values[0].frequency).zero()
         step = FrequencyShift(1)
 
-        lower_frequency = min([a.frequency for a in activations])
-        higher_frequency = max([a.frequency for a in activations])
+        lower_frequency = min([a.frequency for a in values])
+        higher_frequency = max([a.frequency for a in values])
 
         ambitus = higher_frequency - lower_frequency
 
@@ -1252,7 +1252,7 @@ class Activations(PianoRoll, list):
         # Time-Frequency
         origin = (origin_frequency, origin_time)
         array = np.zeros((ambitus // step + 1, duration + 1), dtype=bool)
-        for a in activations:
+        for a in values:
             idx_t = (a.time - zero_time) // tatum - earlier_index
             idx_f = (a.frequency - zero_frequency) // step - lower_index
             array[idx_f, idx_t] = True
