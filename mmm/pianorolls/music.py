@@ -309,7 +309,7 @@ class TimeExtension:
         return self.duration == other.duration
 
     def __str__(self):
-        return '%s - %s (%s)' % (self.start, self.end, self.duration.value)
+        return '%s -> %s (%s)' % (self.start, self.end, self.duration.value)
 
 
 # Frequency
@@ -367,8 +367,6 @@ class Frequency:
 
 
 class FrequencyShift(Frequency):
-    nature = 'shift'
-
     def __init__(self, shift: int):
         super().__init__(shift)
 
@@ -434,14 +432,16 @@ class FrequencyShift(Frequency):
     def __hash__(self):
         return hash((self.value, self.nature))
 
+    @property
+    def nature(self):
+        return 'shift'
+
     @staticmethod
     def zero():
         return FrequencyShift(0)
 
 
 class FrequencyPoint(Frequency):
-    nature = 'point'
-
     def __init__(self, midi_number: int):
         super().__init__(midi_number)
 
@@ -494,6 +494,10 @@ class FrequencyPoint(Frequency):
     def __str__(self):
         return midi_number_to_pitch(self.value)
 
+    @property
+    def nature(self):
+        return 'point'
+
     @staticmethod
     def zero():
         return FrequencyPoint(0)
@@ -523,7 +527,7 @@ class FrequencyExtension:
         return self.range == other.range
 
     def __str__(self):
-        return '%s - %s (%s)' % (self.lower, self.higher, self.range)
+        return '%s -> %s (%s)' % (self.lower, self.higher, self.range)
 
 
 # Time-Frequency
@@ -557,10 +561,6 @@ class TimeFrequency:
     def __add__(self, other):
         assert isinstance(other, TimeFrequency)
         return TimeFrequency(self.time + other.time, self.frequency + other.frequency)
-
-    # @classmethod
-    # def zero(cls):
-    #     return cls('0', 0)
 
     def __str__(self):
         return '(%s, %s)' % (self.time, self.frequency)
@@ -611,14 +611,14 @@ class PianoRoll:
     @multimethod
     def __init__(self, **kwargs):
         self.array: np.ndarray = kwargs.get('array', np.zeros((0, 0), dtype=np.int8))
-        self.origin: TimeFrequency = kwargs.get('origin', TimeFrequency(TimeShift(0), FrequencyShift(0)))
+        self.origin: Optional[TimeFrequency] = kwargs.get('origin', None)
         self.tatum: TimeShift = kwargs.get('tatum', TimeShift(0))
-        self.step: FrequencyShift = kwargs.get('step', FrequencyShift(1))
+        self.step: FrequencyShift = kwargs.get('step', FrequencyShift(0))
 
         self.dynamics: Optional[Dict[Any, int]] = kwargs.get('dynamics', None)
         self.time_signature: TimeSignature = TimeSignature(4, 4)
         if 'time_signature' in kwargs:
-            self.time_signature = TimeSignature(*kwargs['time_signature'])
+            self.time_signature = TimeSignature(kwargs['time_signature'])
 
         assert isinstance(self.tatum, TimeShift)
         assert isinstance(self.step, FrequencyShift)
@@ -664,7 +664,7 @@ class PianoRoll:
 
     def __add__(self, other):
         # Check types
-        assert isinstance(other, PianoRoll), 'Combine is made between blocks.'
+        assert isinstance(other, PianoRoll), 'Cannot add PianoRoll with %s' % type(other)
 
         # Check trivial cases
         if self.array.size == 0:
@@ -672,55 +672,67 @@ class PianoRoll:
         if other.array.size == 0:
             return PianoRoll(self.array, self.origin, self.resolution)
 
+        # Check natures
+        assert self.origin.time.nature == other.origin.time.nature, \
+            'Cannot add PianoRoll with different time nature'
+        assert self.origin.frequency.nature == other.origin.frequency.nature, \
+            'Cannot add PianoRoll with different frequency nature'
+
+        # Origin
+        time_origin = min(self.origin.time, other.origin.time)
+        frequency_origin = min(self.origin.frequency, other.origin.frequency)
+        new_origin = TimeFrequency(time_origin, frequency_origin)
+
         # Tatum
-        new_tatum = self.tatum.gcd(other.tatum)
-        new_block_1 = self.change_tatum(new_tatum)
-        new_block_2 = other.change_tatum(new_tatum)
+        new_tatum = self.tatum.gcd(other.tatum, self.origin.time - time_origin, other.origin.time - time_origin)
+        new_self = self.change_tatum(new_tatum)
+        new_other = other.change_tatum(new_tatum)
 
         # Step
         if self.step != other.step:
-            raise NotImplementedError('Supremum between blocks with different step is not implemented.')
+            raise NotImplementedError('Supremum between piano rolls with different step is not implemented.')
         else:
             new_step = self.step
 
         # Compute extensions
-        extension_1 = new_block_1.extension
-        extension_2 = new_block_2.extension
-        extension = Extension(TimeExtension(min(extension_1.time.start, extension_2.time.start),
-                                            max(extension_1.time.end, extension_2.time.end)),
-                              FrequencyExtension(min(extension_1.frequency.lower, extension_2.frequency.lower),
-                                                 max(extension_1.frequency.higher, extension_2.frequency.higher)))
+        extension_self = new_self.extension
+        extension_other = new_other.extension
+        extension = Extension(TimeExtension(min(extension_self.time.start,
+                                                extension_other.time.start),
+                                            max(extension_self.time.end,
+                                                extension_other.time.end)),
+                              FrequencyExtension(min(extension_self.frequency.lower,
+                                                     extension_other.frequency.lower),
+                                                 max(extension_self.frequency.higher,
+                                                     extension_other.frequency.higher)))
 
-        # Pad blocks
-        pad_width_1 = (((extension_1.frequency.lower - extension.frequency.lower) // new_step,
-                       (extension.frequency.higher - extension_1.frequency.higher) // new_step),
-                       ((extension_1.time.start - extension.time.start) // new_tatum,
-                       (extension.time.end - extension_1.time.end) // new_tatum))
-        array_1 = np.pad(new_block_1.array, pad_width_1)
+        # Pad piano rolls
+        pad_width_self = (((extension_self.frequency.lower - extension.frequency.lower) // new_step,
+                           (extension.frequency.higher - extension_self.frequency.higher) // new_step),
+                          ((extension_self.time.start - extension.time.start) // new_tatum,
+                           (extension.time.end - extension_self.time.end) // new_tatum))
+        array_self = np.pad(new_self.array, pad_width_self)
 
-        pad_width_2 = (((extension_2.frequency.lower - extension.frequency.lower) // new_step,
-                       (extension.frequency.higher - extension_2.frequency.higher) // new_step),
-                       ((extension_2.time.start - extension.time.start) // new_tatum,
-                       (extension.time.end - extension_2.time.end) // new_tatum))
-        array_2 = np.pad(new_block_2.array, pad_width_2)
+        pad_width_other = (((extension_other.frequency.lower - extension.frequency.lower) // new_step,
+                            (extension.frequency.higher - extension_other.frequency.higher) // new_step),
+                           ((extension_other.time.start - extension.time.start) // new_tatum,
+                            (extension.time.end - extension_other.time.end) // new_tatum))
+        array_other = np.pad(new_other.array, pad_width_other)
 
-        # Create new piano_roll
-        time_type = type(self.time_vector[0])
-        frequency_type = type(self.frequency_vector[0])
-
-        zero_time = time_type.zero()
-        zero_frequency = frequency_type.zero()
-
-        new_origin = TimeFrequency(
-            time_type((extension.time.start - zero_time) // new_tatum),
-            frequency_type((extension.frequency.lower - zero_frequency) // new_step)
-        )
-        new_array = np.maximum(array_1, array_2)
+        new_array = np.maximum(array_self, array_other)
 
         result = PianoRoll(new_array, new_origin, new_tatum, new_step)
         result.reduce(inplace=True)
 
         return result
+
+    @property
+    def time_nature(self):
+        return self.origin.time.nature
+
+    @property
+    def frequency_nature(self):
+        return self.origin.frequency.nature
 
     @property
     def resolution(self):
@@ -741,9 +753,42 @@ class PianoRoll:
 
     @property
     def duration(self):
-        return self.array.shape[1] * self.tatum
+        return self.array.shape[-1] * self.tatum
 
-    def change_tatum(self, new_tatum: TimeShift, inplace=False, null=False):
+    @property
+    def time_vector(self):
+        if self._time_vector is None:
+            result = []
+            start = self.extension.time.start
+            for i in range(self.array.shape[-1]):
+                result.append(start + i * self.tatum)
+            self._time_vector = result
+            return result
+        else:
+            return self._time_vector
+
+    @property
+    def frequency_vector(self):
+        result = []
+        lower = self.extension.frequency.lower
+        for i in range(self.array.shape[-2]):
+            result.append(lower + i * self.step)
+        return result
+
+    def copy(self):
+        return deepcopy(self)
+
+    def shift(self, time_frequency: TimeFrequency):
+        self.origin += time_frequency
+
+    def supremum(self, other):
+        result = self + other
+        self.array = result.array
+        self.origin = result.origin
+        self.tatum = result.tatum
+        self.step = result.step
+
+    def change_tatum(self, new_tatum: TimeShift, inplace=False, sparse=False):
         if self.tatum != new_tatum:
             # Compute ratio
             ratio = self.tatum / new_tatum
@@ -769,7 +814,7 @@ class PianoRoll:
                 new_array = np.zeros(new_shape, dtype=self.array.dtype)
 
                 # Compute array
-                if null:
+                if sparse:
                     new_array[:, ::ratio_int] = self.array
                 else:
                     for k in range(ratio_int):
@@ -791,8 +836,8 @@ class PianoRoll:
         if inplace:
             self.array = self.array.astype(new_type)
         else:
-            new_block = PianoRoll(self.array.astype(new_type), self.origin, self.tatum, self.step)
-            return new_block
+            new_piano_roll = PianoRoll(self.array.astype(new_type), self.origin, self.tatum, self.step)
+            return new_piano_roll
 
     def reduce(self, inplace: bool = False):
         low = 0
@@ -829,42 +874,22 @@ class PianoRoll:
                                            self.origin.frequency + early * self.step),
                              self.tatum, self.step)
 
-    def combine(self, other: PianoRoll, inplace: bool = False):
-        if inplace:
-            new_block = self + other
-            self.array = new_block.array
-            self.origin = new_block.origin
-            self.tatum = new_block.tatum
-            self.step = new_block.step
-            del new_block
-        else:
-            return self + other
+    # def combine(self, other: PianoRoll, inplace: bool = False):
+    #     if inplace:
+    #         new_piano_roll = self + other
+    #         self.array = new_piano_roll.array
+    #         self.origin = new_piano_roll.origin
+    #         self.tatum = new_piano_roll.tatum
+    #         self.step = new_piano_roll.step
+    #         del new_piano_roll
+    #     else:
+    #         return self + other
 
     @classmethod
-    def empty_like(cls, block):
-        block: PianoRoll
-        new_block = cls(np.zeros_like(block.array), block.origin, block.tatum, block.step)
-        return new_block
-
-    @property
-    def time_vector(self):
-        if self._time_vector is None:
-            result = []
-            start = self.extension.time.start
-            for i in range(self.array.shape[-1]):
-                result.append(start + i * self.tatum)
-            self._time_vector = result
-            return result
-        else:
-            return self._time_vector
-
-    @property
-    def frequency_vector(self):
-        result = []
-        lower = self.extension.frequency.lower
-        for i in range(self.array.shape[-2]):
-            result.append(lower + i * self.step)
-        return result
+    def empty_like(cls, piano_roll):
+        piano_roll: PianoRoll
+        new_piano_roll = cls(np.zeros_like(piano_roll.array), piano_roll.origin, piano_roll.tatum, piano_roll.step)
+        return new_piano_roll
 
     def collapse_tracks(self, inplace: bool = False, keepdims: bool = False):
         if inplace:
@@ -879,7 +904,7 @@ class PianoRoll:
         else:
             raise NotImplementedError
 
-    def to_chroma_block(self) -> ChromaRoll:
+    def to_chroma_roll(self) -> ChromaRoll:
         return ChromaRoll(self)
 
     def to_binary(self, inplace=False):
@@ -895,45 +920,55 @@ class ChromaRoll(PianoRoll):
         super().__init__(array, origin, tatum, step)
 
     @multimethod
-    def __init__(self, block: PianoRoll):
-        array = np.zeros((12, block.array.shape[1]), block.array.dtype)
-        origin = TimeFrequency(block.origin.time, type(block.origin.frequency)(0))
+    def __init__(self, piano_roll: PianoRoll):
+        array = np.zeros((12, piano_roll.array.shape[1]), piano_roll.array.dtype)
+        origin = TimeFrequency(piano_roll.origin.time, type(piano_roll.origin.frequency)(0))
         for i in range(12):
-            idx = (i + block.origin.frequency.value) % 12
+            idx = (i + piano_roll.origin.frequency.value) % 12
             try:
-                array[i, :] = np.max(block.array[idx::12, :], 0)
+                array[i, :] = np.max(piano_roll.array[idx::12, :], 0)
             except ValueError:
                 pass
-        self.__init__(array, origin, block.tatum, block.step)
+        self.__init__(array, origin, piano_roll.tatum, piano_roll.step)
 
     def change_type(self, new_type: np.dtype, inplace: bool = False):
         if inplace:
             self.array = self.array.astype(new_type)
         else:
-            new_block = ChromaRoll(self.array.astype(new_type), self.origin, self.tatum, self.step)
-            return new_block
+            new_piano_roll = ChromaRoll(self.array.astype(new_type), self.origin, self.tatum, self.step)
+            return new_piano_roll
 
     @classmethod
-    def empty_like(cls, block):
-        block: ChromaRoll
-        new_block = cls(np.zeros_like(block.array), block.origin, block.tatum, block.step)
-        return new_block
+    def empty_like(cls, piano_roll):
+        piano_roll: ChromaRoll
+        new_piano_roll = cls(np.zeros_like(piano_roll.array), piano_roll.origin, piano_roll.tatum, piano_roll.step)
+        return new_piano_roll
 
     @property
     def frequency_vector(self):
         return midi_numbers_to_chromas([i for i in range(12)])
 
 
-class Hit:
-    def __init__(self, start: str, duration: str, nature: str = 'shift'):
-        self.nature = nature
+class Hit(PianoRoll):
+    @multimethod
+    def __init__(self, start: Time, duration: TimeShift):
+        self.start = start
 
+        array = np.array([[2]], dtype=np.uint8)
+        origin = TimeFrequency(start, FrequencyShift(0))
+        tatum = duration
+        step = FrequencyShift(1)
+
+        super().__init__(array, origin, tatum, step)
+
+    @multimethod
+    def __init__(self, start: str, duration: str, nature: str = 'shift'):
         if nature == 'shift':
             self.start = TimeShift(start)
         elif nature == 'point':
             self.start = TimePoint(start)
 
-        self.duration = TimeShift(duration)
+        self.__init__(self.start, TimeShift(duration))
 
     @property
     def end(self):
@@ -945,49 +980,22 @@ class Hit:
 
 class Rhythm(PianoRoll):
     def __init__(self, *hits: Hit):
-        self.hits: List[Hit] = list(hits)
-        if len({type(hit.start) for hit in hits}) > 1:
+        natures = list({hit.time_nature for hit in hits})
+        if len(natures) > 1:
             raise WrongNature('Hits must be of the same nature')
 
-        # Tatum
-        tatum = TimeShift(0, 1)
+        self.hits: List[Hit] = list(hits)
+
+        super().__init__()
         for hit in hits:
-            tatum = tatum.gcd(hit.start, hit.duration)
-
-        # Array size
-        if len(hits) > 0:
-            extension = ()
-            for h, hit in enumerate(hits):
-                start_idx = hit.start // tatum
-                end_idx = (hit.start + hit.duration) // tatum
-                if h == 0:
-                    extension = (start_idx, end_idx)
-                else:
-                    extension = (min(extension[0], start_idx), max(extension[1], end_idx))
-            size = (1, extension[1] - extension[0])
-            time_origin = extension[0] * tatum
-        else:
-            size = (1, 0)
-            time_origin = TimeShift(0)
-            tatum = TimeShift(1, 1)
-
-        # Create and fill array
-        array = np.zeros(size, dtype=np.uint8)
-        for hit in hits:
-            start_idx = (hit.start - time_origin) // tatum
-            end_idx = (hit.end - time_origin) // tatum
-            array[:, start_idx: end_idx] = np.maximum(array[:, start_idx: end_idx], 1)
-            array[:, start_idx] = np.maximum(array[:, start_idx], 2)
-
-        # Create object
-        PianoRoll.__init__(self, array, TimeFrequency(time_origin, FrequencyShift(0)), tatum)
+            self.supremum(hit)
 
     @property
     def nature(self):
         if len(self.hits) == 0:
             return 'shift'
         else:
-            return self.hits[0].nature
+            return self.hits[0].time_nature
 
 
 class Texture(list):
@@ -1117,10 +1125,10 @@ class HarmonicTexture(PianoRoll):
         for rhythm, chord in zip(texture, harmony):
             rhythm: Rhythm
             chord: Chord
-            tensor_product = PianoRoll(chord.array * rhythm.array,
+            rhythmed_chord = PianoRoll(chord.array * rhythm.array,
                                        TimeFrequency(rhythm.origin.time, chord.origin.frequency),
                                        rhythm.tatum, chord.step)
-            self.combine(tensor_product, inplace=True)
+            self.supremum(rhythmed_chord)
 
     def __len__(self):
         return len(self.texture)
@@ -1180,7 +1188,7 @@ class Activations(PianoRoll, list):
         # PianoRoll
         PianoRoll.__init__(self, array, origin, tatum, step)
 
-    def change_tatum(self, new_tatum: TimeShift, inplace=False, null=True):
+    def change_tatum(self, new_tatum: TimeShift, inplace=False, sparse=True):
         if inplace:
             PianoRoll.change_tatum(self, new_tatum, inplace, True)
         else:
@@ -1188,8 +1196,8 @@ class Activations(PianoRoll, list):
 
     def __add__(self, other):
         assert isinstance(other, PianoRoll)
-        from .morphology import dilate_sparse
-        return dilate_sparse(self, other)
+        from .morphology import dilate_activations
+        return dilate_activations(self, other)
 
 
 class ScoreTree:

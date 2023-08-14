@@ -85,17 +85,23 @@ class TestHarmonicTexture(unittest.TestCase):
         h_1 = Hit('0/8', '1/8')
         h_2 = Hit('2/8', '1/8', 'shift')
         h_3 = Hit('0/8', '1/8', 'point')
+        h_4 = Hit('0/4', '1/4', 'shift')
+        h_5 = Hit('-1/8', '1/4')
+        h_6 = Hit('-1/8', '1/4', 'point')
+        h_7 = Hit('0', '1/4')
 
         try:
             Rhythm(h_1, h_2, h_3)
             raise Exception('Cannot mix hits of different natures')
         except WrongNature:
             pass
+        r_0 = Rhythm(h_5, h_7)
         r_1 = Rhythm(h_1, h_2)
-        h_4 = Hit('0/4', '1/4', 'shift')
         r_2 = Rhythm(h_1, h_4)
+        Rhythm(h_3, h_6)
 
         Texture(r_1, r_2)
+        Texture(r_0)
 
     def test_harmony(self):
         from mmm.pianorolls.music import Chord, Harmony, WrongNature

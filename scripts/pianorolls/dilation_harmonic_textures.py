@@ -45,9 +45,6 @@ b_4 = A7_2_prime
 b_5 = Dm_1
 b_6 = AM_1
 
-# t = TimePoint(1, 1, 0, time_signature=(3, 8))
-# f = FrequencyShift(0)
-# tf = TimeFrequency(t, f)
 a_1 = Activations(
     TimeFrequency(TimePoint(1, 1, 0, time_signature=(3, 8)), FrequencyShift(0)),
     TimeFrequency(TimePoint(2, 1, 0, time_signature=(3, 8)), FrequencyShift(0)),
@@ -90,7 +87,7 @@ plot_piano_roll(p, x_tick_start=TimePoint(-3, 8), x_tick_step=TimeShift(3, 8),
 
 folder = Path(__file__).parent.parent.parent / Path('phd') / Path('chapter_4')
 folder.mkdir(parents=True, exist_ok=True)
-fig_path = folder / Path('dilation_harmonic_textures.eps')
+fig_path = folder / Path('dilation_harmonic_textures.pdf')
 
 plt.savefig(fig_path)
 

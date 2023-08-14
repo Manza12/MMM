@@ -87,7 +87,7 @@ plot_piano_roll(p, x_tick_start=TimePoint(-3, 8), x_tick_step=TimeShift(3, 8),
 
 folder = Path(__file__).parent.parent.parent / Path('phd') / Path('chapter_4')
 folder.mkdir(parents=True, exist_ok=True)
-fig_path = folder / Path('dilation_harmonic_textures.eps')
+fig_path = folder / Path('dilation_harmonic_textures.pdf')
 
 plt.savefig(fig_path)
 
