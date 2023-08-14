@@ -240,7 +240,7 @@ def plot_all(lines, signals, spectrograms, plot, components, paths):
     plt.show()
 
 
-def plot_input_phd(spectrograms, plot, images_folder, settings):
+def plot_input_phd(spectrograms, images_folder, settings):
     # Input spectrogram
     if settings.get('input', None) is not None:
         plot_single(spectrograms['input'], 'input', 'Input', images_folder,
@@ -259,7 +259,7 @@ def plot_input_phd(spectrograms, plot, images_folder, settings):
                      phd={'x_lim': (0.08, 0.16), 'y_lim': (500, 1000), 'name': 'erosion'})
 
 
-def plot_noise_phd(spectrograms, plot, images_folder, settings):
+def plot_noise_phd(spectrograms, images_folder, settings):
     # Opening spectrogram
     if settings.get('opening', None) is not None:
         plot_compare(spectrograms['erosion'], spectrograms['opening'],
@@ -307,7 +307,7 @@ def plot_noise_phd(spectrograms, plot, images_folder, settings):
                      phd=settings['input_noise'])
 
 
-def plot_sinusoids_phd(lines, spectrograms, plot, images_folder, settings):
+def plot_sinusoids_phd(lines, spectrograms, images_folder, settings):
     # Vertical thinning spectrogram
     if settings.get('vertical_thin', None) is not None:
         plot_compare(spectrograms['reconstruction_erosion'], spectrograms['vertical_thin'],
@@ -345,7 +345,7 @@ def plot_sinusoids_phd(lines, spectrograms, plot, images_folder, settings):
                      phd=settings['input_sinusoids'])
 
 
-def plot_transient_phd(lines, spectrograms, plot, images_folder, settings):
+def plot_transient_phd(lines, spectrograms, images_folder, settings):
     # Horizontal thinning spectrogram
     if settings.get('horizontal_thin', None) is not None:
         plot_compare(spectrograms['reconstruction_erosion'], spectrograms['horizontal_thin'],
@@ -383,23 +383,23 @@ def plot_transient_phd(lines, spectrograms, plot, images_folder, settings):
                      phd=settings['input_transient'])
 
 
-def plot_output_phd(spectrograms, plot, images_folder, settings):
+def plot_output_phd(spectrograms, images_folder, settings):
     # Input - Output spectrogram
     if settings.get('input_output', None) is not None:
         plot_compare(spectrograms['input'], spectrograms['output'], 'input_output', 'Input - Output', images_folder,
                      phd=settings['input_output'])
 
 
-def plot_phd(lines, spectrograms, plot, components, paths, settings):
+def plot_phd(lines, spectrograms, components, paths, settings):
     if components['input']:
-        plot_input_phd(spectrograms, plot, paths['images_folder'], settings)
+        plot_input_phd(spectrograms, paths['images_folder'], settings)
     if components['noise']:
-        plot_noise_phd(spectrograms, plot, paths['images_folder'], settings)
+        plot_noise_phd(spectrograms, paths['images_folder'], settings)
     if components['sinusoids']:
-        plot_sinusoids_phd(lines, spectrograms, plot, paths['images_folder'], settings)
+        plot_sinusoids_phd(lines, spectrograms, paths['images_folder'], settings)
     if components['transient']:
-        plot_transient_phd(lines, spectrograms, plot, paths['images_folder'], settings)
+        plot_transient_phd(lines, spectrograms, paths['images_folder'], settings)
     if components['output']:
-        plot_output_phd(spectrograms, plot, paths['images_folder'], settings)
+        plot_output_phd(spectrograms, paths['images_folder'], settings)
 
     plt.show()

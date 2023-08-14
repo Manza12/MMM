@@ -172,6 +172,6 @@ sys.stdout.close()
 if operations['plots']:
     if phd:
         from mmm.spectrograms.phd_settings import settings
-        plot_phd(lines, spectrograms, plot, components, paths, settings[name])
+        plot_phd(lines, spectrograms, components, paths, settings[name])
     else:
         plot_all(lines, signals, spectrograms, plot, components, paths)
