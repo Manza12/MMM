@@ -17,7 +17,7 @@ def plot_single(spectrogram, name, title, images_folder, v_min=MIN_DB, v_max=0, 
         fig.axes[0].set_ylim(phd['y_lim'][0] / FREQUENCY_PRECISION, phd['y_lim'][1] / FREQUENCY_PRECISION)
         phd_folder = images_folder / 'phd'
         phd_folder.mkdir(parents=True, exist_ok=True)
-        fig.savefig(phd_folder / (phd['name'] + '.eps'), dpi=300)
+        fig.savefig(phd_folder / (phd['name'] + '.pdf'), dpi=300)
 
     return fig
 
@@ -54,8 +54,8 @@ def plot_compare(spectrogram_1, spectrogram_2, name, title, images_folder,
         bbox_0 = mpl.transforms.Bbox([[0., 0.], [x_border, fig_size[1]]])
         bbox_1 = mpl.transforms.Bbox([[x_border, 0.], fig_size])
 
-        fig.savefig(phd_folder / (phd['name'] + '_0.eps'), dpi=dpi, bbox_inches=bbox_0)
-        fig.savefig(phd_folder / (phd['name'] + '_1.eps'), dpi=dpi, bbox_inches=bbox_1)
+        fig.savefig(phd_folder / (phd['name'] + '_0.pdf'), dpi=dpi, bbox_inches=bbox_0)
+        fig.savefig(phd_folder / (phd['name'] + '_1.pdf'), dpi=dpi, bbox_inches=bbox_1)
 
     return fig
 
