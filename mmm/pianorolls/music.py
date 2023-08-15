@@ -308,6 +308,10 @@ class TimeExtension:
         assert isinstance(other, TimeExtension)
         return self.duration == other.duration
 
+    def __sub__(self, other: TimeExtension):
+        assert isinstance(other, TimeExtension)
+        return self.start - other.start, self.end - other.end
+
     def __str__(self):
         return '%s -> %s (%s)' % (self.start, self.end, self.duration.value)
 
@@ -526,6 +530,10 @@ class FrequencyExtension:
         assert isinstance(other, FrequencyExtension)
         return self.range == other.range
 
+    def __sub__(self, other: FrequencyExtension):
+        assert isinstance(other, FrequencyExtension)
+        return self.lower - other.lower, self.higher - other.higher
+
     def __str__(self):
         return '%s -> %s (%s)' % (self.lower, self.higher, self.range)
 
@@ -602,6 +610,13 @@ class Extension:
     def __eq__(self, other):
         assert isinstance(other, Extension)
         return self.time.duration == other.time.duration and self.frequency.range == other.frequency.range
+
+    def __sub__(self, other: Extension):
+        assert isinstance(other, Extension)
+        time_extension_diff = self.time - other.time
+        frequency_extension_diff = self.frequency - other.frequency
+        return (TimeFrequency(time_extension_diff[0], frequency_extension_diff[0]),
+                TimeFrequency(time_extension_diff[1], frequency_extension_diff[1]))
 
     def __str__(self):
         return 'Time: %s\tFrequency: %s' % (self.time, self.frequency)
@@ -788,6 +803,28 @@ class PianoRoll:
         self.tatum = result.tatum
         self.step = result.step
 
+    def change_time_extension(self, new_extension: TimeExtension):
+        # Compute difference
+        diff = new_extension - self.extension.time
+        pad_width = ((0, 0), (- diff[0] // self.tatum, diff[1] // self.tatum))
+
+        # Update attributes
+        self.array = np.pad(self.array, pad_width)
+        self.origin.time = new_extension.start
+
+    def change_frequency_extension(self, new_extension: FrequencyExtension):
+        # Compute difference
+        diff = new_extension - self.extension.frequency
+        pad_width = ((- diff[0] // self.step, diff[1] // self.step), (0, 0))
+
+        # Update attributes
+        self.array = np.pad(self.array, pad_width)
+        self.origin.frequency = new_extension.lower
+
+    def change_extension(self, new_extension: Extension):
+        self.change_time_extension(new_extension.time)
+        self.change_frequency_extension(new_extension.frequency)
+
     def change_tatum(self, new_tatum: TimeShift, inplace=False, sparse=False):
         if self.tatum != new_tatum:
             # Compute ratio
@@ -867,7 +904,7 @@ class PianoRoll:
 
         if inplace:
             self.array = self.array[low: self.array.shape[0] - high, early: self.array.shape[1] - later]
-            self.origin = TimeFrequency(self.origin.time + low * self.tatum, self.origin.frequency + early * self.step)
+            self.origin = TimeFrequency(self.origin.time + early * self.tatum, self.origin.frequency + low * self.step)
         else:
             return PianoRoll(self.array[low: self.array.shape[0] - high, early: self.array.shape[1] - later],
                              TimeFrequency(self.origin.time + low * self.tatum,

@@ -164,6 +164,7 @@ def plot_piano_roll(piano_roll: PianoRoll, note_names: bool = True, time_shift: 
                     freq_label: Optional[str] = None, time_label: Optional[str] = None,
                     colorbar=True, colorbar_ticks=None, colorbar_labels=None,
                     x_tick_start=None, x_tick_step=None,
+                    y_tick_start=None, y_tick_step=None,
                     marker_color='r',
                     tight_frame=True,
                     **kwargs):
@@ -177,6 +178,15 @@ def plot_piano_roll(piano_roll: PianoRoll, note_names: bool = True, time_shift: 
     if time_label is None:
         time_label = 'Time (wholes)'
 
+    if freq_label is None:
+        if piano_roll.frequency_nature == 'point':
+            if isinstance(piano_roll, ChromaRoll):
+                freq_label = 'Chroma'
+            else:
+                freq_label = 'Pitch'
+        else:
+            freq_label = 'Shift (semitones)'
+
     if time_shift is not None:
         time_vector += time_shift
 
@@ -185,14 +195,15 @@ def plot_piano_roll(piano_roll: PianoRoll, note_names: bool = True, time_shift: 
                                 (piano_roll.extension.frequency.higher + FrequencyShift(1)).value,
                                 piano_roll.step.value)
         if note_names:
-            if isinstance(piano_roll, ChromaRoll) or note_names == 'chroma':
-                freq_vector = midi_numbers_to_chromas(freq_vector)
-                if freq_label is None:
-                    freq_label = 'Chroma'
-            else:
-                freq_vector = midi_numbers_to_pitches(freq_vector)
-                if freq_label is None:
-                    freq_label = 'Pitch'
+            if piano_roll.frequency_nature == 'point':
+                if isinstance(piano_roll, ChromaRoll) or note_names == 'chroma':
+                    freq_vector = midi_numbers_to_chromas(freq_vector)
+                    if freq_label is None:
+                        freq_label = 'Chroma'
+                else:
+                    freq_vector = midi_numbers_to_pitches(freq_vector)
+                    if freq_label is None:
+                        freq_label = 'Pitch'
         else:
             freq_vector = freq_vector
             if freq_label is None:
@@ -221,7 +232,7 @@ def plot_piano_roll(piano_roll: PianoRoll, note_names: bool = True, time_shift: 
         if x_tick_start is None:
             x_tick_start = TimePoint(0, 1)
         ticks = np.arange((x_tick_start - piano_roll.extension.time.start) / piano_roll.tatum,
-                          (piano_roll.extension.time.end / piano_roll.tatum) + 1,
+                          (piano_roll.extension.time.end - piano_roll.extension.time.start) / piano_roll.tatum + 1,
                           x_tick_step / piano_roll.tatum)
         ticks -= 0.5
         plt.xticks(ticks)
@@ -229,6 +240,14 @@ def plot_piano_roll(piano_roll: PianoRoll, note_names: bool = True, time_shift: 
         # Update the ticks
         x_ticks = plt.xticks()[0]
         plt.xticks(x_ticks - 0.5)
+
+    if y_tick_step is not None:
+        if y_tick_start is None:
+            y_tick_start = piano_roll.extension.frequency.lower
+        ticks = np.arange((y_tick_start - piano_roll.extension.frequency.lower) / piano_roll.step,
+                          (piano_roll.extension.frequency.higher - piano_roll.extension.frequency.lower) / piano_roll.step + 1,
+                          y_tick_step / piano_roll.step)
+        plt.yticks(ticks)
 
     if measure_width is not None:
         if measure_offset is None:

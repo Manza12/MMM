@@ -3,10 +3,15 @@ from pathlib import Path
 
 from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.music import Hit, Rhythm, Texture, Chord, PianoRoll, \
-    Activations, TimeFrequency, TimePoint, TimeShift, FrequencyShift
+    Activations, TimeFrequency, TimePoint, TimeShift, FrequencyPoint, \
+    FrequencyExtension, FrequencyShift
 from mmm.pianorolls.plot import plot_piano_roll
 
-texture = Texture(
+# Path
+folder = Path('..') / Path('..') / Path('phd') / Path('chapter_5') / Path('structuring_elements')
+folder.mkdir(parents=True, exist_ok=True)
+
+t = Texture(
     Rhythm(
         Hit('1/16', '1/16'),
         Hit('3/16', '1/16'),
@@ -19,28 +24,37 @@ texture = Texture(
     ),
 )
 
-Am = Chord(69, 72, 76)
-FM = Chord(69, 72, 77)
-EM = Chord(68, 71, 76)
-Em = Chord(67, 71, 76)
+i = Chord(0, 3, 7)
+VI = Chord(0, 3, 8)
+V = Chord(-1, 2, 7)
+v = Chord(-2, 2, 7)
 
-chords = [Am, FM, EM, Em]
+patterns = [i, VI, V, v]
+
+harmonic_textures = [t * i, t * VI, t * V, t * v]
+
+for h, harmonic_texture in enumerate(harmonic_textures):
+    harmonic_texture.change_frequency_extension(FrequencyExtension(FrequencyShift(-2), FrequencyShift(9)))
+    plot_piano_roll(harmonic_texture, fig_size=(360, 240),
+                    y_tick_start=FrequencyShift(-2), y_tick_step=FrequencyShift(2))
+    plt.savefig(folder / Path('harmonic_texture_%d.pdf' % h))
+
+A4 = FrequencyPoint(69)
 activations_chords = [
-    Activations(TimeFrequency(TimePoint('0/4'), FrequencyShift(0))),
-    Activations(TimeFrequency(TimePoint('1/4'), FrequencyShift(0))),
-    Activations(TimeFrequency(TimePoint('2/4'), FrequencyShift(0))),
-    Activations(TimeFrequency(TimePoint('3/4'), FrequencyShift(0))),
+    Activations(TimeFrequency(TimePoint('0/4'), A4)),
+    Activations(TimeFrequency(TimePoint('1/4'), A4)),
+    Activations(TimeFrequency(TimePoint('2/4'), A4)),
+    Activations(TimeFrequency(TimePoint('3/4'), A4)),
 ]
 piano_roll = PianoRoll()
-for chord, activations in zip(chords, activations_chords):
-    piano_roll += activations + texture * chord
+for harmonic_texture, activations in zip(harmonic_textures, activations_chords):
+    shifted_harmonic_texture = activations + harmonic_texture
+    piano_roll = piano_roll + shifted_harmonic_texture
 
 midi_file = create_midi(piano_roll)
 
-plot_piano_roll(piano_roll, time_label='Time (m, b)', x_tick_start=TimePoint(0), x_tick_step=TimeShift('1/4'))
-
-folder = Path('..') / Path('..') / Path('phd') / Path('chapter_5') / Path('structuring_elements')
-folder.mkdir(parents=True, exist_ok=True)
+plot_piano_roll(piano_roll, time_label='Time (m, b)', x_tick_start=TimePoint(0), x_tick_step=TimeShift('1/4'),
+                fig_size=(480, 360))
 
 midi_path = folder / Path('example_1.mid')
 file_path = folder / Path('example_1.pdf')
