@@ -1153,7 +1153,7 @@ class Activations(PianoRoll, list):
         # Time
         zero_time = type(values[0].time).zero()
         tatum = TimeShift.gcd(*[(a.time - zero_time) for a in values])
-        if tatum == zero_time:
+        if tatum.value == 0:
             tatum = TimeShift(1)
 
         earlier_activation = min([a.time for a in values])

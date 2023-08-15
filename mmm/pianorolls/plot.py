@@ -1,5 +1,3 @@
-import matplotlib.pyplot as plt
-
 from . import *
 from .music import Time, TimePoint, TimeShift, FrequencyShift, PianoRoll, ChromaRoll
 from .utils import midi_numbers_to_chromas, midi_numbers_to_pitches, round_half_up
@@ -164,7 +162,7 @@ def plot_piano_roll(piano_roll: PianoRoll, note_names: bool = True, time_shift: 
                     measure_width: Optional[Time] = None, measure_offset: Optional[Time] = None,
                     measure_number_offset: int = 0,
                     freq_label: Optional[str] = None, time_label: Optional[str] = None,
-                    colorbar=False, colorbar_ticks=None, colorbar_labels=None,
+                    colorbar=True, colorbar_ticks=None, colorbar_labels=None,
                     x_tick_start=None, x_tick_step=None,
                     marker_color='r',
                     tight_frame=True,
