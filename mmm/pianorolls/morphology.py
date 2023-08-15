@@ -2,15 +2,24 @@ import torch
 import numpy as np
 from multimethod import multimethod
 from nnMorpho.binary_operators import erosion as binary_erosion
-from .music import Activations, PianoRoll, PianoRollStack, TimeFrequency
+from .music import Activations, PianoRoll, PianoRollStack, TimeFrequency, ActivationsStack
 
 
-def dilate_activations(activations: Activations, piano_roll: PianoRoll):
+@multimethod
+def dilation(activations: Activations, structuring_element: PianoRoll):
     result = PianoRoll()
     for activation in activations:
-        shifted_piano_roll = piano_roll.copy()
+        shifted_piano_roll = structuring_element.copy()
         shifted_piano_roll.shift(activation)
         result += shifted_piano_roll
+    return result
+
+
+@multimethod
+def dilation(activations_list: ActivationsStack, structuring_elements: PianoRollStack):
+    result = PianoRoll()
+    for activations, structuring_element in zip(activations_list, structuring_elements):
+        result += dilation(activations, structuring_element)
     return result
 
 
@@ -48,7 +57,7 @@ def erosion(piano_roll: PianoRoll, structuring_element: PianoRoll):
 
 @multimethod
 def erosion(piano_roll: PianoRoll, structuring_elements: PianoRollStack):
-    result = PianoRollStack()
+    result = ActivationsStack()
     for structuring_element in structuring_elements:
         result.append(erosion(piano_roll, structuring_element))
     return result

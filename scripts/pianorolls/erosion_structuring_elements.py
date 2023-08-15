@@ -5,7 +5,7 @@ from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.music import Hit, Rhythm, Texture, Chord, PianoRoll, \
     Activations, TimeFrequency, TimePoint, TimeShift, FrequencyPoint, \
     FrequencyExtension, FrequencyShift, TimeExtension, Extension, PianoRollStack
-from mmm.pianorolls.morphology import erosion
+from mmm.pianorolls.morphology import erosion, dilation
 from mmm.pianorolls.plot import plot_piano_roll
 
 # Path
@@ -69,13 +69,16 @@ activations_16: PianoRoll = erosion(piano_roll, hit_16)
 B_2_by_2 = PianoRollStack(
     piano_roll[TimePoint('1/16'): TimePoint('3/16'), FrequencyPoint(69): FrequencyPoint(73)],
     piano_roll[TimePoint('3/16'): TimePoint('5/16'), FrequencyPoint(69): FrequencyPoint(78)],
-    piano_roll[TimePoint('7/16'): TimePoint('9/16'), FrequencyPoint(69): FrequencyPoint(79)]
+    piano_roll[TimePoint('7/16'): TimePoint('9/16'), FrequencyPoint(69): FrequencyPoint(79)],
+    piano_roll[TimePoint('13/16'): TimePoint('15/16'), FrequencyPoint(67): FrequencyPoint(72)],
+    piano_roll[TimePoint('15/16'): TimePoint('17/16'), FrequencyPoint(67): FrequencyPoint(77)],
 )
 
 for j, b in enumerate(B_2_by_2):
     B_2_by_2[j] = b - TimeFrequency(b.origin.time, b.origin.frequency)
 
-A_2_by_2: PianoRollStack = erosion(piano_roll, B_2_by_2)
+A_2_by_2 = erosion(piano_roll, B_2_by_2)
+piano_roll_two_by_two = dilation(A_2_by_2, B_2_by_2)
 
 # Figures
 # Sixteenth note
@@ -102,6 +105,14 @@ for j, a in enumerate(A_2_by_2):
                     fig_size=(400, 200))
     file_path = folder / Path('erosion_2_by_2-%d.pdf' % (j + 1))
     plt.savefig(file_path)
+
+# Dilation
+piano_roll_two_by_two.change_extension(piano_roll.extension)
+plot_piano_roll(piano_roll_two_by_two, time_label='Time (m, b)',
+                x_tick_start=TimePoint(0), x_tick_step=TimeShift('1/4'),
+                fig_size=(400, 200))
+file_path = folder / Path('dilation_2_by_2.pdf')
+plt.savefig(file_path)
 
 # Harmonic textures
 for h, harmonic_texture in enumerate(harmonic_textures):

@@ -1300,8 +1300,13 @@ class Activations(list, PianoRoll):
 
     def __add__(self, other):
         assert isinstance(other, PianoRoll)
-        from .morphology import dilate_activations
-        return dilate_activations(self, other)
+        from .morphology import dilation
+        return dilation(self, other)
+
+
+class ActivationsStack(List[Activations]):
+    def __init__(self, *activations_list: Activations):
+        super().__init__(activations_list)
 
 
 class ScoreTree:
