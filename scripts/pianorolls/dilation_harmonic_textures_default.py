@@ -1,6 +1,7 @@
 from pathlib import Path
 import matplotlib.pyplot as plt
 
+from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.music import TimeFrequency, TimePoint, FrequencyPoint, TimeShift, TimeSignature,\
     Hit, Rhythm, Texture, Chord, Activations
 from mmm.pianorolls.plot import plot_piano_roll
@@ -82,13 +83,17 @@ a_6 = Activations(
 p = (a_1 + b_1) + (a_2 + b_2) + (a_3 + b_3) + (a_4 + b_4) + (a_5 + b_5) + (a_6 + b_6)
 p.time_signature = TimeSignature(3, 8)
 
+midi_file = create_midi(p, tempo=120)
+
 plot_piano_roll(p, x_tick_start=TimePoint(-3, 8), x_tick_step=TimeShift(3, 8),
                 time_label='Time (m, b)', fig_size=(640, 400))
 
 folder = Path(__file__).parent.parent.parent / Path('phd') / Path('chapter_4')
 folder.mkdir(parents=True, exist_ok=True)
+midi_path = folder / Path('dilation_harmonic_textures_default.mid')
 fig_path = folder / Path('dilation_harmonic_textures.pdf')
 
 plt.savefig(fig_path)
+midi_file.save(midi_path)
 
 plt.show()

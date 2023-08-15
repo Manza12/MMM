@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from pathlib import Path
 
+from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.music import Hit, Rhythm, Texture, Chord, PianoRoll, \
     Activations, TimeFrequency, TimePoint, TimeShift, FrequencyShift
 from mmm.pianorolls.plot import plot_piano_roll
@@ -21,7 +22,7 @@ texture = Texture(
 Am = Chord(69, 72, 76)
 FM = Chord(69, 72, 77)
 EM = Chord(68, 71, 76)
-Em = Chord(68, 71, 75)
+Em = Chord(67, 71, 76)
 
 chords = [Am, FM, EM, Em]
 activations_chords = [
@@ -34,11 +35,17 @@ piano_roll = PianoRoll()
 for chord, activations in zip(chords, activations_chords):
     piano_roll += activations + texture * chord
 
+midi_file = create_midi(piano_roll)
+
 plot_piano_roll(piano_roll, time_label='Time (m, b)', x_tick_start=TimePoint(0), x_tick_step=TimeShift('1/4'))
 
-folder = Path('..') / Path('..') / Path('phd') / Path('chapter_5')
+folder = Path('..') / Path('..') / Path('phd') / Path('chapter_5') / Path('structuring_elements')
 folder.mkdir(parents=True, exist_ok=True)
+
+midi_path = folder / Path('example_1.mid')
 file_path = folder / Path('example_1.pdf')
+
+midi_file.save(midi_path)
 plt.savefig(file_path)
 
 plt.show()

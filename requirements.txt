@@ -6,3 +6,4 @@ multimethod==1.9
 nnAudio==0.3.2
 torch==1.12.1
 nnMorpho==2.2.3
+mido==1.2.10
