@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from . import *
 from .dictionaries import roman_numeral_to_factors_dict
-from .utils import midi_number_to_pitch, midi_numbers_to_chromas, gcd
+from .utils import midi_number_to_pitch, midi_number_to_chroma, gcd
 
 
 class WrongNature(Exception):
@@ -316,6 +316,17 @@ class TimeExtension:
         return '%s -> %s (%s)' % (self.start, self.end, self.duration.value)
 
 
+class TimeVector:
+    def __init__(self, origin: Time, tatum: TimeShift):
+        assert isinstance(origin, Time)
+        assert isinstance(tatum, TimeShift)
+        self.origin = origin
+        self.tatum = tatum
+
+    def __getitem__(self, item):
+        return self.origin + self.tatum * item
+
+
 # Frequency
 class Frequency:
     nature: Optional[str] = None
@@ -507,6 +518,32 @@ class FrequencyPoint(Frequency):
         return FrequencyPoint(0)
 
 
+class ChromaShift(FrequencyShift):
+    def __init__(self, shift: int):
+        assert 0 <= shift < 12
+        super().__init__(shift)
+
+    def __add__(self, other):
+        assert isinstance(other, ChromaShift) or isinstance(other, Chroma)
+        if isinstance(other, ChromaShift):
+            return ChromaShift((self.value + other.value) % 12)
+        else:
+            return Chroma((self.value + other.value) % 12)
+
+
+class Chroma(FrequencyPoint):
+    def __init__(self, number: int):
+        assert 0 <= number < 12
+        super().__init__(number)
+
+    def __add__(self, other: ChromaShift):
+        assert isinstance(other, ChromaShift), 'Chroma can only be added with Shift.'
+        return Chroma((self.value + other.value) % 12)
+
+    def __str__(self):
+        return midi_number_to_chroma(self.value)
+
+
 class FrequencyExtension:
     def __init__(self, lower: Frequency, higher: Frequency):
         assert type(lower) == type(higher)
@@ -536,6 +573,17 @@ class FrequencyExtension:
 
     def __str__(self):
         return '%s -> %s (%s)' % (self.lower, self.higher, self.range)
+
+
+class FrequencyVector:
+    def __init__(self, origin: Frequency, step: FrequencyShift):
+        assert isinstance(origin, Frequency)
+        assert isinstance(step, FrequencyShift)
+        self.origin = origin
+        self.step = step
+
+    def __getitem__(self, item):
+        return self.origin + self.step * item
 
 
 # Time-Frequency
@@ -772,23 +820,11 @@ class PianoRoll:
 
     @property
     def time_vector(self):
-        if self._time_vector is None:
-            result = []
-            start = self.extension.time.start
-            for i in range(self.array.shape[-1]):
-                result.append(start + i * self.tatum)
-            self._time_vector = result
-            return result
-        else:
-            return self._time_vector
+        return TimeVector(self.origin.time, self.tatum)
 
     @property
     def frequency_vector(self):
-        result = []
-        lower = self.extension.frequency.lower
-        for i in range(self.array.shape[-2]):
-            result.append(lower + i * self.step)
-        return result
+        return FrequencyVector(self.origin.frequency, self.step)
 
     def copy(self):
         return deepcopy(self)
@@ -873,7 +909,8 @@ class PianoRoll:
         if inplace:
             self.array = self.array.astype(new_type)
         else:
-            new_piano_roll = PianoRoll(self.array.astype(new_type), self.origin, self.tatum, self.step)
+            type_self = type(self)
+            new_piano_roll = type_self(self.array.astype(new_type), self.origin, self.tatum, self.step)
             return new_piano_roll
 
     def reduce(self, inplace: bool = False):
@@ -923,8 +960,7 @@ class PianoRoll:
     #         return self + other
 
     @classmethod
-    def empty_like(cls, piano_roll):
-        piano_roll: PianoRoll
+    def empty_like(cls, piano_roll: PianoRoll):
         new_piano_roll = cls(np.zeros_like(piano_roll.array), piano_roll.origin, piano_roll.tatum, piano_roll.step)
         return new_piano_roll
 
@@ -953,7 +989,9 @@ class PianoRoll:
 
 class ChromaRoll(PianoRoll):
     @multimethod
-    def __init__(self, array: np.ndarray, origin: TimeFrequency, tatum: TimeShift, step: FrequencyShift):
+    def __init__(self, array: np.ndarray, origin_time: Time, tatum: TimeShift, step: FrequencyShift):
+        assert array.shape[-2] == 12
+        origin = TimeFrequency(origin_time, Chroma(0))
         super().__init__(array, origin, tatum, step)
 
     @multimethod
@@ -961,29 +999,12 @@ class ChromaRoll(PianoRoll):
         array = np.zeros((12, piano_roll.array.shape[1]), piano_roll.array.dtype)
         origin = TimeFrequency(piano_roll.origin.time, type(piano_roll.origin.frequency)(0))
         for i in range(12):
-            idx = (i + piano_roll.origin.frequency.value) % 12
+            idx = (i - piano_roll.origin.frequency.value) % 12
             try:
                 array[i, :] = np.max(piano_roll.array[idx::12, :], 0)
             except ValueError:
                 pass
         self.__init__(array, origin, piano_roll.tatum, piano_roll.step)
-
-    def change_type(self, new_type: np.dtype, inplace: bool = False):
-        if inplace:
-            self.array = self.array.astype(new_type)
-        else:
-            new_piano_roll = ChromaRoll(self.array.astype(new_type), self.origin, self.tatum, self.step)
-            return new_piano_roll
-
-    @classmethod
-    def empty_like(cls, piano_roll):
-        piano_roll: ChromaRoll
-        new_piano_roll = cls(np.zeros_like(piano_roll.array), piano_roll.origin, piano_roll.tatum, piano_roll.step)
-        return new_piano_roll
-
-    @property
-    def frequency_vector(self):
-        return midi_numbers_to_chromas([i for i in range(12)])
 
 
 class Hit(PianoRoll):

@@ -1,27 +1,20 @@
 from . import *
-from .music import Time, TimePoint, TimeShift, FrequencyShift, PianoRoll, ChromaRoll
-from .utils import midi_numbers_to_chromas, midi_numbers_to_pitches, round_half_up
+from .music import TimePoint, PianoRoll, ChromaRoll
+from .utils import round_half_up
 
 
 def format_freq(x, pos, freq_names):
     if pos:
         pass
     n = int(round(x))
-    if 0 <= n < len(freq_names):
-        return freq_names[n]
-    else:
-        return ""
+    return freq_names[n]
 
 
 def format_time(x, pos, time_names):
     if pos:
         pass
     n = int(round_half_up(x))
-    if n < len(time_names):
-        if n >= 0:
-            return time_names[n]
-    else:
-        return ""
+    return time_names[n]
 
 
 def plot_activations(a, t, f, fig_title=None, full_screen=False, fig_size=(640, 480),
@@ -81,6 +74,7 @@ def plot_time_frequency(a, t, f, v_min=None, v_max=None, c_map='Greys',
                         interpolation='nearest', return_image=False):
     if v_min is None:
         v_min = np.min(a)
+        v_min = min(v_min, 0)
     if v_max is None:
         v_max = np.max(a)
 
@@ -157,10 +151,7 @@ def plot_time_frequency(a, t, f, v_min=None, v_max=None, c_map='Greys',
         return fig
 
 
-def plot_piano_roll(piano_roll: PianoRoll, note_names: bool = True, time_shift: Optional[Time] = None,
-                    time_vector: Iterable = None, freq_vector: Iterable = None,
-                    measure_width: Optional[Time] = None, measure_offset: Optional[Time] = None,
-                    measure_number_offset: int = 0,
+def plot_piano_roll(piano_roll: PianoRoll,
                     freq_label: Optional[str] = None, time_label: Optional[str] = None,
                     colorbar=True, colorbar_ticks=None, colorbar_labels=None,
                     x_tick_start=None, x_tick_step=None,
@@ -168,15 +159,10 @@ def plot_piano_roll(piano_roll: PianoRoll, note_names: bool = True, time_shift: 
                     marker_color='r',
                     tight_frame=True,
                     **kwargs):
-    if time_label == 'Time (m, b)':
-        TimePoint.__str__ = lambda self: f'({self.measure}, {self.beat})'
-    if time_vector is None:
-        time_vector = np.arange(piano_roll.extension.time.start,
-                                piano_roll.extension.time.end + piano_roll.tatum,
-                                piano_roll.tatum)
-
     if time_label is None:
         time_label = 'Time (wholes)'
+    elif time_label == 'Time (m, b)':
+        TimePoint.__str__ = lambda self: f'({self.measure}, {self.beat})'
 
     if freq_label is None:
         if piano_roll.frequency_nature == 'point':
@@ -187,39 +173,18 @@ def plot_piano_roll(piano_roll: PianoRoll, note_names: bool = True, time_shift: 
         else:
             freq_label = 'Shift (semitones)'
 
-    if time_shift is not None:
-        time_vector += time_shift
-
-    if freq_vector is None:
-        freq_vector = np.arange(piano_roll.extension.frequency.lower.value,
-                                (piano_roll.extension.frequency.higher + FrequencyShift(1)).value,
-                                piano_roll.step.value)
-        if note_names:
-            if piano_roll.frequency_nature == 'point':
-                if isinstance(piano_roll, ChromaRoll) or note_names == 'chroma':
-                    freq_vector = midi_numbers_to_chromas(freq_vector)
-                    if freq_label is None:
-                        freq_label = 'Chroma'
-                else:
-                    freq_vector = midi_numbers_to_pitches(freq_vector)
-                    if freq_label is None:
-                        freq_label = 'Pitch'
-        else:
-            freq_vector = freq_vector
-            if freq_label is None:
-                freq_label = 'MIDI numbers'
-
     if piano_roll.array.dtype == np.bool:
-        fig = plot_activations(piano_roll.array, time_vector, freq_vector, freq_label=freq_label, time_label=time_label,
+        fig = plot_activations(piano_roll.array, piano_roll.time_vector, piano_roll.frequency_vector,
+                               freq_label=freq_label, time_label=time_label,
                                marker_color=marker_color, **kwargs)
     else:
         if piano_roll.dynamics is None:
-            fig = plot_time_frequency(piano_roll.array, time_vector, freq_vector,
+            fig = plot_time_frequency(piano_roll.array, piano_roll.time_vector, piano_roll.frequency_vector,
                                       freq_label=freq_label, time_label=time_label,
                                       colorbar=colorbar, colorbar_ticks=colorbar_ticks, colorbar_labels=colorbar_labels,
                                       **kwargs)
         else:
-            fig = plot_time_frequency(piano_roll.array[1, :, :], time_vector, freq_vector,
+            fig = plot_time_frequency(piano_roll.array[1, :, :], piano_roll.time_vector, piano_roll.frequency_vector,
                                       freq_label=freq_label, time_label=time_label,
                                       colorbar=colorbar, colorbar_ticks=colorbar_ticks,
                                       colorbar_labels=colorbar_labels,
@@ -244,20 +209,12 @@ def plot_piano_roll(piano_roll: PianoRoll, note_names: bool = True, time_shift: 
     if y_tick_step is not None:
         if y_tick_start is None:
             y_tick_start = piano_roll.extension.frequency.lower
-        ticks = np.arange((y_tick_start - piano_roll.extension.frequency.lower) / piano_roll.step,
-                          (piano_roll.extension.frequency.higher - piano_roll.extension.frequency.lower) / piano_roll.step + 1,
-                          y_tick_step / piano_roll.step)
+
+        start = (y_tick_start - piano_roll.extension.frequency.lower) / piano_roll.step
+        end = (piano_roll.extension.frequency.higher - piano_roll.extension.frequency.lower) / piano_roll.step
+        step = y_tick_step / piano_roll.step
+        ticks = np.arange(start, end + 1, step)
         plt.yticks(ticks)
-
-    if measure_width is not None:
-        if measure_offset is None:
-            measure_offset = TimeShift(0, 1)
-
-        for i in np.arange(measure_offset // piano_roll.tatum, piano_roll.extension.time.end // piano_roll.tatum,
-                           measure_width // piano_roll.tatum):
-            plt.vlines(i-0.5, ymin=-1, ymax=len(freq_vector))
-            plt.text(i - 0.5, len(freq_vector) + 1,
-                     str(measure_number_offset + 1 + i // (measure_width // piano_roll.tatum)))
 
     # Update the limits
     if tight_frame:
