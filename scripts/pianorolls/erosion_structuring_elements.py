@@ -37,7 +37,7 @@ for h, harmonic_texture in enumerate(harmonic_textures):
     harmonic_texture.change_frequency_extension(FrequencyExtension(FrequencyShift(-2), FrequencyShift(9)))
     plot_piano_roll(harmonic_texture, fig_size=(360, 240),
                     y_tick_start=FrequencyShift(-2), y_tick_step=FrequencyShift(2))
-    plt.savefig(folder / Path('harmonic_texture_%d.pdf' % h))
+    plt.savefig(folder / Path('harmonic_texture_%d.pdf' % (h + 1)))
 
 A4 = FrequencyPoint(69)
 activations_chords = [
