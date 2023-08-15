@@ -196,9 +196,13 @@ def plot_piano_roll(piano_roll: PianoRoll,
     if x_tick_step is not None:
         if x_tick_start is None:
             x_tick_start = TimePoint(0, 1)
-        ticks = np.arange((x_tick_start - piano_roll.extension.time.start) / piano_roll.tatum,
-                          (piano_roll.extension.time.end - piano_roll.extension.time.start) / piano_roll.tatum + 1,
-                          x_tick_step / piano_roll.tatum)
+        # For Activations with zero tatum
+        if x_tick_step / piano_roll.tatum == 0:
+            ticks = np.array([0.])
+        else:
+            ticks = np.arange((x_tick_start - piano_roll.extension.time.start) / piano_roll.tatum,
+                              (piano_roll.extension.time.end - piano_roll.extension.time.start) / piano_roll.tatum + 1,
+                              x_tick_step / piano_roll.tatum)
         ticks -= 0.5
         plt.xticks(ticks)
     else:

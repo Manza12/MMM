@@ -1,7 +1,8 @@
 import torch
 import numpy as np
-from nnMorpho.binary_operators import erosion
-from .music import Activations, PianoRoll
+from multimethod import multimethod
+from nnMorpho.binary_operators import erosion as binary_erosion
+from .music import Activations, PianoRoll, PianoRollStack, TimeFrequency
 
 
 def dilate_activations(activations: Activations, piano_roll: PianoRoll):
@@ -13,7 +14,8 @@ def dilate_activations(activations: Activations, piano_roll: PianoRoll):
     return result
 
 
-def erosion_piano_roll(piano_roll: PianoRoll, structuring_element: PianoRoll):
+@multimethod
+def erosion(piano_roll: PianoRoll, structuring_element: PianoRoll):
     # Origin
     if structuring_element.frequency_nature == 'shift':
         origin_frequency = - structuring_element.origin.frequency // structuring_element.step
@@ -30,13 +32,23 @@ def erosion_piano_roll(piano_roll: PianoRoll, structuring_element: PianoRoll):
     str_el_tensor = torch.from_numpy(structuring_element.array)
 
     # Erosion
-    eroded_tensor = erosion(piano_roll_tensor, str_el_tensor, origin=(origin_time, origin_frequency))
+    eroded_tensor = binary_erosion(piano_roll_tensor, str_el_tensor, origin=(origin_time, origin_frequency))
 
     # To numpy array
     eroded_array = eroded_tensor.numpy()
 
-    # To PianoRoll
-    activations = PianoRoll.empty_like(piano_roll)
-    activations.array = eroded_array.astype(np.bool)
+    # To Activations
+    f, t = np.where(eroded_array)
+    activations = Activations(*[TimeFrequency(
+        piano_roll.origin.time + t[i] * piano_roll.tatum,
+        piano_roll.origin.frequency + f[i] * piano_roll.step) for i in range(len(f))])
 
     return activations
+
+
+@multimethod
+def erosion(piano_roll: PianoRoll, structuring_elements: PianoRollStack):
+    result = PianoRollStack()
+    for structuring_element in structuring_elements:
+        result.append(erosion(piano_roll, structuring_element))
+    return result

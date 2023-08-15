@@ -41,7 +41,7 @@ class Time:
     def __add__(self, other) -> Time:
         raise NotImplementedError
 
-    def __sub__(self, other) -> Time:
+    def __sub__(self, other) -> TimeShift:
         raise NotImplementedError
 
     def __mul__(self, other):
@@ -116,6 +116,8 @@ class TimeShift(Time):
     def __truediv__(self, other):
         assert isinstance(other, TimeShift) or isinstance(other, int)
         if isinstance(other, TimeShift):
+            if other.value == 0:
+                return 0
             return self.value / other.value
         else:
             return TimeShift(self.value / other)
@@ -123,6 +125,8 @@ class TimeShift(Time):
     def __floordiv__(self, other):
         assert isinstance(other, TimeShift) or isinstance(other, int)
         if isinstance(other, TimeShift):
+            if other.value == 0:
+                return 0
             return self.value // other.value
         else:
             return TimeShift(self.value // other)
@@ -349,7 +353,7 @@ class Frequency:
     def __add__(self, other) -> Frequency:
         raise NotImplementedError
 
-    def __sub__(self, other) -> Frequency:
+    def __sub__(self, other) -> FrequencyShift:
         raise NotImplementedError
 
     def __mul__(self, other):
@@ -614,9 +618,13 @@ class TimeFrequency:
         else:
             return False
 
-    def __add__(self, other):
+    def __add__(self, other: TimeFrequency):
         assert isinstance(other, TimeFrequency)
         return TimeFrequency(self.time + other.time, self.frequency + other.frequency)
+
+    def __sub__(self, other: TimeFrequency):
+        assert isinstance(other, TimeFrequency)
+        return TimeFrequency(self.time - other.time, self.frequency - other.frequency)
 
     def __str__(self):
         return '(%s, %s)' % (self.time, self.frequency)
@@ -789,6 +797,31 @@ class PianoRoll:
 
         return result
 
+    def __sub__(self, other: TimeFrequency):
+        assert isinstance(other, TimeFrequency)
+        return type(self)(self.array, self.origin - other, self.tatum, self.step)
+
+    def __getitem__(self, key):
+        assert isinstance(key, tuple) and len(key) == 2, 'PianoRoll can be indexed with 2 dimensions.'
+        assert isinstance(key[0], slice) and isinstance(key[1], slice), 'PianoRoll can be indexed with slices.'
+        time_slice = key[0]
+        if time_slice.step is not None:
+            raise NotImplementedError()
+
+        frequency_slice = key[1]
+        if frequency_slice.step is not None:
+            raise NotImplementedError()
+
+        new_origin = TimeFrequency(time_slice.start, frequency_slice.start)
+
+        f_0 = (frequency_slice.start - self.origin.frequency) // self.step
+        f_1 = (frequency_slice.stop - self.origin.frequency) // self.step
+        t_0 = (time_slice.start - self.origin.time) // self.tatum
+        t_1 = (time_slice.stop - self.origin.time) // self.tatum
+        new_array = self.array[f_0: f_1, t_0: t_1]
+
+        return type(self)(new_array, new_origin, self.tatum, self.step)
+
     @property
     def time_nature(self):
         return self.origin.time.nature
@@ -842,7 +875,7 @@ class PianoRoll:
     def change_time_extension(self, new_extension: TimeExtension):
         # Compute difference
         diff = new_extension - self.extension.time
-        pad_width = ((0, 0), (- diff[0] // self.tatum, diff[1] // self.tatum))
+        pad_width = ((0, 0), (-(diff[0] // self.tatum), diff[1] // self.tatum))
 
         # Update attributes
         self.array = np.pad(self.array, pad_width)
@@ -851,7 +884,7 @@ class PianoRoll:
     def change_frequency_extension(self, new_extension: FrequencyExtension):
         # Compute difference
         diff = new_extension - self.extension.frequency
-        pad_width = ((- diff[0] // self.step, diff[1] // self.step), (0, 0))
+        pad_width = ((-(diff[0] // self.step), diff[1] // self.step), (0, 0))
 
         # Update attributes
         self.array = np.pad(self.array, pad_width)
@@ -1005,6 +1038,11 @@ class ChromaRoll(PianoRoll):
             except ValueError:
                 pass
         self.__init__(array, origin, piano_roll.tatum, piano_roll.step)
+
+
+class PianoRollStack(List[PianoRoll]):
+    def __init__(self, *piano_rolls: PianoRoll):
+        super().__init__(piano_rolls)
 
 
 class Hit(PianoRoll):
@@ -1199,8 +1237,13 @@ class ChordTexture(HarmonicTexture):
         HarmonicTexture.__init__(self, texture, harmony)
 
 
-class Activations(PianoRoll, list):
+class Activations(list, PianoRoll):
     def __init__(self, *values: TimeFrequency):
+        if len(values) == 0:
+            PianoRoll.__init__(self)
+            list.__init__(self, [])
+            return
+
         if len({type(v.time) for v in values}) > 1:
             raise WrongNature('Activations must be of the same time type')
         if len({type(v.frequency) for v in values}) > 1:
@@ -1209,48 +1252,51 @@ class Activations(PianoRoll, list):
         list.__init__(self, values)
 
         # Time
-        zero_time = type(values[0].time).zero()
-        tatum = TimeShift.gcd(*[(a.time - zero_time) for a in values])
-        if tatum.value == 0:
-            tatum = TimeShift(1)
-
-        earlier_activation = min([a.time for a in values])
-        earlier_index = (earlier_activation - zero_time) // tatum
-
-        later_activation = max([a.time for a in values])
-        later_index = (later_activation - zero_time) // tatum
-
-        duration = later_index - earlier_index
-        origin_time = -earlier_index
+        origin_time = min([a.time for a in values])
+        tatum = TimeShift.gcd(*[(a.time - origin_time) for a in values])
+        # if tatum.value == 0:
+        #     tatum = TimeShift(1)
+        duration = max([a.time for a in values]) - origin_time
 
         # Frequency
-        zero_frequency = type(values[0].frequency).zero()
+        origin_frequency = min([a.frequency for a in values])
         step = FrequencyShift(1)
-
-        lower_frequency = min([a.frequency for a in values])
-        higher_frequency = max([a.frequency for a in values])
-
-        ambitus = higher_frequency - lower_frequency
-
-        lower_index = (lower_frequency - zero_frequency) // step
-        origin_frequency = -lower_index
+        ambitus = max([a.frequency for a in values]) - origin_frequency
 
         # Time-Frequency
-        origin = TimeFrequency(origin_time, origin_frequency, values[0].time.nature, values[0].frequency.nature)
-        array = np.zeros((ambitus // step + 1, duration + 1), dtype=bool)
+        origin = TimeFrequency(origin_time, origin_frequency)
+        array = np.zeros((ambitus // step + 1, duration // tatum + 1), dtype=bool)
         for a in values:
-            idx_t = (a.time - zero_time) // tatum - earlier_index
-            idx_f = (a.frequency - zero_frequency) // step - lower_index
+            idx_t = (a.time - origin_time) // tatum
+            idx_f = (a.frequency - origin_frequency) // step
             array[idx_f, idx_t] = True
 
         # PianoRoll
         PianoRoll.__init__(self, array, origin, tatum, step)
 
+    def change_time_extension(self, new_extension: TimeExtension):
+        if self.tatum.value == 0:
+            tatum = self.origin.time - new_extension.start
+            self.tatum = tatum
+
+        PianoRoll.change_time_extension(self, new_extension)
+
     def change_tatum(self, new_tatum: TimeShift, inplace=False, sparse=True):
         if inplace:
-            PianoRoll.change_tatum(self, new_tatum, inplace, True)
+            if self.tatum.value == 0:
+                self.tatum = new_tatum
+            else:
+                PianoRoll.change_tatum(self, new_tatum, inplace, True)
         else:
-            return PianoRoll.change_tatum(self, new_tatum, inplace, True)
+            if self.tatum.value == 0:
+                new_activations = Activations(*self)
+                new_activations.tatum = new_tatum
+                return new_activations
+            else:
+                return PianoRoll.change_tatum(self, new_tatum, inplace, True)
+
+    def append(self, element: TimeFrequency) -> None:
+        raise NotImplementedError('Change of array not implemented yet.')
 
     def __add__(self, other):
         assert isinstance(other, PianoRoll)

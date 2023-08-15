@@ -4,8 +4,8 @@ from pathlib import Path
 from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.music import Hit, Rhythm, Texture, Chord, PianoRoll, \
     Activations, TimeFrequency, TimePoint, TimeShift, FrequencyPoint, \
-    FrequencyExtension, FrequencyShift, TimeExtension, Extension
-from mmm.pianorolls.morphology import erosion_piano_roll
+    FrequencyExtension, FrequencyShift, TimeExtension, Extension, PianoRollStack
+from mmm.pianorolls.morphology import erosion
 from mmm.pianorolls.plot import plot_piano_roll
 
 # Path
@@ -63,7 +63,19 @@ midi_file.save(midi_path)
 
 # Trivial erosion
 hit_16 = Hit('0', '1/16')
-activations_16 = erosion_piano_roll(piano_roll, hit_16)
+activations_16: PianoRoll = erosion(piano_roll, hit_16)
+
+# Packing two by two
+B_2_by_2 = PianoRollStack(
+    piano_roll[TimePoint('1/16'): TimePoint('3/16'), FrequencyPoint(69): FrequencyPoint(73)],
+    piano_roll[TimePoint('3/16'): TimePoint('5/16'), FrequencyPoint(69): FrequencyPoint(78)],
+    piano_roll[TimePoint('7/16'): TimePoint('9/16'), FrequencyPoint(69): FrequencyPoint(79)]
+)
+
+for j, b in enumerate(B_2_by_2):
+    B_2_by_2[j] = b - TimeFrequency(b.origin.time, b.origin.frequency)
+
+A_2_by_2: PianoRollStack = erosion(piano_roll, B_2_by_2)
 
 # Figures
 # Sixteenth note
@@ -72,12 +84,24 @@ plot_piano_roll(hit_16, tight_frame=False, fig_size=(360, 240),
 file_path = folder / Path('sixteenth_note.pdf')
 plt.savefig(file_path)
 
-# Erosion
+# Erosion trivial
+activations_16.change_extension(piano_roll.extension)
 plot_piano_roll(activations_16, time_label='Time (m, b)',
                 x_tick_start=TimePoint(0), x_tick_step=TimeShift('1/4'),
                 fig_size=(400, 200))
 file_path = folder / Path('erosion_16.pdf')
 plt.savefig(file_path)
+
+# Erosion two by two
+for j, a in enumerate(A_2_by_2):
+    a: Activations
+    a.change_tatum(piano_roll.tatum, inplace=True)
+    a.change_extension(piano_roll.extension)
+    plot_piano_roll(a, time_label='Time (m, b)',
+                    x_tick_start=TimePoint(0), x_tick_step=TimeShift('1/4'),
+                    fig_size=(400, 200))
+    file_path = folder / Path('erosion_2_by_2-%d.pdf' % (j + 1))
+    plt.savefig(file_path)
 
 # Harmonic textures
 for h, harmonic_texture in enumerate(harmonic_textures):
