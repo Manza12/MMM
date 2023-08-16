@@ -51,20 +51,20 @@ def create_midi(piano_roll: PianoRoll, velocity: int = 64, tempo: int = 60, tick
                         delta = 0
                 else:
                     track.append(mido.Message('note_off',
-                                              note=int(piano_roll.extension.frequency.lower) + n,
+                                              note=piano_roll.extension.frequency.lower.value + n,
                                               velocity=velocity,
                                               time=delta))
                     if delta != 0:
                         index_delta = t
                         delta = 0
                     track.append(mido.Message('note_on',
-                                              note=int(piano_roll.extension.frequency.lower) + n,
+                                              note=piano_roll.extension.frequency.lower.value + n,
                                               velocity=velocity,
                                               time=delta))
             elif array[n, t] == 1:
                 if on_array[n] == 0:
                     track.append(mido.Message('note_on',
-                                              note=int(piano_roll.extension.frequency.lower) + n,
+                                              note=piano_roll.extension.frequency.lower.value + n,
                                               velocity=velocity,
                                               time=delta))
                     on_array[n] = 1

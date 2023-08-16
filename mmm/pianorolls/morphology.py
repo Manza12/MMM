@@ -36,6 +36,13 @@ def erosion(piano_roll: PianoRoll, structuring_element: PianoRoll):
     else:
         raise NotImplementedError
 
+    # Tatum
+    if structuring_element.tatum != piano_roll.tatum:
+        new_tatum = piano_roll.tatum.gcd(structuring_element.tatum,
+                                         piano_roll.origin.time - structuring_element.origin.time)
+        piano_roll = piano_roll.change_tatum(new_tatum)
+        structuring_element = structuring_element.change_tatum(new_tatum)
+
     # To PyTorch tensors
     piano_roll_tensor = torch.from_numpy(piano_roll.array)
     str_el_tensor = torch.from_numpy(structuring_element.array)

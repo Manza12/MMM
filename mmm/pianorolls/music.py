@@ -859,6 +859,10 @@ class PianoRoll:
     def frequency_vector(self):
         return FrequencyVector(self.origin.frequency, self.step)
 
+    def measure(self, c: dict):
+        assert isinstance(c, dict) and len(c) == 2, 'c must be a dict of 2 integers.'
+        return c['sustain'] * np.sum(self.array.astype(bool)) * self.tatum.value + c['attack'] * np.sum(self.array == 2)
+
     def copy(self):
         return deepcopy(self)
 
@@ -1254,8 +1258,6 @@ class Activations(list, PianoRoll):
         # Time
         origin_time = min([a.time for a in values])
         tatum = TimeShift.gcd(*[(a.time - origin_time) for a in values])
-        # if tatum.value == 0:
-        #     tatum = TimeShift(1)
         duration = max([a.time for a in values]) - origin_time
 
         # Frequency
@@ -1273,6 +1275,9 @@ class Activations(list, PianoRoll):
 
         # PianoRoll
         PianoRoll.__init__(self, array, origin, tatum, step)
+
+    def measure(self, c=None):
+        return np.sum(self.array)
 
     def change_time_extension(self, new_extension: TimeExtension):
         if self.tatum.value == 0:
@@ -1307,6 +1312,10 @@ class Activations(list, PianoRoll):
 class ActivationsStack(List[Activations]):
     def __init__(self, *activations_list: Activations):
         super().__init__(activations_list)
+
+    def change_extension(self, extension: Extension):
+        for i, a in enumerate(self):
+            self[i] = a.change_extension(extension)
 
 
 class ScoreTree:
