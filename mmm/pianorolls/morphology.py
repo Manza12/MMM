@@ -48,7 +48,7 @@ def erosion(piano_roll: PianoRoll, structuring_element: PianoRoll):
     str_el_tensor = torch.from_numpy(structuring_element.array)
 
     # Erosion
-    eroded_tensor = binary_erosion(piano_roll_tensor, str_el_tensor, origin=(origin_time, origin_frequency))
+    eroded_tensor = binary_erosion(piano_roll_tensor, str_el_tensor, origin=(origin_frequency, origin_time))
 
     # To numpy array
     eroded_array = eroded_tensor.numpy()

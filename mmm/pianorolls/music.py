@@ -1280,11 +1280,20 @@ class Activations(list, PianoRoll):
         return np.sum(self.array)
 
     def change_time_extension(self, new_extension: TimeExtension):
-        if self.tatum.value == 0:
-            tatum = self.origin.time - new_extension.start
-            self.tatum = tatum
+        # Compute difference
+        diff = new_extension - self.extension.time
 
-        PianoRoll.change_time_extension(self, new_extension)
+        if diff[1] < TimeShift(0):
+            if diff[1] < self.tatum:
+                new_tatum = self.tatum.gcd(diff[1])
+                self.change_tatum(new_tatum, inplace=True)
+                self.reduce(inplace=True)
+                diff = new_extension - self.extension.time
+        pad_width = ((0, 0), (-(diff[0] // self.tatum), diff[1] // self.tatum))
+
+        # Update attributes
+        self.array = np.pad(self.array, pad_width)
+        self.origin.time = new_extension.start
 
     def change_tatum(self, new_tatum: TimeShift, inplace=False, sparse=True):
         if inplace:

@@ -19,7 +19,7 @@ def format_time(x, pos, time_names):
 
 def plot_activations(a, t, f, fig_title=None, full_screen=False, fig_size=(640, 480),
                      freq_label='Frequency (Hz)', time_label='Time (s)', dpi=120,
-                     grid_t=False, grid_f=False, marker_color='r',
+                     grid_t=False, grid_f=False, marker_color='r', marker_size=None,
                      ax=None):
 
     if ax is None:
@@ -33,7 +33,7 @@ def plot_activations(a, t, f, fig_title=None, full_screen=False, fig_size=(640, 
         fig = ax.get_figure()
 
     activations = np.where(a)
-    ax.scatter(activations[1] - 0.5, activations[0], c=marker_color, marker='x')
+    ax.scatter(activations[1] - 0.5, activations[0], c=marker_color, s=marker_size, marker='x')
 
     # Freq axis
     ax.yaxis.set_major_formatter(tick.FuncFormatter(lambda x, pos: format_freq(x, pos, f)))
@@ -156,7 +156,7 @@ def plot_piano_roll(piano_roll: PianoRoll,
                     colorbar=True, colorbar_ticks=None, colorbar_labels=None,
                     x_tick_start=None, x_tick_step=None,
                     y_tick_start=None, y_tick_step=None,
-                    marker_color='r',
+                    marker_color='r', marker_size=None,
                     tight_frame=True,
                     **kwargs):
     if time_label is None:
@@ -176,7 +176,8 @@ def plot_piano_roll(piano_roll: PianoRoll,
     if piano_roll.array.dtype == np.bool:
         fig = plot_activations(piano_roll.array, piano_roll.time_vector, piano_roll.frequency_vector,
                                freq_label=freq_label, time_label=time_label,
-                               marker_color=marker_color, **kwargs)
+                               marker_color=marker_color, marker_size=marker_size,
+                               **kwargs)
     else:
         if piano_roll.dynamics is None:
             fig = plot_time_frequency(piano_roll.array, piano_roll.time_vector, piano_roll.frequency_vector,
