@@ -2,7 +2,7 @@ from mmm.pianorolls.music import *
 from mmm.pianorolls.algorithms import redundancy
 from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.morphology import erosion, dilation
-from mmm.pianorolls.plot import plot_piano_roll
+from mmm.pianorolls.plot import plot_piano_roll, plot_activations_stack
 
 # Parameters
 mpl.rcParams['figure.max_open_warning'] = 25
@@ -41,10 +41,10 @@ I_full64 = Chord(7, 24+7, 36, 36+3, 36+7)
 # Harmonic textures
 harmonic_textures = PianoRollStack(
     t_1 * IP,
+    t_1 * Harmony(I_full, I_full64),
     t_2 * I64,
     t_2 * I5,
     t_2 * I6,
-    t_1 * Harmony(I_full, I_full64)
 )
 
 # Activations
@@ -52,10 +52,10 @@ start = TimePoint('0/4')
 CS2 = FrequencyPoint(61-12-12)
 activations_harmonic_textures = ActivationsStack(
     Activations(*[TimeFrequency(start + TimeShift(k, 4), CS2) for k in range(7)]),
+    Activations(TimeFrequency(start + TimeShift(7, 4), CS2)),
     Activations(*[TimeFrequency(start + TimeShift(3 * k, 4), CS2 + FrequencyShift(12 * k)) for k in range(3)]),
     Activations(*[TimeFrequency(start + TimeShift(1 + 3 * k, 4), CS2 + FrequencyShift(12 * (k+1))) for k in range(2)]),
     Activations(*[TimeFrequency(start + TimeShift(2 + 3 * k, 4), CS2 + FrequencyShift(12 * (k+1))) for k in range(2)]),
-    Activations(TimeFrequency(start + TimeShift(7, 4), CS2))
 )
 
 # Piano roll
@@ -143,14 +143,16 @@ for h, harmonic_texture in enumerate(harmonic_textures):
     plt.savefig(file_path)
 
 # Erosion optimal
-for j, activations in enumerate(activations_harmonic_textures):
-    activations.change_tatum(piano_roll.tatum, inplace=True)
-    activations.change_extension(piano_roll.extension)
-    plot_piano_roll(activations, time_label='Time (m, b)', tight_frame=False,
-                    x_tick_start=TimePoint(0), x_tick_step=TimeShift('1/2'),
-                    fig_size=(360, 300), marker_size=10)
-    file_path = folder / Path('erosion_harmonic_textures-%d.pdf' % (j + 1))
-    plt.savefig(file_path)
+activations_harmonic_textures.change_tatum(inplace=True)
+activations_harmonic_textures.change_extension(piano_roll.extension)
+plot_activations_stack(activations_harmonic_textures,
+                       time_label='Time (m, b)', tight_frame=False,
+                       x_tick_start=TimePoint(0), x_tick_step=TimeShift('1/2'),
+                       fig_size=(360, 300), marker_size=20, legend=True,
+                       legend_params={'loc': 'upper left', 'ncol': 2, 'columnspacing': 0.8,
+                                      'labelspacing': 0.1})
+file_path = folder / Path('erosion_harmonic_textures.pdf')
+plt.savefig(file_path)
 
 # Dilation optimal
 for j, pair in enumerate(zip(activations_harmonic_textures, harmonic_textures)):

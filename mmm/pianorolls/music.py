@@ -150,6 +150,9 @@ class TimeShift(Time):
     def __str__(self):
         return str(self.value)
 
+    def __hash__(self):
+        return hash((self.value, self.nature))
+
     @staticmethod
     def zero():
         return TimeShift(0)
@@ -676,6 +679,9 @@ class Extension:
 
     def __str__(self):
         return 'Time: %s\tFrequency: %s' % (self.time, self.frequency)
+
+    def __hash__(self):
+        return hash((self.time.duration, self.frequency.range))
 
 
 class PianoRoll:
@@ -1322,9 +1328,15 @@ class ActivationsStack(List[Activations]):
     def __init__(self, *activations_list: Activations):
         super().__init__(activations_list)
 
+    def change_tatum(self, new_tatum=None, inplace=False):
+        if new_tatum is None:
+            new_tatum = self[0].tatum.gcd(*[a.tatum for a in self[1:]])
+        for a in self:
+            a.change_tatum(new_tatum, inplace=inplace)
+
     def change_extension(self, extension: Extension):
         for i, a in enumerate(self):
-            self[i] = a.change_extension(extension)
+            a.change_extension(extension)
 
 
 class ScoreTree:

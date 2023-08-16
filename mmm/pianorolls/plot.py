@@ -1,5 +1,5 @@
 from . import *
-from .music import TimePoint, PianoRoll, ChromaRoll
+from .music import TimePoint, PianoRoll, ChromaRoll, ActivationsStack
 from .utils import round_half_up
 
 
@@ -19,7 +19,8 @@ def format_time(x, pos, time_names):
 
 def plot_activations(a, t, f, fig_title=None, full_screen=False, fig_size=(640, 480),
                      freq_label='Frequency (Hz)', time_label='Time (s)', dpi=120,
-                     grid_t=False, grid_f=False, marker_color='r', marker_size=None,
+                     grid_t=False, grid_f=False,
+                     marker_color: Optional[str] = 'r', marker_size=None,
                      ax=None):
 
     if ax is None:
@@ -228,6 +229,96 @@ def plot_piano_roll(piano_roll: PianoRoll,
     else:
         plt.xlim([-1.5, piano_roll.array.shape[1] + 0.5])
         plt.ylim([-1.5, piano_roll.array.shape[0] + 0.5])
+
+    # Tight layout
+    plt.tight_layout()
+
+    return fig
+
+
+def plot_activations_stack(activations_stack: ActivationsStack,
+                           freq_label: Optional[str] = None, time_label: Optional[str] = None,
+                           fig_size=(640, 480), fig_title=None, dpi=120,
+                           x_tick_start=None, x_tick_step=None,
+                           y_tick_start=None, y_tick_step=None,
+                           marker_size=None,
+                           tight_frame=True,
+                           legend=False, legend_params=None,
+                           **kwargs):
+    assert len(activations_stack) >= 1
+    assert len({a.tatum for a in activations_stack}) == 1
+    assert len({a.extension for a in activations_stack}) == 1
+    assert len({a.frequency_nature for a in activations_stack}) == 1
+    a_master = activations_stack[0]
+
+    if time_label is None:
+        time_label = 'Time (wholes)'
+    elif time_label == 'Time (m, b)':
+        TimePoint.__str__ = lambda self: f'({self.measure}, {self.beat})'
+
+    if freq_label is None:
+        if a_master.frequency_nature == 'point':
+            if isinstance(a_master, ChromaRoll):
+                freq_label = 'Chroma'
+            else:
+                freq_label = 'Pitch'
+        else:
+            freq_label = 'Shift (semitones)'
+
+    assert a_master.array.dtype == np.bool
+    fig = plt.figure(figsize=(fig_size[0] / dpi, fig_size[1] / dpi), dpi=dpi)
+
+    if fig_title:
+        fig.suptitle(fig_title)
+
+    ax = fig.add_subplot(111)
+
+    for activations in activations_stack:
+        plot_activations(activations.array, activations.time_vector, activations.frequency_vector,
+                         freq_label=freq_label, time_label=time_label,
+                         marker_color=None, marker_size=marker_size,
+                         ax=ax, **kwargs)
+
+    if x_tick_step is not None:
+        if x_tick_start is None:
+            x_tick_start = TimePoint(0, 1)
+        # For Activations with zero tatum
+        if x_tick_step / activations_stack[0].tatum == 0:
+            ticks = np.array([0.])
+        else:
+            ticks = np.arange((x_tick_start - a_master.extension.time.start) / a_master.tatum,
+                              (a_master.extension.time.end - a_master.extension.time.start) / a_master.tatum + 1,
+                              x_tick_step / a_master.tatum)
+        ticks -= 0.5
+        plt.xticks(ticks)
+    else:
+        # Update the ticks
+        x_ticks = plt.xticks()[0]
+        plt.xticks(x_ticks - 0.5)
+
+    if y_tick_step is not None:
+        if y_tick_start is None:
+            y_tick_start = a_master.extension.frequency.lower
+
+        start = (y_tick_start - a_master.extension.frequency.lower) / a_master.step
+        end = (a_master.extension.frequency.higher - a_master.extension.frequency.lower) / a_master.step
+        step = y_tick_step / a_master.step
+        ticks = np.arange(start, end + 1, step)
+        plt.yticks(ticks)
+
+    if legend:
+        if legend_params is None:
+            legend_params = {}
+        plt.legend(fig.axes[0].collections, [r'$A_{%d}$' % j for j in range(len(activations_stack))],
+                   **legend_params)
+
+    # Update the limits
+    if tight_frame:
+        plt.xlim([-0.5, a_master.array.shape[1] - 0.5])
+        plt.ylim([-0.5, a_master.array.shape[0] - 0.5])
+    else:
+        plt.xlim([-1.5, a_master.array.shape[1] + 0.5])
+        plt.ylim([-1.5, a_master.array.shape[0] + 0.5])
 
     # Tight layout
     plt.tight_layout()
