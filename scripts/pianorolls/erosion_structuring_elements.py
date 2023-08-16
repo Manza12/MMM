@@ -135,9 +135,10 @@ for j, pair in enumerate(zip(activations_note_values, note_values)):
     plt.savefig(file_path)
 
 # Harmonic textures
+fig_sizes = [(216, 216), (324, 216), (324, 216), (324, 216), (216, 216)]
 for h, harmonic_texture in enumerate(harmonic_textures):
-    plot_piano_roll(harmonic_texture, fig_size=(360, 240), tight_frame=False,
-                    x_tick_start=TimeShift(0), x_tick_step=TimeShift('1/16'))
+    plot_piano_roll(harmonic_texture, fig_size=fig_sizes[h], tight_frame=False,
+                    x_tick_start=TimeShift(0), x_tick_step=TimeShift('1/8'))
     file_path = folder / Path('harmonic_texture-%d.pdf' % (h + 1))
     plt.savefig(file_path)
 
