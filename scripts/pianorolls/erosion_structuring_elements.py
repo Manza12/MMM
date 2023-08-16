@@ -69,6 +69,7 @@ midi_path = folder / Path('moonlight_3rd.mid')
 midi_file.save(midi_path)
 
 # Trivial erosion
+print('Trivial erosion:')
 hit_8 = Hit('0', '1/8')
 hit_16 = Hit('0', '1/16')
 note_values = PianoRollStack(hit_8, hit_16)
@@ -78,16 +79,25 @@ activations_note_values: ActivationsStack = erosion(piano_roll, note_values)
 print('Measure of A_8:', activations_note_values[0].measure())
 print('Measure of A_16:', activations_note_values[1].measure())
 print()
+print('Measure of B_8 (attack):', note_values[0].measure(c_attack))
+print('Measure of B_8 (sustain):', note_values[0].measure(c_sustain))
+print('Measure of B_16 (attack):', note_values[1].measure(c_attack))
+print('Measure of B_16 (sustain):', note_values[1].measure(c_sustain))
+print()
 print('Redundancy of note_values (attack): %.1f%%' % redundancy(piano_roll, note_values, c_attack))
 print('Redundancy of note_values (sustain): %.1f%%' % redundancy(piano_roll, note_values, c_sustain))
 print()
 
 # Optimal erosion
+print('Optimal erosion:')
 activations_harmonic_textures: ActivationsStack = erosion(piano_roll, harmonic_textures)
 
 # Measure and redundancy
 for a, activations in enumerate(activations_harmonic_textures):
     print('Measure of activations %d:' % (a + 1), activations.measure())
+    print('Measure of harmonic texture %d (attack):' % (a + 1), harmonic_textures[a].measure(c_attack))
+    print('Measure of harmonic texture %d (sustain):' % (a + 1), harmonic_textures[a].measure(c_sustain))
+
 print()
 print('Redundancy of harmonic_textures (attack): %.1f%%' % redundancy(piano_roll, harmonic_textures, c_attack))
 print('Redundancy of harmonic_textures (sustain): %.1f%%' % redundancy(piano_roll, harmonic_textures, c_sustain))
