@@ -309,7 +309,7 @@ def plot_activations_stack(activations_stack: ActivationsStack,
     if legend:
         if legend_params is None:
             legend_params = {}
-        plt.legend(fig.axes[0].collections, [r'$A_{%d}$' % j for j in range(len(activations_stack))],
+        plt.legend(fig.axes[0].collections, [r'$A_{%d}$' % (j + 1) for j in range(len(activations_stack))],
                    **legend_params)
 
     # Update the limits

@@ -158,9 +158,9 @@ activations_harmonic_textures.change_extension(piano_roll.extension)
 plot_activations_stack(activations_harmonic_textures,
                        time_label='Time (m, b)', tight_frame=False,
                        x_tick_start=TimePoint(0), x_tick_step=TimeShift('1/2'),
-                       fig_size=(360, 300), marker_size=20, legend=True,
-                       legend_params={'loc': 'upper left', 'ncol': 2, 'columnspacing': 0.8,
-                                      'labelspacing': 0.1})
+                       fig_size=(500, 300), marker_size=20, legend=True,
+                       legend_params={'loc': 'upper left', 'ncol': 2, 'columnspacing': 0.2,
+                                      'labelspacing': 0., 'fontsize': 'large'})
 file_path = folder / Path('erosion_harmonic_textures.pdf')
 plt.savefig(file_path)
 
