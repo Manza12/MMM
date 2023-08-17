@@ -1338,6 +1338,17 @@ class ActivationsStack(List[Activations]):
         for i, a in enumerate(self):
             a.change_extension(extension)
 
+    def synchronize(self):
+        from .algorithms import synchronize_activations_stack
+        return synchronize_activations_stack(self)
+
+    def to_array(self):
+        assert len({a.tatum for a in self}) == 1, 'All activations must have the same tatum'
+        assert len({a.step for a in self}) == 1, 'All activations must have the same step'
+        assert len({a.extension for a in self}) == 1, 'All activations must have the same extension'
+
+        return np.stack([a.array for a in self])
+
 
 class ScoreTree:
     def __init__(self, components: List[Tuple[Activations, Union[HarmonicTexture, ScoreTree]]]):
