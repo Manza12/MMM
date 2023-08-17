@@ -1,13 +1,13 @@
 from mmm.pianorolls.music import *
 from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.morphology import erosion, dilation
-from mmm.pianorolls.plot import plot_piano_roll, plot_activations_stack
+from mmm.pianorolls.plot import plot_piano_roll, plot_activations_stack, plot_activations_graph
+from mmm.pianorolls.graphs import GraphActivations
 
 
 # Parameters
-plot = True
-c_attack = {'attack': 1, 'sustain': 0}
-c_sustain = {'attack': 0, 'sustain': 1}
+plot = False
+TimePoint.__str__ = lambda self: '(%s, %s)' % (self.beat, self.offset)
 
 # Path
 folder = Path('..') / Path('..') / Path('phd') / Path('chapter_5') / Path('textures')
@@ -64,6 +64,9 @@ midi_file.save(midi_path)
 activations_texture: ActivationsStack = erosion(piano_roll, texture)
 activations_texture.change_extension(piano_roll.extension)
 
+# Create graph
+graph = GraphActivations(piano_roll, activations_texture, texture)
+
 # Figures
 if plot:
     # Piano roll
@@ -87,5 +90,10 @@ if plot:
                            })
     file_path = folder / Path('erosion_texture-54.pdf')
     plt.savefig(file_path)
+
+# Plot graph
+fig = plot_activations_graph(graph)
+file_path = folder / Path('graph-54.pdf')
+fig.savefig(file_path)
 
 plt.show()

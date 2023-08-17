@@ -1,4 +1,5 @@
 from . import *
+from .graphs import GraphActivations
 from .music import TimePoint, PianoRoll, ChromaRoll, ActivationsStack
 from .utils import round_half_up
 
@@ -322,5 +323,61 @@ def plot_activations_stack(activations_stack: ActivationsStack,
 
     # Tight layout
     plt.tight_layout()
+
+    return fig
+
+
+def plot_activations_graph(graph: GraphActivations):
+    piano_roll: PianoRoll = graph.graph['piano_roll']
+
+    fig = plt.figure(figsize=(10., 6.))
+
+    pos = nx.get_node_attributes(graph, 'pos')
+    labels = nx.get_node_attributes(graph, 'label')
+
+    nx.draw_networkx_labels(graph, pos, labels=labels, font_size=12)
+
+    # Offsets
+    offset = np.zeros(graph.graph['array'].shape)
+    for xi in range(offset.shape[0]):
+        for t_s in range(offset.shape[1]):
+            offset[xi, t_s] = len(graph.graph['array'][xi, t_s])
+    offset = np.max(offset, axis=1)
+
+    # Plot grid
+    t_0 = piano_roll.extension.time.start
+    t_1 = piano_roll.extension.time.end
+    for n, t in enumerate(np.arange(t_0, t_1, piano_roll.tatum)):
+        plt.text(n, -3, str(t), ha='center', va='center')
+
+    off = 0
+    xi_0 = piano_roll.extension.frequency.lower
+    xi_1 = piano_roll.extension.frequency.higher
+    for m, xi in enumerate(np.arange(xi_0, xi_1, piano_roll.step)):
+        if offset[m] == 0:
+            continue
+        plt.text(-1.5, off, str(xi), ha='center', va='center')
+
+        off += offset[m]
+
+    # off = 0
+    # for m in range(offset.shape[0]):
+    #     y = off
+    #     plt.plot([-2, graph.graph['array'].shape[1]], [y, y], 'k--', lw=0.5)
+    #     off += offset[m]
+
+    plt.text(-1., -3, r'$t_s$', fontdict={'fontsize': 14}, ha='center', va='center')
+    plt.text(-1.25, -3, r'/', fontdict={'fontsize': 20}, ha='center', va='center')
+    plt.text(-1.5, -3, r'$\xi$', fontdict={'fontsize': 14}, ha='center', va='center')
+
+    # Adjust limits
+    x_lim = [-1.5, float((t_1 - t_0) / piano_roll.tatum)]
+    y_lim = [-3, off]
+
+    plt.xlim(x_lim)
+    plt.ylim(y_lim)
+
+    plt.tight_layout()
+    plt.axis('off')
 
     return fig

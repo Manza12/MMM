@@ -261,12 +261,10 @@ class TimePoint(Time):
         raise ValueError('TimePoint cannot be multiplied.')
 
     def __truediv__(self, other):
-        assert isinstance(other, TimeShift), 'TimePoint can only be divided by TimeShift.'
-        return self.value / other.value
+        raise ValueError('TimePoint cannot be divided.')
 
     def __floordiv__(self, other):
-        assert isinstance(other, TimeShift), 'TimePoint can only be floordivided by TimeShift.'
-        return self.value // other.value
+        raise ValueError('TimePoint cannot be divided.')
 
     def __lt__(self, other):
         assert isinstance(other, TimePoint), 'TimePoint is only comparable with TimePoint.'
