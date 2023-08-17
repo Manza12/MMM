@@ -1,7 +1,7 @@
 from mmm.pianorolls.music import *
 from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.morphology import erosion, dilation
-from mmm.pianorolls.plot import plot_piano_roll  # , plot_activations_stack
+from mmm.pianorolls.plot import plot_piano_roll
 from mmm.pianorolls.algorithms import redundancy
 
 
@@ -153,48 +153,5 @@ if plot:
                         fig_size=(460, 260))
         file_path = folder / Path('dilation_texture-%d.pdf' % (j + 1))
         plt.savefig(file_path)
-
-# # Harmonic textures
-# fig_sizes = [(216, 216), (324, 216), (324, 216), (324, 216), (216, 216)]
-# for h, harmonic_texture in enumerate(harmonic_textures):
-#     plot_piano_roll(harmonic_texture, fig_size=fig_sizes[h], tight_frame=False,
-#                     x_tick_start=TimeShift(0), x_tick_step=TimeShift('1/8'))
-#     file_path = folder / Path('harmonic_texture-%d.pdf' % (h + 1))
-#     plt.savefig(file_path)
-#
-# # Erosion optimal
-# activations_harmonic_textures.change_tatum(inplace=True)
-# activations_harmonic_textures.change_extension(piano_roll.extension)
-# plot_activations_stack(activations_harmonic_textures,
-#                        time_label='Time (m, b)', tight_frame=False,
-#                        x_tick_start=TimePoint(0), x_tick_step=TimeShift('1/2'),
-#                        fig_size=(500, 300), marker_size=20, legend=True,
-#                        legend_params={'loc': 'upper left', 'ncol': 2, 'columnspacing': 0.2,
-#                                       'labelspacing': 0., 'fontsize': 'large'})
-# file_path = folder / Path('erosion_harmonic_textures.pdf')
-# plt.savefig(file_path)
-#
-# # Dilation optimal
-# for j, pair in enumerate(zip(activations_harmonic_textures, harmonic_textures)):
-#     activations, note_value = pair
-#     d: PianoRoll = dilation(activations, note_value)
-#     d.change_tatum(piano_roll.tatum, inplace=True)
-#     d.reduce(inplace=True)
-#     d.change_extension(piano_roll.extension)
-#     plot_piano_roll(d, time_label='Time (m, b)', tight_frame=False,
-#                     x_tick_start=TimePoint(0), x_tick_step=TimeShift('1/2'),
-#                     fig_size=(360, 300))
-#     file_path = folder / Path('dilation_harmonic_textures-%d.pdf' % (j + 1))
-#     plt.savefig(file_path)
-#
-# # Dilation optimal (reduced)
-# d = dilation(activations_harmonic_textures, harmonic_textures)
-#
-# plot_piano_roll(d, time_label='Time (m, b)',
-#                 x_tick_start=TimePoint(0), x_tick_step=TimeShift('1/2'),
-#                 fig_size=(800, 400), tight_frame=False)
-#
-# file_path = folder / Path('dilation_harmonic_textures.pdf')
-# plt.savefig(file_path)
 
 plt.show()
