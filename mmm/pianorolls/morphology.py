@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from multimethod import multimethod
 from nnMorpho.binary_operators import erosion as binary_erosion
-from .music import Activations, PianoRoll, PianoRollStack, TimeFrequency, ActivationsStack
+from .music import Activations, PianoRoll, PianoRollStack, TimeFrequency, ActivationsStack, Texture
 
 
 @multimethod
@@ -67,4 +67,12 @@ def erosion(piano_roll: PianoRoll, structuring_elements: PianoRollStack):
     result = ActivationsStack()
     for structuring_element in structuring_elements:
         result.append(erosion(piano_roll, structuring_element))
+    return result
+
+
+@multimethod
+def erosion(piano_roll: PianoRoll, texture: Texture):
+    result = ActivationsStack()
+    for rhythm in texture:
+        result.append(erosion(piano_roll, rhythm))
     return result
