@@ -2,6 +2,13 @@ from mmm.pianorolls.music import *
 from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.morphology import erosion, dilation
 from mmm.pianorolls.plot import plot_piano_roll  # , plot_activations_stack
+from mmm.pianorolls.algorithms import redundancy
+
+
+# Parameters
+plot = False
+c_attack = {'attack': 1, 'sustain': 0}
+c_sustain = {'attack': 0, 'sustain': 1}
 
 # Path
 folder = Path('..') / Path('..') / Path('phd') / Path('chapter_5') / Path('textures')
@@ -96,37 +103,53 @@ midi_file = create_midi(piano_roll, tempo=120)
 midi_path = folder / Path('moonlight_3rd_53-56.mid')
 midi_file.save(midi_path)
 
+print('Measure of the piano roll (attack):', piano_roll.measure(c_attack))
+print('Measure of the piano roll (sustain):', piano_roll.measure(c_sustain))
+print()
+
 # Erosion texture
 activations_texture: ActivationsStack = erosion(piano_roll, texture)
 
+# Measure and redundancy
+for a, activations in enumerate(activations_texture):
+    print('Measure of activations %d:' % (a + 1), activations.measure())
+    print('Measure of rhythm %d (attack):' % (a + 1), texture[a].measure(c_attack))
+    print('Measure of rhythm %d (sustain):' % (a + 1), texture[a].measure(c_sustain))
+
+print()
+print('Redundancy of texture (attack): %.1f%%' % redundancy(piano_roll, texture, c_attack))
+print('Redundancy of texture (sustain): %.1f%%' % redundancy(piano_roll, texture, c_sustain))
+print()
+
 # Figures
-# Piano roll
-plot_piano_roll(piano_roll, time_label='Time (m, b)',
-                x_tick_start=TimePoint(0), x_tick_step=TimeShift('1'),
-                fig_size=(460, 280), tight_frame=False)
-
-file_path = folder / Path('piano_roll.pdf')
-plt.savefig(file_path)
-
-# Erosion texture
-for j, activations in enumerate(activations_texture):
-    plot_piano_roll(activations, time_label='Time (m, b)', tight_frame=False,
+if plot:
+    # Piano roll
+    plot_piano_roll(piano_roll, time_label='Time (m, b)',
                     x_tick_start=TimePoint(0), x_tick_step=TimeShift('1'),
-                    fig_size=(400, 260), marker_size=10)
-    file_path = folder / Path('erosion_texture-%d.pdf' % (j + 1))
+                    fig_size=(460, 280), tight_frame=False)
+
+    file_path = folder / Path('piano_roll.pdf')
     plt.savefig(file_path)
 
-# Dilation texture
-for j, pair in enumerate(zip(activations_texture, texture)):
-    activations, rhythm = pair
-    d: PianoRoll = dilation(activations, rhythm)
-    d.change_tatum(piano_roll.tatum, inplace=True)
-    d.change_extension(piano_roll.extension)
-    plot_piano_roll(d, time_label='Time (m, b)', tight_frame=False,
-                    x_tick_start=TimePoint(0), x_tick_step=TimeShift('1'),
-                    fig_size=(460, 260))
-    file_path = folder / Path('dilation_texture-%d.pdf' % (j + 1))
-    plt.savefig(file_path)
+    # Erosion texture
+    for j, activations in enumerate(activations_texture):
+        plot_piano_roll(activations, time_label='Time (m, b)', tight_frame=False,
+                        x_tick_start=TimePoint(0), x_tick_step=TimeShift('1'),
+                        fig_size=(400, 260), marker_size=10)
+        file_path = folder / Path('erosion_texture-%d.pdf' % (j + 1))
+        plt.savefig(file_path)
+
+    # Dilation texture
+    for j, pair in enumerate(zip(activations_texture, texture)):
+        activations, rhythm = pair
+        d: PianoRoll = dilation(activations, rhythm)
+        d.change_tatum(piano_roll.tatum, inplace=True)
+        d.change_extension(piano_roll.extension)
+        plot_piano_roll(d, time_label='Time (m, b)', tight_frame=False,
+                        x_tick_start=TimePoint(0), x_tick_step=TimeShift('1'),
+                        fig_size=(460, 260))
+        file_path = folder / Path('dilation_texture-%d.pdf' % (j + 1))
+        plt.savefig(file_path)
 
 # # Harmonic textures
 # fig_sizes = [(216, 216), (324, 216), (324, 216), (324, 216), (216, 216)]
