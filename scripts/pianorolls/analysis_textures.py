@@ -76,17 +76,17 @@ harmonic_textures = PianoRollStack(
 )
 
 # Activations
-start = TimePoint('0/4')
-Gs2 = FrequencyPoint(56)
+start = TimePoint(53, 1, 0)
+Gs3 = FrequencyPoint(56)
 activations_harmonic_textures = ActivationsStack(
-    Activations(TimeFrequency(start, Gs2)),
-    Activations(TimeFrequency(start + TimeShift(1, 2), Gs2)),
-    Activations(TimeFrequency(start + TimeShift(2, 2), Gs2)),
-    Activations(TimeFrequency(start + TimeShift(3, 2), Gs2)),
-    Activations(TimeFrequency(start + TimeShift(4, 2), Gs2)),
-    Activations(TimeFrequency(start + TimeShift(5, 2), Gs2)),
-    Activations(TimeFrequency(start + TimeShift(6, 2), Gs2)),
-    Activations(TimeFrequency(start + TimeShift(7, 2), Gs2)),
+    Activations(TimeFrequency(start, Gs3)),
+    Activations(TimeFrequency(start + TimeShift(1, 2), Gs3)),
+    Activations(TimeFrequency(start + TimeShift(2, 2), Gs3)),
+    Activations(TimeFrequency(start + TimeShift(3, 2), Gs3)),
+    Activations(TimeFrequency(start + TimeShift(4, 2), Gs3)),
+    Activations(TimeFrequency(start + TimeShift(5, 2), Gs3)),
+    Activations(TimeFrequency(start + TimeShift(6, 2), Gs3)),
+    Activations(TimeFrequency(start + TimeShift(7, 2), Gs3)),
 )
 
 # Piano roll
@@ -124,7 +124,7 @@ for j, pair in enumerate(zip(activations_texture, texture)):
     d.change_extension(piano_roll.extension)
     plot_piano_roll(d, time_label='Time (m, b)', tight_frame=False,
                     x_tick_start=TimePoint(0), x_tick_step=TimeShift('1'),
-                    fig_size=(400, 260))
+                    fig_size=(460, 260))
     file_path = folder / Path('dilation_texture-%d.pdf' % (j + 1))
     plt.savefig(file_path)
 
