@@ -57,14 +57,14 @@ class GraphActivations(nx.DiGraph):
                                 # Compute number of elements
                                 self.graph['array'][m, n_s].append(node)
 
-        # Assign positions
-        offset = 0
-        for m in range(piano_roll.array.shape[-2]):
-            max_n = 0
-            for n_s in range(piano_roll.array.shape[-1]):
-                nodes = self.graph['array'][m, n_s]
-                max_n = max(max_n, len(nodes))
-                for n, node in enumerate(nodes):
-                    self.nodes[node]['pos'] = (n_s, n + offset - max_n/2 + 0.5)
-
-            offset += max_n
+        # # Assign positions
+        # offset = 0
+        # for m in range(piano_roll.array.shape[-2]):
+        #     max_n = 0
+        #     for n_s in range(piano_roll.array.shape[-1]):
+        #         nodes = self.graph['array'][m, n_s]
+        #         max_n = max(max_n, len(nodes))
+        #         for n, node in enumerate(nodes):
+        #             self.nodes[node]['pos'] = (n_s, n + offset - max_n/2 + 0.5)
+        #
+        #     offset += max_n

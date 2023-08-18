@@ -327,52 +327,73 @@ def plot_activations_stack(activations_stack: ActivationsStack,
     return fig
 
 
-def plot_activations_graph(graph: GraphActivations):
+def plot_activations_graph(graph: GraphActivations, pad_f=0.5):
     piano_roll: PianoRoll = graph.graph['piano_roll']
+    array: np.ndarray = graph.graph['array']
 
     fig = plt.figure(figsize=(10., 6.))
 
+    # Compute number of elements
+    n_elements = np.zeros_like(array, dtype=np.int)
+    for m in range(array.shape[-2]):
+        for n_s in range(array.shape[-1]):
+            n_elements[m, n_s] = len(array[m, n_s])
+
+    max_f = np.max(n_elements, axis=-1)
+    offset = np.cumsum(max_f + pad_f * max_f.astype(bool))
+    offset = np.concatenate(([0], offset))
+
+    # Assign positions
+    for m in range(piano_roll.array.shape[-2]):
+        for n_s in range(piano_roll.array.shape[-1]):
+            nodes = array[m, n_s]
+            for n, node in enumerate(nodes):
+                y = n + offset[m] + (max_f[m] - n_elements[m, n_s]) / 2 + pad_f / 2
+                graph.nodes[node]['pos'] = (n_s, y)
+
+    # Plot graph
     pos = nx.get_node_attributes(graph, 'pos')
     labels = nx.get_node_attributes(graph, 'label')
 
     nx.draw_networkx_labels(graph, pos, labels=labels, font_size=12)
 
-    # Offsets
-    offset = np.zeros(graph.graph['array'].shape)
-    for xi in range(offset.shape[0]):
-        for t_s in range(offset.shape[1]):
-            offset[xi, t_s] = len(graph.graph['array'][xi, t_s])
-    offset = np.max(offset, axis=1)
+    # Grid
+    plt.text(-0.75, -1.5, r'$t_s$', fontdict={'fontsize': 14}, ha='center', va='center')
+    plt.text(-1., -1.5, r'/', fontdict={'fontsize': 20}, ha='center', va='center')
+    plt.text(-1.25, -1.5, r'$\xi$', fontdict={'fontsize': 14}, ha='center', va='center')
 
-    # Plot grid
-    t_0 = piano_roll.extension.time.start
-    t_1 = piano_roll.extension.time.end
-    for n, t in enumerate(np.arange(t_0, t_1, piano_roll.tatum)):
-        plt.text(n, -3, str(t), ha='center', va='center')
-
-    off = 0
-    xi_0 = piano_roll.extension.frequency.lower
-    xi_1 = piano_roll.extension.frequency.higher
-    for m, xi in enumerate(np.arange(xi_0, xi_1, piano_roll.step)):
-        if offset[m] == 0:
+    # Grid frequency
+    for m in range(piano_roll.array.shape[-2]):
+        if max_f[m] == 0:
             continue
-        plt.text(-1.5, off, str(xi), ha='center', va='center')
+        xi = piano_roll.origin.frequency + m * piano_roll.step
+        y = offset[m] + (max_f[m] - 1) / 2 + pad_f / 2
+        plt.text(-1., y, str(xi), ha='center', va='center')
 
-        off += offset[m]
+        # Plot horizontal lines
+        y = offset[m] - 0.5
+        plt.plot([-1.5, piano_roll.array.shape[-1] - 0.5], [y, y], 'k--', linewidth=0.5)
 
-    # off = 0
-    # for m in range(offset.shape[0]):
-    #     y = off
-    #     plt.plot([-2, graph.graph['array'].shape[1]], [y, y], 'k--', lw=0.5)
-    #     off += offset[m]
+    # Plot last horizontal line
+    y = offset[-1] - 0.5
+    plt.plot([-1.5, piano_roll.array.shape[-1] - 0.5], [y, y], 'k--', linewidth=0.5)
 
-    plt.text(-1., -3, r'$t_s$', fontdict={'fontsize': 14}, ha='center', va='center')
-    plt.text(-1.25, -3, r'/', fontdict={'fontsize': 20}, ha='center', va='center')
-    plt.text(-1.5, -3, r'$\xi$', fontdict={'fontsize': 14}, ha='center', va='center')
+    # Grid time
+    for n in range(piano_roll.array.shape[-1]):
+        t = piano_roll.origin.time + n * piano_roll.tatum
+        plt.text(n, -1.5, str(t), ha='center', va='center')
+
+        # Plot vertical lines
+        x = n - 0.5
+        plt.plot([x, x], [-2, offset[-1] - 0.5], 'k--', linewidth=0.5)
+
+    # Plot last vertical line
+    x = piano_roll.array.shape[-1] - 0.5
+    plt.plot([x, x], [-2, offset[-1] - 0.5], 'k--', linewidth=0.5)
 
     # Adjust limits
-    x_lim = [-1.5, float((t_1 - t_0) / piano_roll.tatum)]
-    y_lim = [-3, off]
+    x_lim = [-1.5, piano_roll.array.shape[-1] - 0.4]
+    y_lim = [-2, offset[-1] - 0.5]
 
     plt.xlim(x_lim)
     plt.ylim(y_lim)
