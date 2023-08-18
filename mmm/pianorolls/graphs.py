@@ -3,14 +3,14 @@ from .music import PianoRoll, ActivationsStack, Texture, Rhythm, TimePoint, Freq
 
 
 class ActivationNode:
-    def __init__(self, t_s: TimePoint, t_a: TimePoint, xi: FrequencyPoint, i: int):
-        self.t_s = t_s
+    def __init__(self, t_p: TimePoint, t_a: TimePoint, xi: FrequencyPoint, i: int):
+        self.t_p = t_p
         self.t_a = t_a
         self.xi = xi
         self.i = i
 
     def __str__(self):
-        return r't_a=%s, f=%s, t_s=%s, i=%s' % (self.t_a, self.xi, self.t_s, self.i)
+        return r't_a=%s, f=%s, t_p=%s, i=%s' % (self.t_a, self.xi, self.t_p, self.i)
 
     @property
     def label(self):
@@ -28,7 +28,7 @@ class GraphActivations(nx.DiGraph):
 
         # Loop
         for n_s in range(piano_roll.array.shape[-1]):
-            t_s = n_s * piano_roll.tatum + piano_roll.origin.time
+            t_p = n_s * piano_roll.tatum + piano_roll.origin.time
             for m in range(piano_roll.array.shape[-2]):
                 xi = m * piano_roll.step + piano_roll.origin.frequency
 
@@ -40,7 +40,7 @@ class GraphActivations(nx.DiGraph):
                     for i in range(activations_stack_array.shape[0]):
                         rhythm: Rhythm = texture[i]
                         for u in range(rhythm.array.shape[-1]):
-                            t_a = t_s - rhythm.origin.time - rhythm.tatum * u
+                            t_a = t_p - rhythm.origin.time - rhythm.tatum * u
                             n_a = (t_a - piano_roll.origin.time) // piano_roll.tatum
 
                             inside = 0 <= n_a < activations_stack_array.shape[2]
@@ -48,7 +48,7 @@ class GraphActivations(nx.DiGraph):
                             exists = inside and activations_stack_array[i, m, n_a]
 
                             if inside and covers and exists:
-                                node = ActivationNode(t_s, t_a, xi, i)
+                                node = ActivationNode(t_p, t_a, xi, i)
 
                                 self.add_node(node, label=node.label)
 

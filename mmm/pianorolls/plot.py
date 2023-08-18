@@ -355,7 +355,7 @@ def plot_activations_graph(graph: GraphActivations, fig_size=(9., 6.), pad_f=0.5
     nx.draw_networkx_labels(graph, pos, labels=labels, font_size=12)
 
     # Grid
-    plt.text(-0.75, -1.5, r'$t_s$', fontdict={'fontsize': 14}, ha='center', va='center')
+    plt.text(-0.75, -1.5, r'$t_P$', fontdict={'fontsize': 14}, ha='center', va='center')
     plt.text(-1., -1.5, r'/', fontdict={'fontsize': 20}, ha='center', va='center')
     plt.text(-1.25, -1.5, r'$\xi$', fontdict={'fontsize': 14}, ha='center', va='center')
 
