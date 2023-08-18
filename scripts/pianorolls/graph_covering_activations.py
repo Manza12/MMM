@@ -92,7 +92,7 @@ if plot:
     plt.savefig(file_path)
 
 # Plot graph
-fig = plot_activations_graph(graph)
+fig = plot_activations_graph(graph, fig_size=(8.5, 8.))
 file_path = folder / Path('graph-54.pdf')
 fig.savefig(file_path)
 

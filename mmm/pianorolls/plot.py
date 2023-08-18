@@ -327,8 +327,8 @@ def plot_activations_stack(activations_stack: ActivationsStack,
     return fig
 
 
-def plot_activations_graph(graph: GraphActivations, pad_f=0.5):
-    fig = plt.figure(figsize=(9., 6.))
+def plot_activations_graph(graph: GraphActivations, fig_size=(9., 6.), pad_f=0.5):
+    fig = plt.figure(figsize=fig_size)
 
     # Compute number of elements
     n_elements = np.zeros_like(graph.array, dtype=np.int)

@@ -40,7 +40,7 @@ class GraphActivations(nx.DiGraph):
                     for i in range(activations_stack_array.shape[0]):
                         rhythm: Rhythm = texture[i]
                         for u in range(rhythm.array.shape[-1]):
-                            t_a = t_s - rhythm.tatum * u
+                            t_a = t_s - rhythm.origin.time - rhythm.tatum * u
                             n_a = (t_a - piano_roll.origin.time) // piano_roll.tatum
 
                             inside = 0 <= n_a < activations_stack_array.shape[2]
