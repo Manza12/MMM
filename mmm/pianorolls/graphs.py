@@ -20,13 +20,11 @@ class ActivationNode:
 class GraphActivations(nx.DiGraph):
     def __init__(self, piano_roll: PianoRoll, activations_stack: ActivationsStack, texture: Texture):
         super().__init__()
+        self.array = np.empty(piano_roll.array.shape, dtype=object)
+        self.piano_roll = piano_roll
 
         # Create stack of activations
         activations_stack_array = activations_stack.to_array()
-
-        # Create an array representing the piano roll
-        self.graph['array'] = np.empty(piano_roll.array.shape, dtype=object)
-        self.graph['piano_roll'] = piano_roll
 
         # Loop
         for n_s in range(piano_roll.array.shape[-1]):
@@ -35,7 +33,7 @@ class GraphActivations(nx.DiGraph):
                 xi = m * piano_roll.step + piano_roll.origin.frequency
 
                 # Add empty list to the graph
-                self.graph['array'][m, n_s] = []
+                self.array[m, n_s] = []
 
                 # Add activations
                 if piano_roll.array[m, n_s] > 0:
@@ -55,4 +53,4 @@ class GraphActivations(nx.DiGraph):
                                 self.add_node(node, label=node.label)
 
                                 # Compute number of elements
-                                self.graph['array'][m, n_s].append(node)
+                                self.array[m, n_s].append(node)
