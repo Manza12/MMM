@@ -17,7 +17,49 @@ class ActivationNode:
         return r'$(%s, %d)$' % (self.t_a, self.i)
 
 
-class GraphActivations(nx.DiGraph):
+class Graph(nx.DiGraph):
+    def derive_label_weight(self, placement=0.5):
+        derivative_graph = Graph()
+
+        # Add nodes
+        for edge in self.edges:
+            x = self.nodes[edge[0]]['pos']
+            y = self.nodes[edge[1]]['pos']
+            pos = x[0] * placement + y[0] * (1 - placement), x[1] * placement + y[1] * (1 - placement)
+
+            label = ''.join([self.nodes[node]['label'] for node in edge])
+            derivative_graph.add_node(edge, pos=pos, label=label)
+
+            # Add edges
+            for outgoing_edge in self.edges(edge[1]):
+                old_labels = [self.nodes[node]['label'] for node in edge]
+                weight = 0 if self.nodes[outgoing_edge[1]]['label'] in old_labels else 1
+
+                # Add edge
+                derivative_graph.add_edge(edge, outgoing_edge, weight=weight)
+
+        return derivative_graph
+
+    def derive(self, placement=0.5):
+        derived_graph = Graph()
+
+        # Add nodes
+        for edge in self.edges:
+            x = self.nodes[edge[0]]['pos']
+            y = self.nodes[edge[1]]['pos']
+            pos = x[0] * placement + y[0] * (1 - placement), x[1] * placement + y[1] * (1 - placement)
+
+            derived_graph.add_node(edge, pos=pos, label='$(%s, %s)$' % edge)
+
+            # Add edges
+            for outgoing_edge in self.edges(edge[1]):
+                # Add edge
+                derived_graph.add_edge(edge, outgoing_edge)
+
+        return derived_graph
+
+
+class GraphActivations(Graph):
     def __init__(self, piano_roll: PianoRoll, activations_stack: ActivationsStack, texture: Texture):
         super().__init__()
         self.array = np.empty(piano_roll.array.shape, dtype=object)
