@@ -91,9 +91,15 @@ if plot:
     file_path = folder / Path('erosion_texture-54.pdf')
     plt.savefig(file_path)
 
-# Plot graph
+# Plot graph - vertices
 fig = plot_activations_graph(graph, fig_size=(8.5, 8.))
 file_path = folder / Path('graph-54.pdf')
+fig.savefig(file_path)
+
+# Plot graph - edges
+fig = plot_activations_graph(graph, fig_size=(8.5, 4.), plot_edges=True,
+                             node_font_size=8, grid_font_size=10, node_size=1000)
+file_path = folder / Path('graph-54_edges.pdf')
 fig.savefig(file_path)
 
 plt.show()

@@ -27,9 +27,12 @@ class GraphActivations(nx.DiGraph):
         activations_stack_array = activations_stack.to_array()
 
         # Loop
+        previous_nodes = []
         for n_s in range(piano_roll.array.shape[-1]):
             t_p = n_s * piano_roll.tatum + piano_roll.origin.time
             for m in range(piano_roll.array.shape[-2]):
+                current_nodes = []
+
                 xi = m * piano_roll.step + piano_roll.origin.frequency
 
                 # Add empty list to the graph
@@ -51,6 +54,14 @@ class GraphActivations(nx.DiGraph):
                                 node = ActivationNode(t_p, t_a, xi, i)
 
                                 self.add_node(node, label=node.label)
+                                current_nodes.append(node)
+
+                                # Add edges
+                                for previous_node in previous_nodes:
+                                    self.add_edge(previous_node, node)
 
                                 # Compute number of elements
                                 self.array[m, n_s].append(node)
+
+                if len(current_nodes) != 0:
+                    previous_nodes = current_nodes

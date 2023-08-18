@@ -327,7 +327,8 @@ def plot_activations_stack(activations_stack: ActivationsStack,
     return fig
 
 
-def plot_activations_graph(graph: GraphActivations, fig_size=(9., 6.), pad_f=0.5):
+def plot_activations_graph(graph: GraphActivations, fig_size=(9., 6.), pad_f=0.5, plot_edges=False,
+                           node_font_size=12, grid_font_size=13, node_size=2500):
     fig = plt.figure(figsize=fig_size)
 
     # Compute number of elements
@@ -352,12 +353,14 @@ def plot_activations_graph(graph: GraphActivations, fig_size=(9., 6.), pad_f=0.5
     pos = nx.get_node_attributes(graph, 'pos')
     labels = nx.get_node_attributes(graph, 'label')
 
-    nx.draw_networkx_labels(graph, pos, labels=labels, font_size=12)
+    nx.draw_networkx_labels(graph, pos, labels=labels, font_size=node_font_size)
+    if plot_edges:
+        nx.draw_networkx_edges(graph, pos, edge_color='k', arrows=True, node_size=node_size)
 
     # Grid
-    plt.text(-0.75, -1.5, r'$t_P$', fontdict={'fontsize': 14}, ha='center', va='center')
-    plt.text(-1., -1.5, r'/', fontdict={'fontsize': 20}, ha='center', va='center')
-    plt.text(-1.25, -1.5, r'$\xi$', fontdict={'fontsize': 14}, ha='center', va='center')
+    plt.text(-0.75, -1.5, r'$t_P$', fontdict={'fontsize': grid_font_size}, ha='center', va='center')
+    plt.text(-1., -1.5, r'/', fontdict={'fontsize': int(grid_font_size * 4 / 3)}, ha='center', va='center')
+    plt.text(-1.25, -1.5, r'$\xi$', fontdict={'fontsize': grid_font_size}, ha='center', va='center')
 
     # Grid frequency
     for m in range(graph.piano_roll.array.shape[-2]):
@@ -365,7 +368,7 @@ def plot_activations_graph(graph: GraphActivations, fig_size=(9., 6.), pad_f=0.5
             continue
         xi = graph.piano_roll.origin.frequency + m * graph.piano_roll.step
         y = offset[m] + (max_f[m] - 1) / 2 + pad_f / 2
-        plt.text(-1., y, str(xi), ha='center', va='center', fontdict={'fontsize': 13})
+        plt.text(-1., y, str(xi), ha='center', va='center', fontdict={'fontsize': grid_font_size})
 
         # Plot horizontal lines
         y = offset[m] - 0.5
@@ -378,7 +381,8 @@ def plot_activations_graph(graph: GraphActivations, fig_size=(9., 6.), pad_f=0.5
     # Grid time
     for n in range(graph.piano_roll.array.shape[-1]):
         t = graph.piano_roll.origin.time + n * graph.piano_roll.tatum
-        plt.text(n, -1.5, r'$%s$' % t, ha='center', va='center', fontdict={'fontsize': 14})
+        plt.text(n, -1.5, r'$%s$' % t, ha='center', va='center',
+                 fontdict={'fontsize': grid_font_size})
 
         # Plot vertical lines
         x = n - 0.5
