@@ -2,7 +2,7 @@ from mmm.pianorolls.music import *
 from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.morphology import erosion, dilation
 from mmm.pianorolls.plot import plot_piano_roll, plot_activations_stack, plot_activations_graph
-from mmm.pianorolls.graphs import GraphActivations
+from mmm.pianorolls.graphs import ActivationsGraph
 
 
 # Parameters
@@ -65,7 +65,7 @@ activations_texture: ActivationsStack = erosion(piano_roll, texture)
 activations_texture.change_extension(piano_roll.extension)
 
 # Create graph
-graph = GraphActivations(piano_roll, activations_texture, texture)
+graph = ActivationsGraph(piano_roll, activations_texture.to_array(), texture)
 
 # Figures
 if plot:

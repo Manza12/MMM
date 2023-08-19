@@ -1,3 +1,5 @@
+from __future__ import annotations
+import time
 from . import *
 from .music import PianoRoll, ActivationsStack, Texture, Rhythm, TimePoint, FrequencyPoint
 
@@ -59,14 +61,38 @@ class Graph(nx.DiGraph):
         return derived_graph
 
 
-class GraphActivations(Graph):
-    def __init__(self, piano_roll: PianoRoll, activations_stack: ActivationsStack, texture: Texture):
+class DerivedActivationsGraph(Graph):
+    def __init__(self, graph: Union[ActivationsGraph, DerivedActivationsGraph]):
         super().__init__()
-        self.array = np.empty(piano_roll.array.shape, dtype=object)
-        self.piano_roll = piano_roll
 
-        # Create stack of activations
-        activations_stack_array = activations_stack.to_array()
+        # Add nodes
+        for edge in graph.edges:
+            if isinstance(edge[0], tuple):
+                u = *edge[0], edge[1][-1]
+            else:
+                u = edge
+            self.add_node(u)
+
+            # Add edges
+            for outgoing_edge in graph.edges(edge[1]):
+                if isinstance(outgoing_edge[0], tuple):
+                    v = *outgoing_edge[0], outgoing_edge[1][-1]
+                else:
+                    v = outgoing_edge
+                self.add_edge(u, v)
+
+    def derive(self, placement=0.5):
+        return DerivedActivationsGraph(self)
+
+
+class ActivationsGraph(Graph):
+    def __init__(self, piano_roll: PianoRoll, activations_stack_array: np.ndarray, texture: Texture):
+        super().__init__()
+        self.piano_roll = piano_roll
+        self.activations_stack_array = activations_stack_array
+        self.texture = texture
+
+        self.array = np.empty(piano_roll.array.shape, dtype=object)
 
         # Loop
         previous_nodes = []
@@ -107,3 +133,67 @@ class GraphActivations(Graph):
 
                 if len(current_nodes) != 0:
                     previous_nodes = current_nodes
+
+    def derive(self, placement=0.5):
+        return DerivedActivationsGraph(self)
+
+    def find_minimal_activations(self, derivation_order=None, verbose=False, folder_save=None):
+        # Differentiate the graph
+        if derivation_order is None:
+            order_texture = (self.texture.extension.end - self.texture.extension.start) // self.texture.tatum
+            order_frequency = np.max(np.sum((self.piano_roll.array.astype(bool)).astype(np.int8), axis=0))
+            order = order_frequency * order_texture
+            n_diff = order - 1
+        else:
+            n_diff = derivation_order
+
+        if verbose:
+            print('Number of derivatives: %d' % n_diff)
+
+        derived_graph = self
+
+        start_all = time.time()
+        for k in range(n_diff):
+            print('Computing derivative %d...' % (k + 1))
+
+            # Differentiate graph
+            start = time.time()
+            derived_graph = derived_graph.derive()
+            # derivative_graph = differentiate_graph_overlap(derivative_graph,
+            #                                                label_fn=concatenate_labels,
+            #                                                weight_fn=weight_indexes)
+            print('Time to differentiate graph: %.3f' % (time.time() - start))
+
+            # Save graph
+            if folder_save is not None:
+                file_name = 'derivative_graph-%d.gpickle' % (k + 1)
+                nx.write_gpickle(derived_graph, folder_save / file_name)
+
+        if verbose:
+            print('Time to differentiate graph: %.3f s' % (time.time() - start_all))
+            print('Derivative of %d order graph: %s' % (n_diff, derived_graph))
+
+        # # Remove inconsistent nodes
+        # start = time.time()
+        # remove_inconsistent_nodes(derivative_graph, len(texture))
+        # print('Time to remove inconsistent nodes: %.3f s' % (time.time() - start))
+        # if verbose:
+        #     print('Pruned graph: %s' % derivative_graph)
+
+        # # Find the shortest path
+        # start = time.time()
+        # shortest_path = nx.shortest_path(derivative_graph, derivative_graph.graph['start'],
+        #                                  derivative_graph.graph['end'])
+        # length = nx.shortest_path_length(derivative_graph, derivative_graph.graph['start'],
+        #                                  derivative_graph.graph['end'])
+        # print('Time to find shortest path: %.3f' % (time.time() - start))
+        # concatenated_path = concatenate_path(shortest_path)
+        #
+        # # Create minimal activations
+        # minimal_result = np.zeros_like(activation_stack)
+
+        # for node in concatenated_path:
+        #     if isinstance(node, ActivationNode):
+        #         minimal_result[node.i, node.xi, node.t_a] = True
+
+        return derived_graph

@@ -1115,6 +1115,18 @@ class Texture(list):
         else:
             return self[0].nature
 
+    @property
+    def extension(self):
+        max_time = max([rhythm.extension.time.end for rhythm in self])
+        min_time = min([rhythm.extension.time.start for rhythm in self])
+        return TimeExtension(min_time, max_time)
+
+    @property
+    def tatum(self):
+        if len(self) == 0:
+            return TimeShift(0)
+        return self[0].tatum.gcd(*[r.tatum for r in self[1:]])
+
     @multimethod
     def __mul__(self, harmony: Harmony) -> PianoRoll:
         return HarmonicTexture(self, harmony)
@@ -1122,12 +1134,6 @@ class Texture(list):
     @multimethod
     def __mul__(self, chord: Chord) -> PianoRoll:
         return ChordTexture(self, chord)
-
-    @property
-    def tatum(self):
-        if len(self) == 0:
-            return TimeShift(0)
-        return self[0].gcd(*self[1:])
 
 
 class Chord(PianoRoll):

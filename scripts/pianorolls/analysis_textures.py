@@ -111,7 +111,6 @@ print()
 activations_texture: ActivationsStack = erosion(piano_roll, texture)
 
 activations_texture.change_extension(piano_roll.extension)
-activations_synchronized = activations_texture.synchronize()
 
 # Measure and redundancy
 for a, activations in enumerate(activations_texture):

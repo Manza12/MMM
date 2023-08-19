@@ -1,5 +1,5 @@
 from . import *
-from .graphs import GraphActivations
+from .graphs import ActivationsGraph
 from .music import TimePoint, PianoRoll, ChromaRoll, ActivationsStack
 from .utils import round_half_up
 
@@ -327,7 +327,7 @@ def plot_activations_stack(activations_stack: ActivationsStack,
     return fig
 
 
-def plot_activations_graph(graph: GraphActivations, fig_size=(9., 6.), pad_f=0.5, plot_edges=False,
+def plot_activations_graph(graph: ActivationsGraph, fig_size=(9., 6.), pad_f=0.5, plot_edges=False,
                            node_font_size=12, grid_font_size=13, node_size=2500):
     fig = plt.figure(figsize=fig_size)
 
