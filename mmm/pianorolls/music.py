@@ -285,6 +285,9 @@ class TimePoint(Time):
     def __str__(self):
         return '(%s, %s, %s)' % (self.measure, self.beat, self.offset)
 
+    def __hash__(self):
+        return hash(self.value)
+
     @staticmethod
     def zero(time_signature=(4, 4)):
         return TimePoint(0, time_signature=time_signature)
@@ -513,6 +516,9 @@ class FrequencyPoint(Frequency):
 
     def __str__(self):
         return midi_number_to_pitch(self.value)
+
+    def __hash__(self):
+        return hash(self.value)
 
     @property
     def nature(self):

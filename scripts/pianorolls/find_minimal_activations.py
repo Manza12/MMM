@@ -2,9 +2,8 @@ import time
 from mmm.pianorolls.music import *
 from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.morphology import erosion, dilation
-# from mmm.pianorolls.plot import plot_piano_roll, plot_activations_stack, plot_activations_graph
-from mmm.pianorolls.graphs import ActivationsGraph
-
+from mmm.pianorolls.plot import plot_piano_roll, plot_activations_stack, plot_activations_graph
+from mmm.pianorolls.graphs import ActivationsGraph, DerivedActivationsGraph
 
 # Parameters
 plot = False
@@ -70,41 +69,37 @@ graph = ActivationsGraph(piano_roll, activations_texture.to_array(), texture)
 print(graph)
 
 # Synchronize textures
-activations_synchronized_array = activations_texture.synchronize()
-graph_synchronized = ActivationsGraph(piano_roll, activations_synchronized_array, texture)
+graph_synchronized = ActivationsGraph(piano_roll, activations_texture.synchronize(), texture)
 print(graph_synchronized)
+
+# Create derived graph of order 0
+derived_graph = DerivedActivationsGraph(graph_synchronized)
+print(derived_graph)
+
+# Figures
+if plot:
+    # Erosion texture
+    plot_activations_stack(activations_synchronized, time_label='Time (m, b)',
+                           tight_frame=False,
+                           x_tick_start=TimePoint(0), x_tick_step=TimeShift('1/2'),
+                           fig_size=(400, 260), marker_size=10,
+                           legend=True,
+                           legend_params={
+                               'columnspacing': 0.2,
+                               'labelspacing': 0.,
+                               'handletextpad': 0.1
+                           })
+    file_path = folder / Path('activations_synchronized.pdf')
+    plt.savefig(file_path)
+
 
 # Find minimal activations
 start = time.time()
-derived_graph = graph_synchronized.find_minimal_activations(verbose=True)
+activations = derived_graph.find_minimal_activations(verbose=True, folder_save=folder)
 # shortest_path, length, minimal_activations = minimal_activations_graph(eroded_score, texture)
 print('Time to find minimal activations: %.3f s' % (time.time() - start))
 print()
 
-# # Figures
-# if plot:
-#     # Piano roll
-#     plot_piano_roll(piano_roll, time_label='Time (m, b)',
-#                     x_tick_start=TimePoint(0), x_tick_step=TimeShift('1/2'),
-#                     fig_size=(460, 280), tight_frame=False)
-#
-#     file_path = folder / Path('piano_roll-54.pdf')
-#     plt.savefig(file_path)
-#
-#     # Erosion texture
-#     plot_activations_stack(activations_texture, time_label='Time (m, b)',
-#                            tight_frame=False,
-#                            x_tick_start=TimePoint(0), x_tick_step=TimeShift('1/2'),
-#                            fig_size=(400, 260), marker_size=10,
-#                            legend=True,
-#                            legend_params={
-#                                'columnspacing': 0.2,
-#                                'labelspacing': 0.,
-#                                'handletextpad': 0.1
-#                            })
-#     file_path = folder / Path('erosion_texture-54.pdf')
-#     plt.savefig(file_path)
-#
 # # Plot graph - vertices
 # fig = plot_activations_graph(graph, fig_size=(8.5, 8.))
 # file_path = folder / Path('graph-54.pdf')

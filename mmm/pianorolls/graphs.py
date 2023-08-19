@@ -1,7 +1,7 @@
 from __future__ import annotations
 import time
 from . import *
-from .music import PianoRoll, ActivationsStack, Texture, Rhythm, TimePoint, FrequencyPoint
+from .music import PianoRoll, Texture, Rhythm, TimePoint, FrequencyPoint
 
 
 class ActivationNode:
@@ -17,6 +17,34 @@ class ActivationNode:
     @property
     def label(self):
         return r'$(%s, %d)$' % (self.t_a, self.i)
+
+
+class DerivedActivationNode:
+    def __init__(self, t_p: TimePoint, t_a: TimePoint, xi: FrequencyPoint, i: int, cluster: int):
+        self.t_p = t_p
+        self.t_a = t_a
+        self.xi = xi
+        self.i = i
+
+        self.cluster = cluster
+
+    def __eq__(self, other):
+        if isinstance(other, DerivedActivationNode):
+            return self.t_p == other.t_a and self.t_p == other.t_a and self.xi == other.xi and self.i == other.i
+        else:
+            return False
+
+    def __str__(self):
+        return r'(%s, %s, %s, %d) #%d' % (self.t_p, self.t_a, self.xi, self.i, self.cluster)
+
+    def __hash__(self):
+        return hash((self.t_p, self.t_a, self.xi, self.i))
+
+    def same_activation(self, other):
+        if isinstance(other, DerivedActivationNode):
+            return self.t_a == other.t_a and self.xi == other.xi and self.i == other.i
+        else:
+            return False
 
 
 class Graph(nx.DiGraph):
@@ -61,36 +89,14 @@ class Graph(nx.DiGraph):
         return derived_graph
 
 
-class DerivedActivationsGraph(Graph):
-    def __init__(self, graph: Union[ActivationsGraph, DerivedActivationsGraph]):
-        super().__init__()
-
-        # Add nodes
-        for edge in graph.edges:
-            if isinstance(edge[0], tuple):
-                u = *edge[0], edge[1][-1]
-            else:
-                u = edge
-            self.add_node(u)
-
-            # Add edges
-            for outgoing_edge in graph.edges(edge[1]):
-                if isinstance(outgoing_edge[0], tuple):
-                    v = *outgoing_edge[0], outgoing_edge[1][-1]
-                else:
-                    v = outgoing_edge
-                self.add_edge(u, v)
-
-    def derive(self, placement=0.5):
-        return DerivedActivationsGraph(self)
-
-
 class ActivationsGraph(Graph):
     def __init__(self, piano_roll: PianoRoll, activations_stack_array: np.ndarray, texture: Texture):
         super().__init__()
         self.piano_roll = piano_roll
         self.activations_stack_array = activations_stack_array
         self.texture = texture
+
+        self.clusters: List[List[ActivationNode]] = []
 
         self.array = np.empty(piano_roll.array.shape, dtype=object)
 
@@ -99,7 +105,7 @@ class ActivationsGraph(Graph):
         for n_s in range(piano_roll.array.shape[-1]):
             t_p = n_s * piano_roll.tatum + piano_roll.origin.time
             for m in range(piano_roll.array.shape[-2]):
-                current_nodes = []
+                self.clusters.append([])
 
                 xi = m * piano_roll.step + piano_roll.origin.frequency
 
@@ -122,7 +128,7 @@ class ActivationsGraph(Graph):
                                 node = ActivationNode(t_p, t_a, xi, i)
 
                                 self.add_node(node, label=node.label)
-                                current_nodes.append(node)
+                                self.clusters[-1].append(node)
 
                                 # Add edges
                                 for previous_node in previous_nodes:
@@ -131,11 +137,65 @@ class ActivationsGraph(Graph):
                                 # Compute number of elements
                                 self.array[m, n_s].append(node)
 
-                if len(current_nodes) != 0:
-                    previous_nodes = current_nodes
+                if len(self.clusters[-1]) != 0:
+                    previous_nodes = self.clusters[-1]
+                else:
+                    self.clusters.pop(-1)
 
-    def derive(self, placement=0.5):
-        return DerivedActivationsGraph(self)
+
+class DerivedActivationsGraph(Graph):
+    @multimethod
+    def __init__(self, piano_roll: PianoRoll, texture: Texture):
+        super().__init__()
+
+        self.texture = texture
+        self.piano_roll = piano_roll
+
+        self.clusters = []
+
+    @multimethod
+    def __init__(self, graph: ActivationsGraph):
+        super().__init__()
+        self.__init__(graph.piano_roll, graph.texture)
+
+        previous_cluster = []
+        for cluster in graph.clusters:
+            self.clusters.append([])
+
+            # Add nodes
+            for node in cluster:
+                u = (DerivedActivationNode(node.t_p, node.t_a, node.xi, node.i, len(self.clusters) - 1), )
+                self.add_node(u)
+                self.clusters[-1].append(u)
+
+            # Add edges
+            for u in previous_cluster:
+                for v in self.clusters[-1]:
+                    self.add_edge(u, v)
+
+            previous_cluster = self.clusters[-1]
+
+    def derive(self, make_clusters=True, placement=0.5):
+        derived_graph = DerivedActivationsGraph(self.piano_roll, self.texture)
+
+        if make_clusters:
+            for _ in range(len(self.clusters) - 1):
+                derived_graph.clusters.append([])
+
+        # Add nodes
+        for edge in self.edges:
+            u = *edge[0], edge[1][-1]
+            derived_graph.add_node(u)
+
+            if make_clusters:
+                derived_graph.clusters[u[0].cluster].append(u)
+
+            # Add edges
+            for outgoing_edge in self.edges(edge[1]):
+                v = *outgoing_edge[0], outgoing_edge[1][-1]
+                derived_graph.add_edge(u, v)
+
+        return derived_graph
 
     def find_minimal_activations(self, derivation_order=None, verbose=False, folder_save=None):
         # Differentiate the graph
@@ -143,25 +203,20 @@ class ActivationsGraph(Graph):
             order_texture = (self.texture.extension.end - self.texture.extension.start) // self.texture.tatum
             order_frequency = np.max(np.sum((self.piano_roll.array.astype(bool)).astype(np.int8), axis=0))
             order = order_frequency * order_texture
-            n_diff = order - 1
-        else:
-            n_diff = derivation_order
+            derivation_order = order - 2
 
         if verbose:
-            print('Number of derivatives: %d' % n_diff)
+            print('Number of derivatives: %d' % derivation_order)
 
         derived_graph = self
 
         start_all = time.time()
-        for k in range(n_diff):
+        for k in range(derivation_order):
             print('Computing derivative %d...' % (k + 1))
 
             # Differentiate graph
             start = time.time()
             derived_graph = derived_graph.derive()
-            # derivative_graph = differentiate_graph_overlap(derivative_graph,
-            #                                                label_fn=concatenate_labels,
-            #                                                weight_fn=weight_indexes)
             print('Time to differentiate graph: %.3f' % (time.time() - start))
 
             # Save graph
@@ -171,7 +226,7 @@ class ActivationsGraph(Graph):
 
         if verbose:
             print('Time to differentiate graph: %.3f s' % (time.time() - start_all))
-            print('Derivative of %d order graph: %s' % (n_diff, derived_graph))
+            print('Derivative of %d order graph: %s' % (derivation_order, derived_graph))
 
         # # Remove inconsistent nodes
         # start = time.time()
