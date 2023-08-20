@@ -144,14 +144,14 @@ def find_minimal_activations(activations_graph: DerivedActivationsGraph,
             # Differentiate graph
             start = time.time()
             derived_graph = derived_graph.derive()
-            print('Time to differentiate graph: %.3f' % (time.time() - start))
+            print('Time to derive graph: %.3f' % (time.time() - start))
 
             # Save graph
             if folder_save is not None:
                 nx.write_gpickle(derived_graph, folder_save / file_name)
 
         if verbose:
-            print('Time to differentiate graph: %.3f s' % (time.time() - start_all))
+            print('Time to derive graph: %.3f s' % (time.time() - start_all))
             print('Derivative of %d order graph: %s' % (derivation_order, derived_graph))
 
     # Remove inconsistent nodes
@@ -161,9 +161,16 @@ def find_minimal_activations(activations_graph: DerivedActivationsGraph,
         print('Time to remove inconsistent nodes: %.3f s' % (time.time() - start))
         print('Pruned graph: %s' % derived_graph)
 
+    # Weight graph
+    start = time.time()
+    derived_graph.weight_graph()
+    if verbose:
+        print('Time to weight graph: %.3f s' % (time.time() - start))
+        print('Weighted graph: %s' % derived_graph)
+
     # Save graph
     if folder_save is not None:
-        file_name = 'pruned_derivative_graph-%d.gpickle' % derivation_order
+        file_name = 'pruned_weighted_graph-%d.gpickle' % derivation_order
         nx.write_gpickle(derived_graph, folder_save / file_name)
 
     # Add start and end nodes
@@ -172,23 +179,45 @@ def find_minimal_activations(activations_graph: DerivedActivationsGraph,
     if verbose:
         print('Time to add start and end nodes: %.3f s' % (time.time() - start))
 
-    # Find the shortest path
+    # Find the shortest paths
     start = time.time()
     try:
-        shortest_path = nx.shortest_path(derived_graph, derived_graph.start, derived_graph.end)
-        print('Time to find shortest path: %.3f' % (time.time() - start))
+        # All shortest paths
+        shortest_paths = list(nx.all_shortest_paths(derived_graph, derived_graph.start, derived_graph.end,
+                                                    weight='weight'))
+        print('Time to find shortest paths: %.3f' % (time.time() - start))
+        print('Number of shortest paths:', len(shortest_paths))
     except nx.NetworkXNoPath:
-        shortest_path = []
+        shortest_paths = []
         print('No path found')
 
-    # Concatenate path
-    concatenated_path = concatenate_path(shortest_path)
+    # Concatenate paths
+    concatenated_paths = []
+    for shortest_path in shortest_paths:
+        concatenated_paths.append(concatenate_path(shortest_path))
+
+    # Find more condensed path
+    condensed_paths = []
+    condensed_path_length = np.inf
+    for path in concatenated_paths:
+        different_t_a = set()
+        for act in path:
+            different_t_a.add(act.t_a)
+
+        if len(different_t_a) < condensed_path_length:
+            condensed_paths = [path]
+            condensed_path_length = len(different_t_a)
+        elif len(different_t_a) == condensed_path_length:
+            condensed_paths.append(path)
+
+    print('Number of condensed paths:', len(condensed_paths))
+    best_path = condensed_paths[0]
 
     # Create activations stack
     activations_list = []
     for i in range(len(derived_graph.texture)):
-        activations = [TimeFrequency(activation.t_a, activation.xi) for activation in concatenated_path if activation.i == i]
+        activations = [TimeFrequency(activation.t_a, activation.xi) for activation in best_path if activation.i == i]
         activations_list.append(Activations(*activations))
     activation_stack = ActivationsStack(*activations_list)
 
-    return shortest_path, activation_stack, derived_graph
+    return best_path, activation_stack, shortest_paths, condensed_paths

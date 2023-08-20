@@ -97,16 +97,14 @@ if plot:
 
 # Find minimal activations
 start = time.time()
-shortest_path, minimal_activation_stack, derived_graph = find_minimal_activations(derived_graph, verbose=True, load=True)
+best_path, minimal_activation_stack, shortest_paths, condensed_paths = \
+    find_minimal_activations(derived_graph, folder_save=folder, verbose=True, load=True)
 print('Time to find minimal activations: %.3f s' % (time.time() - start))
 print()
 
-# All shortest paths
-shortest_paths = nx.all_shortest_paths(derived_graph, derived_graph.start, derived_graph.end)
-print('Number of shortest paths:', len(list(shortest_paths)))
-
 # Minimal activations
 for j, activations in enumerate(minimal_activation_stack):
+    activations.change_extension(piano_roll.extension)
     plot_piano_roll(activations, time_label='Time (m, b)', tight_frame=False,
                     x_tick_start=TimePoint(0), x_tick_step=TimeShift('1'),
                     fig_size=(400, 260), marker_size=10)

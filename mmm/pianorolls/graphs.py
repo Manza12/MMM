@@ -3,7 +3,6 @@ from . import *
 from .music import PianoRoll, Texture, Rhythm, TimePoint, FrequencyPoint
 
 
-TimePoint.__str__ = lambda self: '(%s, %s)' % (self.measure, self.beat)
 class ActivationNode:
     def __init__(self, t_p: TimePoint, t_a: TimePoint, xi: FrequencyPoint, i: int):
         self.t_p = t_p
@@ -186,13 +185,13 @@ class DerivedActivationsGraph(Graph):
         self.start = 'S'
         self.add_node(self.start)
         for node in self.clusters[0]:
-            self.add_edge(self.start, node)
+            self.add_edge(self.start, node, weight=0)
 
         # Add end node
         self.end = 'E'
         self.add_node(self.end)
         for node in self.clusters[-1]:
-            self.add_edge(node, self.end)
+            self.add_edge(node, self.end, weight=0)
 
     def derive(self, make_clusters=True, placement=0.5):
         derived_graph = DerivedActivationsGraph(self.piano_roll, self.texture)
@@ -231,3 +230,13 @@ class DerivedActivationsGraph(Graph):
         self.remove_nodes_from(nodes_to_remove)
         for node in nodes_to_remove:
             self.clusters[node[0].cluster].remove(node)
+
+    def weight_graph(self):
+        for edge in self.edges:
+            last_node = edge[1][-1]
+            weight = 1
+            for node in edge[0]:
+                if node.same_activation(last_node):
+                    weight = 0
+                    break
+            self.edges[edge]['weight'] = weight

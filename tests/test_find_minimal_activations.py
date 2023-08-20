@@ -78,7 +78,8 @@ if plot:
 
 # Find minimal activations
 start = time.time()
-shortest_path, minimal_activation_stack = find_minimal_activations(derived_graph, verbose=True, load=True)
+best_path, minimal_activation_stack, shortest_paths, condensed_paths = \
+    find_minimal_activations(derived_graph, verbose=True, load=True)
 # shortest_path, length, minimal_activations = minimal_activations_graph(eroded_score, texture)
 print('Time to find minimal activations: %.3f s' % (time.time() - start))
 print()
