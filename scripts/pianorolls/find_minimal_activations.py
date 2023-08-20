@@ -4,7 +4,7 @@ from mmm.pianorolls.algorithms import find_minimal_activations
 from mmm.pianorolls.music import *
 from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.morphology import erosion, dilation
-from mmm.pianorolls.plot import plot_piano_roll, plot_activations_stack, plot_activations_graph
+from mmm.pianorolls.plot import plot_piano_roll, plot_activations_stack
 from mmm.pianorolls.graphs import ActivationsGraph, DerivedActivationsGraph
 
 # Parameters
@@ -97,20 +97,18 @@ if plot:
 
 # Find minimal activations
 start = time.time()
-shortest_path, minimal_activation_stack = find_minimal_activations(derived_graph, verbose=True, folder_save=folder, load=True)
-# shortest_path, length, minimal_activations = minimal_activations_graph(eroded_score, texture)
+shortest_path, minimal_activation_stack, derived_graph = find_minimal_activations(derived_graph, verbose=True, load=True)
 print('Time to find minimal activations: %.3f s' % (time.time() - start))
 print()
 
-# # Plot graph - vertices
-# fig = plot_activations_graph(graph, fig_size=(8.5, 8.))
-# file_path = folder / Path('graph-54.pdf')
-# fig.savefig(file_path)
-#
-# # Plot graph - edges
-# fig = plot_activations_graph(graph, fig_size=(8.5, 4.), plot_edges=True,
-#                              node_font_size=8, grid_font_size=10, node_size=1000)
-# file_path = folder / Path('graph-54_edges.pdf')
-# fig.savefig(file_path)
+# All shortest paths
+shortest_paths = nx.all_shortest_paths(derived_graph, derived_graph.start, derived_graph.end)
+print('Number of shortest paths:', len(list(shortest_paths)))
+
+# Minimal activations
+for j, activations in enumerate(minimal_activation_stack):
+    plot_piano_roll(activations, time_label='Time (m, b)', tight_frame=False,
+                    x_tick_start=TimePoint(0), x_tick_step=TimeShift('1'),
+                    fig_size=(400, 260), marker_size=10)
 
 plt.show()

@@ -191,4 +191,4 @@ def find_minimal_activations(activations_graph: DerivedActivationsGraph,
         activations_list.append(Activations(*activations))
     activation_stack = ActivationsStack(*activations_list)
 
-    return shortest_path, activation_stack
+    return shortest_path, activation_stack, derived_graph

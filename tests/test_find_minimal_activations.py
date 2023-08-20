@@ -76,18 +76,6 @@ if plot:
     # Plot graph
     fig = plot_activations_graph(graph, fig_size=(8.5, 8.))
 
-    # # Erosion texture
-    # plot_activations_stack(activations_synchronized, time_label='Time (m, b)',
-    #                        tight_frame=False,
-    #                        x_tick_start=TimePoint(0), x_tick_step=TimeShift('1/2'),
-    #                        fig_size=(400, 260), marker_size=10,
-    #                        legend=True,
-    #                        legend_params={
-    #                            'columnspacing': 0.2,
-    #                            'labelspacing': 0.,
-    #                            'handletextpad': 0.1
-    #                        })
-
 # Find minimal activations
 start = time.time()
 shortest_path, minimal_activation_stack = find_minimal_activations(derived_graph, verbose=True, load=True)
