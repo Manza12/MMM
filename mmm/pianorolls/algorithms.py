@@ -2,7 +2,7 @@ import time
 import os
 from mmm.pianorolls import *
 from mmm.pianorolls.graphs import DerivedActivationsGraph
-from mmm.pianorolls.music import PianoRoll, PianoRollStack, Activations, Texture, ActivationsStack
+from mmm.pianorolls.music import PianoRoll, PianoRollStack, Activations, Texture, ActivationsStack, TimeFrequency
 from mmm.pianorolls.morphology import erosion
 
 
@@ -77,6 +77,22 @@ def compute_size_graph(clusters: List[List], order_derivation: int):
     return size_v, size_e
 
 
+def concatenate_path(path: list):
+    concatenated_path = []
+    for n, node in enumerate(path):
+        if node == 'S':
+            continue
+        elif node == 'E':
+            new_node = path[n - 1]
+            for a, act in enumerate(new_node):
+                if a == 0:
+                    continue
+                concatenated_path.append(act)
+        else:
+            concatenated_path.append(node[0])
+    return concatenated_path
+
+
 def find_minimal_activations(activations_graph: DerivedActivationsGraph,
                              derivation_order=None, verbose=False, folder_save=None,
                              load=False):
@@ -88,7 +104,7 @@ def find_minimal_activations(activations_graph: DerivedActivationsGraph,
         order_frequency = np.max(np.sum((activations_graph.piano_roll.array.astype(bool)).astype(np.int8), axis=0))
 
         order = order_frequency * order_texture
-        derivation_order = order - 2
+        derivation_order = order - 1
 
     if verbose:
         print('Number of derivatives: %d' % derivation_order)
@@ -158,15 +174,21 @@ def find_minimal_activations(activations_graph: DerivedActivationsGraph,
 
     # Find the shortest path
     start = time.time()
-    shortest_path = nx.shortest_path(derived_graph, derived_graph.start, derived_graph.end)
-    print('Time to find shortest path: %.3f' % (time.time() - start))
-    # concatenated_path = concatenate_path(shortest_path)
-    #
-    # # Create minimal activations
-    # minimal_result = np.zeros_like(activation_stack)
+    try:
+        shortest_path = nx.shortest_path(derived_graph, derived_graph.start, derived_graph.end)
+        print('Time to find shortest path: %.3f' % (time.time() - start))
+    except nx.NetworkXNoPath:
+        shortest_path = []
+        print('No path found')
 
-    # for node in concatenated_path:
-    #     if isinstance(node, ActivationNode):
-    #         minimal_result[node.i, node.xi, node.t_a] = True
+    # Concatenate path
+    concatenated_path = concatenate_path(shortest_path)
 
-    return shortest_path
+    # Create activations stack
+    activations_list = []
+    for i in range(len(derived_graph.texture)):
+        activations = [TimeFrequency(activation.t_a, activation.xi) for activation in concatenated_path if activation.i == i]
+        activations_list.append(Activations(*activations))
+    activation_stack = ActivationsStack(*activations_list)
+
+    return shortest_path, activation_stack

@@ -3,6 +3,7 @@ from . import *
 from .music import PianoRoll, Texture, Rhythm, TimePoint, FrequencyPoint
 
 
+TimePoint.__str__ = lambda self: '(%s, %s)' % (self.measure, self.beat)
 class ActivationNode:
     def __init__(self, t_p: TimePoint, t_a: TimePoint, xi: FrequencyPoint, i: int):
         self.t_p = t_p
@@ -170,6 +171,9 @@ class DerivedActivationsGraph(Graph):
                 self.add_node(u)
                 self.clusters[-1].append(u)
 
+                # Set scope
+                self.nodes[u]['t_scope'] = node.t_p - self.texture.extension.duration
+
             # Add edges
             for u in previous_cluster:
                 for v in self.clusters[-1]:
@@ -201,6 +205,7 @@ class DerivedActivationsGraph(Graph):
         for edge in self.edges:
             u = *edge[0], edge[1][-1]
             derived_graph.add_node(u)
+            derived_graph.nodes[u]['t_scope'] = self.nodes[edge[1]]['t_scope']
 
             if make_clusters:
                 derived_graph.clusters[u[0].cluster].append(u)
@@ -215,12 +220,14 @@ class DerivedActivationsGraph(Graph):
     def remove_inconsistent_nodes(self):
         nodes_to_remove = []
         for node in self.nodes:
-            t_a = node[0].t_a
+            t_scope = self.nodes[node]['t_scope']
             indexes = set()
             for activation in node:
-                if activation.t_a == t_a:
+                if activation.t_a == t_scope:
                     indexes.add(activation.i)
-            if len(indexes) != len(self.texture):
+            if len(indexes) != len(self.texture) and len(indexes) != 0:
                 nodes_to_remove.append(node)
 
         self.remove_nodes_from(nodes_to_remove)
+        for node in nodes_to_remove:
+            self.clusters[node[0].cluster].remove(node)
