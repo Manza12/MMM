@@ -78,14 +78,19 @@ if plot:
 
 # Find minimal activations
 start = time.time()
-best_path, minimal_activation_stack, shortest_paths, condensed_paths = \
+shortest_paths, min_activation_stacks, derived_graph = \
     find_minimal_activations(derived_graph, verbose=True, load=True)
-# shortest_path, length, minimal_activations = minimal_activations_graph(eroded_score, texture)
 print('Time to find minimal activations: %.3f s' % (time.time() - start))
 print()
 
+# Pick a single path
+assert len(shortest_paths) == 1
+shortest_path = shortest_paths[0]
+min_activation_stack = min_activation_stacks[0]
+
 # Minimal activations
-for j, activations in enumerate(minimal_activation_stack):
+for j, activations in enumerate(min_activation_stack):
+    activations.change_extension(piano_roll.extension)
     plot_piano_roll(activations, time_label='Time (m, b)', tight_frame=False,
                     x_tick_start=TimePoint(0), x_tick_step=TimeShift('1'),
                     fig_size=(400, 260), marker_size=10)

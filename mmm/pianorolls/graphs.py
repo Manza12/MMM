@@ -39,11 +39,14 @@ class DerivedActivationNode:
     def __hash__(self):
         return hash((self.t_p, self.t_a, self.xi, self.i))
 
-    def same_activation(self, other):
-        if isinstance(other, DerivedActivationNode):
-            return self.t_a == other.t_a and self.xi == other.xi and self.i == other.i
-        else:
-            return False
+    @property
+    def activation(self):
+        return self.t_a, self.xi, self.i
+    # def same_activation(self, other):
+    #     if isinstance(other, DerivedActivationNode):
+    #         return self.t_a == other.t_a and self.xi == other.xi and self.i == other.i
+    #     else:
+    #         return False
 
 
 class Graph(nx.DiGraph):
@@ -185,13 +188,13 @@ class DerivedActivationsGraph(Graph):
         self.start = 'S'
         self.add_node(self.start)
         for node in self.clusters[0]:
-            self.add_edge(self.start, node, weight=0)
+            self.add_edge(self.start, node)
 
         # Add end node
         self.end = 'E'
         self.add_node(self.end)
         for node in self.clusters[-1]:
-            self.add_edge(node, self.end, weight=0)
+            self.add_edge(node, self.end)
 
     def derive(self, make_clusters=True, placement=0.5):
         derived_graph = DerivedActivationsGraph(self.piano_roll, self.texture)
@@ -233,10 +236,19 @@ class DerivedActivationsGraph(Graph):
 
     def weight_graph(self):
         for edge in self.edges:
-            last_node = edge[1][-1]
-            weight = 1
-            for node in edge[0]:
-                if node.same_activation(last_node):
-                    weight = 0
-                    break
+            u = edge[0]
+            v = edge[1]
+
+            if v == 'E':
+                new_activations = {}
+                new_time_a = {}
+            elif u == 'S':
+                new_activations = set([a.activation for a in v])
+                new_time_a = set([a.t_a for a in v])
+            else:
+                new_activations = set([a.activation for a in v]) - set([a.activation for a in u])
+                new_time_a = set([a.t_a for a in v]) - set([a.t_a for a in u])
+
+            weight = len(new_activations) + len(new_time_a)
+
             self.edges[edge]['weight'] = weight
