@@ -1,5 +1,4 @@
 from __future__ import annotations
-import time
 from . import *
 from .music import PianoRoll, Texture, Rhythm, TimePoint, FrequencyPoint
 
@@ -153,6 +152,9 @@ class DerivedActivationsGraph(Graph):
 
         self.clusters = []
 
+        self.start = None
+        self.end = None
+
     @multimethod
     def __init__(self, graph: ActivationsGraph):
         super().__init__()
@@ -174,6 +176,19 @@ class DerivedActivationsGraph(Graph):
                     self.add_edge(u, v)
 
             previous_cluster = self.clusters[-1]
+
+    def add_start_end_nodes(self):
+        # Add start node
+        self.start = 'S'
+        self.add_node(self.start)
+        for node in self.clusters[0]:
+            self.add_edge(self.start, node)
+
+        # Add end node
+        self.end = 'E'
+        self.add_node(self.end)
+        for node in self.clusters[-1]:
+            self.add_edge(node, self.end)
 
     def derive(self, make_clusters=True, placement=0.5):
         derived_graph = DerivedActivationsGraph(self.piano_roll, self.texture)
@@ -197,58 +212,15 @@ class DerivedActivationsGraph(Graph):
 
         return derived_graph
 
-    def find_minimal_activations(self, derivation_order=None, verbose=False, folder_save=None):
-        # Differentiate the graph
-        if derivation_order is None:
-            order_texture = (self.texture.extension.end - self.texture.extension.start) // self.texture.tatum
-            order_frequency = np.max(np.sum((self.piano_roll.array.astype(bool)).astype(np.int8), axis=0))
-            order = order_frequency * order_texture
-            derivation_order = order - 2
+    def remove_inconsistent_nodes(self):
+        nodes_to_remove = []
+        for node in self.nodes:
+            t_a = node[0].t_a
+            indexes = set()
+            for activation in node:
+                if activation.t_a == t_a:
+                    indexes.add(activation.i)
+            if len(indexes) != len(self.texture):
+                nodes_to_remove.append(node)
 
-        if verbose:
-            print('Number of derivatives: %d' % derivation_order)
-
-        derived_graph = self
-
-        start_all = time.time()
-        for k in range(derivation_order):
-            print('Computing derivative %d...' % (k + 1))
-
-            # Differentiate graph
-            start = time.time()
-            derived_graph = derived_graph.derive()
-            print('Time to differentiate graph: %.3f' % (time.time() - start))
-
-            # Save graph
-            if folder_save is not None:
-                file_name = 'derivative_graph-%d.gpickle' % (k + 1)
-                nx.write_gpickle(derived_graph, folder_save / file_name)
-
-        if verbose:
-            print('Time to differentiate graph: %.3f s' % (time.time() - start_all))
-            print('Derivative of %d order graph: %s' % (derivation_order, derived_graph))
-
-        # # Remove inconsistent nodes
-        # start = time.time()
-        # remove_inconsistent_nodes(derivative_graph, len(texture))
-        # print('Time to remove inconsistent nodes: %.3f s' % (time.time() - start))
-        # if verbose:
-        #     print('Pruned graph: %s' % derivative_graph)
-
-        # # Find the shortest path
-        # start = time.time()
-        # shortest_path = nx.shortest_path(derivative_graph, derivative_graph.graph['start'],
-        #                                  derivative_graph.graph['end'])
-        # length = nx.shortest_path_length(derivative_graph, derivative_graph.graph['start'],
-        #                                  derivative_graph.graph['end'])
-        # print('Time to find shortest path: %.3f' % (time.time() - start))
-        # concatenated_path = concatenate_path(shortest_path)
-        #
-        # # Create minimal activations
-        # minimal_result = np.zeros_like(activation_stack)
-
-        # for node in concatenated_path:
-        #     if isinstance(node, ActivationNode):
-        #         minimal_result[node.i, node.xi, node.t_a] = True
-
-        return derived_graph
+        self.remove_nodes_from(nodes_to_remove)

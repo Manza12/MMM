@@ -1,4 +1,6 @@
 import time
+
+from mmm.pianorolls.algorithms import find_minimal_activations
 from mmm.pianorolls.music import *
 from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.morphology import erosion, dilation
@@ -95,7 +97,7 @@ if plot:
 
 # Find minimal activations
 start = time.time()
-activations = derived_graph.find_minimal_activations(verbose=True, folder_save=folder)
+activations = find_minimal_activations(derived_graph, verbose=True, folder_save=folder, load=True)
 # shortest_path, length, minimal_activations = minimal_activations_graph(eroded_score, texture)
 print('Time to find minimal activations: %.3f s' % (time.time() - start))
 print()
