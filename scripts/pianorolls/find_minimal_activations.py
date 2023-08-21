@@ -9,12 +9,13 @@ from mmm.pianorolls.plot import plot_piano_roll, plot_activations_graph
 from mmm.pianorolls.graphs import ActivationsGraph, DerivedActivationsGraph
 
 # Parameters
-full = False
-sync = False
-sparse = True
+full = True
+sync = True
+sparse = False
 
 plot = False
 load = False
+log = True
 TimePoint.__str__ = lambda self: '(%s, %s)' % (self.beat, self.offset)
 
 # Path
@@ -23,14 +24,15 @@ folder = Path('..') / Path('..') / Path('phd') / Path('chapter_5') / Path('minim
 folder.mkdir(parents=True, exist_ok=True)
 
 # Log
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler(folder / 'log.txt'),
-        logging.StreamHandler()
-    ]
-)
+if log:
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        handlers=[
+            logging.FileHandler(folder / 'log.txt'),
+            logging.StreamHandler()
+        ]
+    )
 
 # Textures
 texture = Texture(
@@ -60,7 +62,7 @@ texture_homogeneous = Texture(
 
 # Harmonies
 i = Harmony(
-    Chord(-12, 12+3, 24, 24+3),
+    Chord(-12, 0, 12+3, 24, 24+3),
     Chord(3, 7, 24, 24+3),
     Chord(0, 3, 24+3, 24+7),
 )
@@ -152,13 +154,18 @@ activations_texture: ActivationsStack = erosion(piano_roll, texture)
 activations_texture.change_extension(piano_roll.extension)
 
 # Create graph
-graph = ActivationsGraph(piano_roll, activations_texture.to_array(), texture, lexicographic_priority='time')
-logging.info(graph)
+if sparse:
+    graph = ActivationsGraph(piano_roll, activations_texture.to_array(), texture, lexicographic_priority='frequency')
+else:
+    graph = ActivationsGraph(piano_roll, activations_texture.to_array(), texture, lexicographic_priority='time')
+if log:
+    logging.info(graph)
 
 # Synchronize textures
 if sync:
     graph = ActivationsGraph(piano_roll, activations_texture.synchronize(), texture)
-logging.info(graph)
+if log:
+    logging.info(graph)
 
 # Plot graph
 fig = plot_activations_graph(graph, fig_size=(8.5, 4.), plot_edges=True,
@@ -166,25 +173,30 @@ fig = plot_activations_graph(graph, fig_size=(8.5, 4.), plot_edges=True,
 
 # Create derived graph of order 0
 derived_graph = DerivedActivationsGraph(graph)
-logging.info(derived_graph)
+if log:
+    logging.info(derived_graph)
 
 # Find minimal activations
 start = time.time()
 shortest_paths, min_activation_stacks, derived_graph = \
-    find_minimal_activations(derived_graph, folder_save=folder, verbose=True, load=load, sparse=sparse)
-logging.info('Time to find minimal activations: %.3f s' % (time.time() - start))
+    find_minimal_activations(derived_graph, folder_save=folder, verbose=log, load=load, sparse=sparse)
+if log:
+    logging.info('Time to find minimal activations: %.3f s' % (time.time() - start))
 
 # Pick a single path
 if len(shortest_paths) == 0:
-    logging.info('No shortest path found')
+    if log:
+        logging.info('No shortest path found')
 else:
     if len(shortest_paths) > 1:
-        logging.info('Found %d shortest paths' % len(shortest_paths))
-        logging.info('Picking the first path')
+        if log:
+            logging.info('Found %d shortest paths' % len(shortest_paths))
+            logging.info('Picking the first path')
         shortest_path = shortest_paths[0]
         min_activation_stack = min_activation_stacks[0]
     else:
-        logging.info('Found 1 shortest path')
+        if log:
+            logging.info('Found 1 shortest path')
         shortest_path = shortest_paths[0]
         min_activation_stack = min_activation_stacks[0]
 

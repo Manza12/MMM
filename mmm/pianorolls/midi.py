@@ -86,6 +86,17 @@ def create_midi(piano_roll: PianoRoll, velocity: int = 64, tempo: int = 60, tick
                         index_delta = t
                         delta = 0
 
+    # Turn off all notes
+    delta = factor * (piano_roll.array.shape[1] - index_delta)
+    for n in range(piano_roll.array.shape[0]):
+        if on_array[n] == 1:
+            track.append(mido.Message('note_off',
+                                      note=int(piano_roll.extension.frequency.lower) + n,
+                                      velocity=velocity,
+                                      time=delta))
+            if delta != 0:
+                delta = 0
+
     track.append(mido.MetaMessage('end_of_track', time=time_end*ticks_per_beat))
 
     return midi_file

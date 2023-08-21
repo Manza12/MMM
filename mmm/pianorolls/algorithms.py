@@ -97,7 +97,7 @@ def concatenate_path(path: list):
 def find_minimal_activations(activations_graph: DerivedActivationsGraph,
                              derivation_order=None, verbose=False, folder_save=None,
                              load=False, sparse=True, max_shortest_paths=10):
-    # Differentiate the graph
+    # Compute order of derivation
     if derivation_order is None:
         texture_length = (activations_graph.texture.extension.end - activations_graph.texture.extension.start)
         order_texture = texture_length // activations_graph.texture.tatum
@@ -160,11 +160,12 @@ def find_minimal_activations(activations_graph: DerivedActivationsGraph,
             logging.info('Derivative of %d order graph: %s' % (derivation_order, derived_graph))
 
     # Remove inconsistent nodes
-    start = time.time()
-    derived_graph.remove_inconsistent_nodes()
-    if verbose:
-        logging.info('Time to remove inconsistent nodes: %.3f s' % (time.time() - start))
-        logging.info('Pruned graph: %s' % derived_graph)
+    if sparse:
+        start = time.time()
+        derived_graph.remove_inconsistent_nodes()
+        if verbose:
+            logging.info('Time to remove inconsistent nodes: %.3f s' % (time.time() - start))
+            logging.info('Pruned graph: %s' % derived_graph)
 
     # Add start and end nodes
     start = time.time()

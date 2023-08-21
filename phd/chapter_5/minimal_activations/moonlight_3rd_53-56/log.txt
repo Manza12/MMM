@@ -1,43 +1,56 @@
-2023-08-21 16:38:59,001 [INFO] ActivationsGraph with 290 nodes and 806 edges
-2023-08-21 16:38:59,001 [INFO] ActivationsGraph with 290 nodes and 806 edges
-2023-08-21 16:39:01,875 [INFO] DerivedActivationsGraph with 290 nodes and 806 edges
-2023-08-21 16:39:01,902 [INFO] Number of derivatives: 3
-2023-08-21 16:39:01,909 [INFO] Computing derivative 1...
-2023-08-21 16:39:02,939 [INFO] Time to derive graph: 1.030
-2023-08-21 16:39:02,945 [INFO] Computing derivative 2...
-2023-08-21 16:39:07,215 [INFO] Time to derive graph: 4.270
-2023-08-21 16:39:07,226 [INFO] Computing derivative 3...
-2023-08-21 16:39:22,552 [INFO] Time to derive graph: 15.325
-2023-08-21 16:39:22,572 [INFO] Time to derive graph: 20.663 s
-2023-08-21 16:39:23,537 [INFO] Derivative of 3 order graph: DerivedActivationsGraph with 6246 nodes and 17561 edges
-2023-08-21 16:39:23,545 [INFO] Time to add start and end nodes: 0.007 s
-2023-08-21 16:39:28,935 [INFO] Time to weight graph: 5.390 s
-2023-08-21 16:39:29,898 [INFO] Weighted graph: DerivedActivationsGraph with 6248 nodes and 17585 edges
-2023-08-21 16:39:37,981 [INFO] Time to find shortest paths: 8.061
-2023-08-21 16:39:37,981 [INFO] Number of shortest paths: 10
-2023-08-21 16:39:38,032 [INFO] Time to find minimal activations: 36.130 s
-2023-08-21 16:39:38,032 [INFO] Found 10 shortest paths
-2023-08-21 16:39:38,032 [INFO] Picking the first path
-2023-08-21 16:47:20,743 [INFO] ActivationsGraph with 290 nodes and 806 edges
-2023-08-21 16:47:20,743 [INFO] ActivationsGraph with 290 nodes and 806 edges
-2023-08-21 16:47:23,578 [INFO] DerivedActivationsGraph with 290 nodes and 806 edges
-2023-08-21 16:47:23,606 [INFO] Number of derivatives: 3
-2023-08-21 16:47:23,612 [INFO] Computing derivative 1...
-2023-08-21 16:47:24,716 [INFO] Time to derive graph: 1.103
-2023-08-21 16:47:24,723 [INFO] Computing derivative 2...
-2023-08-21 16:47:28,762 [INFO] Time to derive graph: 4.039
-2023-08-21 16:47:28,772 [INFO] Computing derivative 3...
-2023-08-21 16:47:44,023 [INFO] Time to derive graph: 15.250
-2023-08-21 16:47:44,043 [INFO] Time to derive graph: 20.431 s
-2023-08-21 16:47:45,001 [INFO] Derivative of 3 order graph: DerivedActivationsGraph with 6246 nodes and 17561 edges
-2023-08-21 16:47:46,942 [INFO] Time to remove inconsistent nodes: 1.941 s
-2023-08-21 16:47:47,715 [INFO] Pruned graph: DerivedActivationsGraph with 5065 nodes and 11654 edges
-2023-08-21 16:47:47,722 [INFO] Time to add start and end nodes: 0.007 s
-2023-08-21 16:47:51,261 [INFO] Time to weight graph: 3.539 s
-2023-08-21 16:47:52,033 [INFO] Weighted graph: DerivedActivationsGraph with 5067 nodes and 11678 edges
-2023-08-21 16:47:55,834 [INFO] Maximum number of shortest paths reached.
-2023-08-21 16:47:55,834 [INFO] Time to find shortest paths: 3.784
-2023-08-21 16:47:55,834 [INFO] Number of shortest paths: 10
-2023-08-21 16:47:55,892 [INFO] Time to find minimal activations: 32.287 s
-2023-08-21 16:47:55,893 [INFO] Found 10 shortest paths
-2023-08-21 16:47:55,893 [INFO] Picking the first path
+2023-08-21 16:59:02,483 [INFO] ActivationsGraph with 291 nodes and 806 edges
+2023-08-21 16:59:02,484 [INFO] ActivationsGraph with 291 nodes and 806 edges
+2023-08-21 16:59:05,262 [INFO] DerivedActivationsGraph with 291 nodes and 806 edges
+2023-08-21 16:59:05,286 [INFO] Number of derivatives: 3
+2023-08-21 16:59:05,292 [INFO] Computing derivative 1...
+2023-08-21 16:59:06,296 [INFO] Time to derive graph: 1.004
+2023-08-21 16:59:06,303 [INFO] Computing derivative 2...
+2023-08-21 16:59:10,500 [INFO] Time to derive graph: 4.197
+2023-08-21 16:59:10,512 [INFO] Computing derivative 3...
+2023-08-21 16:59:26,321 [INFO] Time to derive graph: 15.809
+2023-08-21 16:59:26,342 [INFO] Time to derive graph: 21.050 s
+2023-08-21 16:59:27,319 [INFO] Derivative of 3 order graph: DerivedActivationsGraph with 6230 nodes and 17513 edges
+2023-08-21 16:59:27,326 [INFO] Time to add start and end nodes: 0.006 s
+2023-08-21 16:59:32,761 [INFO] Time to weight graph: 5.434 s
+2023-08-21 16:59:33,725 [INFO] Weighted graph: DerivedActivationsGraph with 6232 nodes and 17537 edges
+2023-08-21 16:59:41,926 [INFO] Maximum number of shortest paths reached.
+2023-08-21 16:59:41,926 [INFO] Time to find shortest paths: 8.180
+2023-08-21 16:59:41,926 [INFO] Number of shortest paths: 10
+2023-08-21 16:59:41,978 [INFO] Time to find minimal activations: 36.693 s
+2023-08-21 16:59:41,978 [INFO] Found 10 shortest paths
+2023-08-21 16:59:41,979 [INFO] Picking the first path
+2023-08-21 17:04:26,647 [INFO] ActivationsGraph with 291 nodes and 806 edges
+2023-08-21 17:04:26,648 [INFO] ActivationsGraph with 291 nodes and 806 edges
+2023-08-21 17:04:29,387 [INFO] DerivedActivationsGraph with 291 nodes and 806 edges
+2023-08-21 17:04:29,411 [INFO] Number of derivatives: 3
+2023-08-21 17:04:39,494 [INFO] Computing derivative 1...
+2023-08-21 17:04:40,559 [INFO] Time to derive graph: 1.064
+2023-08-21 17:04:40,566 [INFO] Computing derivative 2...
+2023-08-21 17:04:44,858 [INFO] Time to derive graph: 4.292
+2023-08-21 17:04:44,869 [INFO] Computing derivative 3...
+2023-08-21 17:05:00,904 [INFO] Time to derive graph: 16.034
+2023-08-21 17:05:04,153 [INFO] Time to derive graph: 24.659 s
+2023-08-21 17:05:05,203 [INFO] Derivative of 3 order graph: DerivedActivationsGraph with 6230 nodes and 17513 edges
+2023-08-21 17:05:05,210 [INFO] Time to add start and end nodes: 0.007 s
+2023-08-21 17:05:10,908 [INFO] Time to weight graph: 5.698 s
+2023-08-21 17:05:11,895 [INFO] Weighted graph: DerivedActivationsGraph with 6232 nodes and 17537 edges
+2023-08-21 17:05:20,481 [INFO] Maximum number of shortest paths reached.
+2023-08-21 17:05:20,522 [INFO] Time to find shortest paths: 8.607
+2023-08-21 17:05:20,522 [INFO] Number of shortest paths: 10
+2023-08-21 17:05:20,586 [INFO] Time to find minimal activations: 51.174 s
+2023-08-21 17:05:20,587 [INFO] Found 10 shortest paths
+2023-08-21 17:05:20,587 [INFO] Picking the first path
+2023-08-21 17:11:16,123 [INFO] ActivationsGraph with 291 nodes and 806 edges
+2023-08-21 17:11:16,124 [INFO] ActivationsGraph with 291 nodes and 806 edges
+2023-08-21 17:11:18,872 [INFO] DerivedActivationsGraph with 291 nodes and 806 edges
+2023-08-21 17:11:18,895 [INFO] Number of derivatives: 3
+2023-08-21 17:11:23,130 [INFO] Time to load graph: 4.229 s
+2023-08-21 17:11:23,137 [INFO] Time to add start and end nodes: 0.007 s
+2023-08-21 17:11:28,606 [INFO] Time to weight graph: 5.469 s
+2023-08-21 17:11:29,579 [INFO] Weighted graph: DerivedActivationsGraph with 6232 nodes and 17537 edges
+2023-08-21 17:11:37,886 [INFO] Maximum number of shortest paths reached.
+2023-08-21 17:11:37,886 [INFO] Time to find shortest paths: 8.288
+2023-08-21 17:11:37,886 [INFO] Number of shortest paths: 10
+2023-08-21 17:11:38,002 [INFO] Time to find minimal activations: 19.107 s
+2023-08-21 17:11:38,002 [INFO] Found 10 shortest paths
+2023-08-21 17:11:38,002 [INFO] Picking the first path
