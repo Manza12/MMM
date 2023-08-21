@@ -69,4 +69,20 @@ plt.tight_layout()
 file_path = folder / (name + '_1.pdf')
 plt.savefig(file_path)
 
+# Plot second derivative graph
+graph_2 = graph_1.derive(placement=0.6)
+
+plt.figure(figsize=(6., 2.))
+
+pos = nx.get_node_attributes(graph_2, 'pos')
+nx.draw_networkx_edges(graph_2, pos, arrows=True, node_size=2500)
+nx.draw_networkx_labels(graph_2, pos, nx.get_node_attributes(graph_2, 'label'))
+nx.draw_networkx_edge_labels(graph_2, pos, edge_labels=nx.get_edge_attributes(graph_2, 'weight'))
+
+plt.axis('off')
+plt.tight_layout()
+
+file_path = folder / (name + '_2.pdf')
+plt.savefig(file_path)
+
 plt.show()

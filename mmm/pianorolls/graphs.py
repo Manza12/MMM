@@ -42,11 +42,6 @@ class DerivedActivationNode:
     @property
     def activation(self):
         return self.t_a, self.xi, self.i
-    # def same_activation(self, other):
-    #     if isinstance(other, DerivedActivationNode):
-    #         return self.t_a == other.t_a and self.xi == other.xi and self.i == other.i
-    #     else:
-    #         return False
 
 
 class Graph(nx.DiGraph):
@@ -77,11 +72,24 @@ class Graph(nx.DiGraph):
 
         # Add nodes
         for edge in self.edges:
+            # Position
             x = self.nodes[edge[0]]['pos']
             y = self.nodes[edge[1]]['pos']
             pos = x[0] * placement + y[0] * (1 - placement), x[1] * placement + y[1] * (1 - placement)
 
-            derived_graph.add_node(edge, pos=pos, label='$(%s, %s)$' % edge)
+            # Label
+            try:
+                list_1 = ['%s' % a for a in edge[0]]
+            except TypeError:
+                list_1 = ['%s' % edge[0]]
+            try:
+                list_2 = ['%s' % edge[1][-1]]
+            except TypeError:
+                list_2 = ['%s' % edge[1]]
+            label = '$(' + ', '.join(list_1 + list_2) + ')$'
+
+            # Add node
+            derived_graph.add_node(edge, pos=pos, label=label)
 
             # Add edges
             for outgoing_edge in self.edges(edge[1]):
