@@ -45,14 +45,6 @@ def redundancy(piano_roll: PianoRoll, texture: Texture, c: dict, percentage=True
     return rho
 
 
-def synchronize_activations_stack(activations_stack: ActivationsStack):
-    activations_stack_array = activations_stack.to_array()
-    contraction_frequency = np.any(activations_stack_array, axis=-2, keepdims=True)
-    contraction_indexes = np.all(contraction_frequency, axis=0, keepdims=True)
-    activations_stack_array *= contraction_indexes
-    return activations_stack_array
-
-
 def compute_size_graph(clusters: List[List], order_derivation: int):
     k = order_derivation
     L = len(clusters) - 1

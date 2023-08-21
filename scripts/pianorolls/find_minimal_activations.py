@@ -154,9 +154,9 @@ activations_texture.change_extension(piano_roll.extension)
 
 # Create graph
 if sparse:
-    graph = ActivationsGraph(piano_roll, activations_texture.to_array(), texture, lexicographic_priority='frequency')
+    graph = ActivationsGraph(piano_roll, activations_texture, texture, lexicographic_priority='frequency')
 else:
-    graph = ActivationsGraph(piano_roll, activations_texture.to_array(), texture, lexicographic_priority='time')
+    graph = ActivationsGraph(piano_roll, activations_texture, texture, lexicographic_priority='time')
 if log:
     logging.info(graph)
     logging.info('Clusters size: %s' % [len(cluster) for cluster in graph.clusters])

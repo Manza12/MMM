@@ -1108,18 +1108,18 @@ class Rhythm(PianoRoll):
             return self.hits[0].time_nature
 
 
-class Texture(list):
+class Texture(PianoRollStack):
     def __init__(self, *rhythms: Rhythm):
         if len({type(rhythm.nature) for rhythm in rhythms}) > 1:
             raise WrongNature('Rhythms must be of the same nature')
-        super().__init__(rhythms)
+        super().__init__(*rhythms)
 
     @property
     def nature(self):
         if len(self) == 0:
             return 'shift'
         else:
-            return self[0].nature
+            return self[0].time_nature
 
     @property
     def extension(self):
@@ -1198,18 +1198,18 @@ class Chord(PianoRoll):
         return Chord(*new_frequencies, nature=self.nature)
 
 
-class Harmony(List):
+class Harmony(PianoRollStack):
     def __init__(self, *chords: Chord):
         if len({chord.nature for chord in chords}) > 1:
             raise WrongNature('Chords must be of the same nature')
-        super().__init__(chords)
+        super().__init__(*chords)
 
     @property
     def nature(self):
         if len(self) == 0:
             return 'shift'
         else:
-            return self[0].nature
+            return self[0].frequency_nature
 
     def __mul__(self, other):
         assert isinstance(other, Texture), 'Product should be done between a Texture and a Harmony.'
@@ -1349,8 +1349,20 @@ class ActivationsStack(List[Activations]):
             a.change_extension(extension)
 
     def synchronize(self):
-        from .algorithms import synchronize_activations_stack
-        return synchronize_activations_stack(self)
+        activations_stack_array = self.to_array()
+        contraction_frequency = np.any(activations_stack_array, axis=-2, keepdims=True)
+        contraction_indexes = np.all(contraction_frequency, axis=0, keepdims=True)
+        activations_stack_array *= contraction_indexes
+
+        i, m, n = np.where(activations_stack_array)
+
+        activations_list = []
+        for k in range(len(self)):
+            t = np.array([self[k].origin.time]) + n[i == k] * self[k].tatum
+            f = np.array([self[k].origin.frequency]) + m[i == k] * self[k].step
+            activations_list.append(Activations(*[TimeFrequency(ti, fi) for ti, fi in zip(t, f)]))
+
+        return ActivationsStack(*activations_list)
 
     def to_array(self):
         assert len({a.tatum for a in self}) == 1, 'All activations must have the same tatum'

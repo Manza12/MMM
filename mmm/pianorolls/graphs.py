@@ -1,6 +1,6 @@
 from __future__ import annotations
 from . import *
-from .music import PianoRoll, Texture, Rhythm, TimePoint, FrequencyPoint
+from .music import PianoRoll, Texture, Rhythm, TimePoint, FrequencyPoint, ActivationsStack, Activations
 
 
 class ActivationNode:
@@ -100,11 +100,11 @@ class Graph(nx.DiGraph):
 
 
 class ActivationsGraph(Graph):
-    def __init__(self, piano_roll: PianoRoll, activations_stack_array: np.ndarray, texture: Texture,
+    def __init__(self, piano_roll: PianoRoll, activations_stack: ActivationsStack, texture: Texture,
                  lexicographic_priority: str = 'frequency'):
         super().__init__()
         self.piano_roll = piano_roll
-        self.activations_stack_array = activations_stack_array
+        self.activations_stack = activations_stack
         self.texture = texture
 
         self.clusters: List[List[ActivationNode]] = []
@@ -136,15 +136,16 @@ class ActivationsGraph(Graph):
 
                 # Add activations
                 if self.piano_roll.array[m, n_s] > 0:
-                    for i in range(self.activations_stack_array.shape[0]):
+                    for i in range(len(self.activations_stack)):
                         rhythm: Rhythm = self.texture[i]
+                        activations: Activations = self.activations_stack[i]
                         for u in range(rhythm.array.shape[-1]):
                             t_a = t_p - rhythm.origin.time - rhythm.tatum * u
                             n_a = (t_a - self.piano_roll.origin.time) // self.piano_roll.tatum
 
-                            inside = 0 <= n_a < self.activations_stack_array.shape[2]
+                            inside = 0 <= n_a < activations.array.shape[-1] and 0 <= m < activations.array.shape[-2]
                             covers = rhythm.array[0, u] >= self.piano_roll.array[m, n_s]
-                            exists = inside and self.activations_stack_array[i, m, n_a]
+                            exists = inside and activations.array[m, n_a]
 
                             if inside and covers and exists:
                                 node = ActivationNode(t_p, t_a, xi, i)
@@ -179,15 +180,16 @@ class ActivationsGraph(Graph):
 
                 # Add activations
                 if self.piano_roll.array[m, n_s] > 0:
-                    for i in range(self.activations_stack_array.shape[0]):
+                    for i in range(len(self.activations_stack)):
                         rhythm: Rhythm = self.texture[i]
+                        activations: Activations = self.activations_stack[i]
                         for u in range(rhythm.array.shape[-1]):
                             t_a = t_p - rhythm.origin.time - rhythm.tatum * u
                             n_a = (t_a - self.piano_roll.origin.time) // self.piano_roll.tatum
 
-                            inside = 0 <= n_a < self.activations_stack_array.shape[2]
+                            inside = 0 <= n_a < activations.array.shape[-1] and 0 <= m < activations.array.shape[-2]
                             covers = rhythm.array[0, u] >= self.piano_roll.array[m, n_s]
-                            exists = inside and self.activations_stack_array[i, m, n_a]
+                            exists = inside and activations.array[m, n_a]
 
                             if inside and covers and exists:
                                 node = ActivationNode(t_p, t_a, xi, i)
