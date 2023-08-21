@@ -1,6 +1,6 @@
 import time
 
-from mmm.pianorolls.algorithms import find_minimal_activations
+from mmm.pianorolls.algorithms import find_minimal_activations_no_sync
 from mmm.pianorolls.music import *
 from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.morphology import erosion, dilation
@@ -30,6 +30,16 @@ texture = Texture(
 )
 
 # Harmonies
+i = Harmony(
+    Chord(-12, 12+3, 24, 24+3),
+    Chord(3, 7, 24, 24+3),
+    Chord(0, 3, 24+3, 24+7),
+)
+iv = Harmony(
+    Chord(-7),
+    Chord(5, 8, 24, 24+5),
+    Chord(0, 5, 24+5, 24+8),
+)
 i46 = Harmony(
     Chord(-5),
     Chord(3, 7, 24, 24+3),
@@ -40,26 +50,58 @@ V24 = Harmony(
     Chord(2, 7, 24-1, 24+2),
     Chord(-1, 2, 24+2, 24+7),
 )
+i6 = Harmony(
+    Chord(-9),
+    Chord(7, 12, 12+7, 24+3),
+    Chord(0, 3, 24+3, 24+7),
+)
+Np = Harmony(
+    Chord(-7),
+    Chord(8, 13, 12+5, 24+1),
+    Chord(5, 8, 12+8, 24+5),
+)
+i46_2 = Harmony(
+    Chord(-5),
+    Chord(7, 12, 12+3, 24),
+    Chord(3, 7, 12+7, 24+3),
+)
+V = Harmony(
+    Chord(-5),
+    Chord(5, 11, 12+2, 24-1),
+    Chord(-1, 5, 12+5, 24+2),
+)
 
 # Harmonic textures
 harmonic_textures = PianoRollStack(
+    texture * i,
+    texture * iv,
     texture * i46,
     texture * V24,
+    texture * i6,
+    texture * Np,
+    texture * i46_2,
+    texture * V,
 )
 
 # Activations
-start = TimePoint(54, 1, 0)
+start = TimePoint(53, 1, 0)
 Gs3 = FrequencyPoint(56)
 activations_harmonic_textures = ActivationsStack(
     Activations(TimeFrequency(start, Gs3)),
     Activations(TimeFrequency(start + TimeShift(1, 2), Gs3)),
+    Activations(TimeFrequency(start + TimeShift(2, 2), Gs3)),
+    Activations(TimeFrequency(start + TimeShift(3, 2), Gs3)),
+    Activations(TimeFrequency(start + TimeShift(4, 2), Gs3)),
+    Activations(TimeFrequency(start + TimeShift(5, 2), Gs3)),
+    Activations(TimeFrequency(start + TimeShift(6, 2), Gs3)),
+    Activations(TimeFrequency(start + TimeShift(7, 2), Gs3)),
 )
 
 # Piano roll
 piano_roll = dilation(activations_harmonic_textures, harmonic_textures)
 
 midi_file = create_midi(piano_roll, tempo=120)
-midi_path = folder / Path('moonlight_3rd_54.mid')
+midi_path = folder / Path('moonlight_3rd_53-56.mid')
 midi_file.save(midi_path)
 
 # Erosion texture
@@ -81,24 +123,30 @@ print(derived_graph)
 # Find minimal activations
 start = time.time()
 shortest_paths, min_activation_stacks, derived_graph = \
-    find_minimal_activations(derived_graph, folder_save=folder, verbose=True, load=True,
-                             derivation_order=len(texture)-1)
+    find_minimal_activations_no_sync(derived_graph, folder_save=folder, verbose=True, load=True)
 print('Time to find minimal activations: %.3f s' % (time.time() - start))
 print()
 
 # Pick a single path
-if len(shortest_paths) > 1:
-    print('Found %d shortest paths' % len(shortest_paths))
-    print('Picking the first path')
-shortest_path = shortest_paths[0]
-min_activation_stack = min_activation_stacks[0]
+if len(shortest_paths) == 0:
+    print('No shortest path found')
+else:
+    if len(shortest_paths) > 1:
+        print('Found %d shortest paths' % len(shortest_paths))
+        print('Picking the first path')
+        shortest_path = shortest_paths[0]
+        min_activation_stack = min_activation_stacks[0]
+    else:
+        print('Found 1 shortest path')
+        shortest_path = shortest_paths[0]
+        min_activation_stack = min_activation_stacks[0]
 
-# Minimal activations
-for j, activations in enumerate(min_activation_stack):
-    activations.change_tatum(piano_roll.tatum)
-    activations.change_extension(piano_roll.extension)
-    plot_piano_roll(activations, time_label='Time (m, b)', tight_frame=False,
-                    x_tick_start=TimePoint(0), x_tick_step=TimeShift('1'),
-                    fig_size=(400, 260), marker_size=10)
+    # Minimal activations
+    for j, activations in enumerate(min_activation_stack):
+        activations.change_tatum(piano_roll.tatum)
+        activations.change_extension(piano_roll.extension)
+        plot_piano_roll(activations, time_label='Time (m, b)', tight_frame=False,
+                        x_tick_start=TimePoint(0), x_tick_step=TimeShift('1'),
+                        fig_size=(400, 260), marker_size=10)
 
 plt.show()
