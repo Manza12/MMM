@@ -44,7 +44,7 @@ plt.figure(figsize=(5., 2.))
 
 pos = nx.get_node_attributes(graph, 'pos')
 nx.draw_networkx_edges(graph, pos, arrows=True)
-nx.draw_networkx_labels(graph, pos, nx.get_node_attributes(graph, 'label'))
+nx.draw_networkx_labels(graph, pos, nx.get_node_attributes(graph, 'label'), font_size=14)
 nx.draw_networkx_edge_labels(graph, pos, edge_labels=nx.get_edge_attributes(graph, 'weight'))
 
 plt.axis('off')
@@ -60,7 +60,7 @@ plt.figure(figsize=(5., 2.))
 
 pos = nx.get_node_attributes(graph_1, 'pos')
 nx.draw_networkx_edges(graph_1, pos, arrows=True, node_size=1200)
-nx.draw_networkx_labels(graph_1, pos, nx.get_node_attributes(graph_1, 'label'))
+nx.draw_networkx_labels(graph_1, pos, nx.get_node_attributes(graph_1, 'label'), font_size=14)
 nx.draw_networkx_edge_labels(graph_1, pos, edge_labels=nx.get_edge_attributes(graph_1, 'weight'))
 
 plt.axis('off')
@@ -76,7 +76,7 @@ plt.figure(figsize=(6., 2.))
 
 pos = nx.get_node_attributes(graph_2, 'pos')
 nx.draw_networkx_edges(graph_2, pos, arrows=True, node_size=2500)
-nx.draw_networkx_labels(graph_2, pos, nx.get_node_attributes(graph_2, 'label'))
+nx.draw_networkx_labels(graph_2, pos, nx.get_node_attributes(graph_2, 'label'), font_size=14)
 nx.draw_networkx_edge_labels(graph_2, pos, edge_labels=nx.get_edge_attributes(graph_2, 'weight'))
 
 plt.axis('off')
