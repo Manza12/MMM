@@ -24,6 +24,14 @@ def dilation(activations_list: ActivationsStack, structuring_elements: PianoRoll
 
 
 @multimethod
+def dilation(activations_list: ActivationsStack, texture: Texture):
+    result = PianoRoll()
+    for activations, structuring_element in zip(activations_list, texture):
+        result += dilation(activations, structuring_element)
+    return result
+
+
+@multimethod
 def erosion(piano_roll: PianoRoll, structuring_element: PianoRoll):
     # Origin
     if structuring_element.frequency_nature == 'shift':
