@@ -81,7 +81,7 @@ print(derived_graph)
 # Find minimal activations
 start = time.time()
 shortest_paths, min_activation_stacks, derived_graph = \
-    find_minimal_activations(derived_graph, folder_save=folder, verbose=True, load=False)
+    find_minimal_activations(derived_graph, folder_save=folder, verbose=True, load=True)
 print('Time to find minimal activations: %.3f s' % (time.time() - start))
 print()
 
