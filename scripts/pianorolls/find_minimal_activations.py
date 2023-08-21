@@ -5,17 +5,16 @@ from mmm.pianorolls.algorithms import find_minimal_activations
 from mmm.pianorolls.music import *
 from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.morphology import erosion, dilation
-from mmm.pianorolls.plot import plot_piano_roll, plot_activations_graph
+from mmm.pianorolls.plot import plot_piano_roll, plot_activations_graph, plot_activations_stack
 from mmm.pianorolls.graphs import ActivationsGraph, DerivedActivationsGraph
 
 # Parameters
-full = True
+full = False
 sync = True
-sparse = False
+sparse = True
 
-plot = False
-load = False
-log = True
+load = True
+log = False
 TimePoint.__str__ = lambda self: '(%s, %s)' % (self.beat, self.offset)
 
 # Path
@@ -160,12 +159,14 @@ else:
     graph = ActivationsGraph(piano_roll, activations_texture.to_array(), texture, lexicographic_priority='time')
 if log:
     logging.info(graph)
+    logging.info('Clusters size: %s' % [len(cluster) for cluster in graph.clusters])
 
 # Synchronize textures
 if sync:
     graph = ActivationsGraph(piano_roll, activations_texture.synchronize(), texture)
 if log:
     logging.info(graph)
+    logging.info('Clusters size: %s' % [len(cluster) for cluster in graph.clusters])
 
 # Plot graph
 fig = plot_activations_graph(graph, fig_size=(8.5, 4.), plot_edges=True,
@@ -213,5 +214,19 @@ else:
         plot_piano_roll(activations, time_label='Time (m, b)', tight_frame=False,
                         x_tick_start=TimePoint(0), x_tick_step=TimeShift('1'),
                         fig_size=(400, 260), marker_size=10)
+        plt.savefig(folder / Path('minimal_activations_%d.pdf' % j))
+
+    # Plot together
+    plot_activations_stack(min_activation_stack, time_label='Time (m, b)',
+                           tight_frame=False,
+                           x_tick_start=TimePoint(0), x_tick_step=TimeShift('1/2'),
+                           fig_size=(400, 260), marker_size=10,
+                           legend=True,
+                           legend_params={
+                               'columnspacing': 0.2,
+                               'labelspacing': 0.,
+                               'handletextpad': 0.1
+                           })
+    plt.savefig(folder / Path('minimal_activations.pdf'))
 
 plt.show()
