@@ -1,7 +1,7 @@
 import time
 import logging
 
-from mmm.pianorolls.algorithms import find_minimal_activations_no_sync, find_minimal_activations
+from mmm.pianorolls.algorithms import find_minimal_activations
 from mmm.pianorolls.music import *
 from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.morphology import erosion, dilation
@@ -9,9 +9,9 @@ from mmm.pianorolls.plot import plot_piano_roll, plot_activations_graph
 from mmm.pianorolls.graphs import ActivationsGraph, DerivedActivationsGraph
 
 # Parameters
-full = True
+full = False
 sync = False
-sparse = False
+sparse = True
 
 plot = False
 load = False
@@ -170,12 +170,8 @@ logging.info(derived_graph)
 
 # Find minimal activations
 start = time.time()
-if not sparse:
-    shortest_paths, min_activation_stacks, derived_graph = \
-        find_minimal_activations_no_sync(derived_graph, folder_save=folder, verbose=True, load=load)
-else:
-    shortest_paths, min_activation_stacks, derived_graph = \
-        find_minimal_activations(derived_graph, folder_save=folder, verbose=True, load=load)
+shortest_paths, min_activation_stacks, derived_graph = \
+    find_minimal_activations(derived_graph, folder_save=folder, verbose=True, load=load, sparse=sparse)
 logging.info('Time to find minimal activations: %.3f s' % (time.time() - start))
 
 # Pick a single path

@@ -96,15 +96,16 @@ def concatenate_path(path: list):
 
 def find_minimal_activations(activations_graph: DerivedActivationsGraph,
                              derivation_order=None, verbose=False, folder_save=None,
-                             load=False):
+                             load=False, sparse=True, max_shortest_paths=10):
     # Differentiate the graph
     if derivation_order is None:
         texture_length = (activations_graph.texture.extension.end - activations_graph.texture.extension.start)
         order_texture = texture_length // activations_graph.texture.tatum
-
-        order_frequency = np.max(np.sum((activations_graph.piano_roll.array.astype(bool)).astype(np.int8), axis=0))
-
-        order = order_frequency * order_texture
+        if sparse:
+            order_frequency = np.max(np.sum((activations_graph.piano_roll.array.astype(bool)).astype(np.int8), axis=0))
+            order = order_frequency * order_texture
+        else:
+            order = order_texture
         derivation_order = order - 1
 
     if verbose:
@@ -187,115 +188,6 @@ def find_minimal_activations(activations_graph: DerivedActivationsGraph,
     start = time.time()
     try:
         # All shortest paths
-        shortest_paths = list(nx.all_shortest_paths(derived_graph, derived_graph.start, derived_graph.end,
-                                                    weight='weight'))
-        logging.info('Time to find shortest paths: %.3f' % (time.time() - start))
-        logging.info('Number of shortest paths:', len(shortest_paths))
-    except nx.NetworkXNoPath:
-        shortest_paths = []
-        logging.info('No path found')
-
-    # Concatenate paths
-    concatenated_paths = []
-    for shortest_path in shortest_paths:
-        concatenated_paths.append(concatenate_path(shortest_path))
-
-    # Create activations stack
-    activation_stacks = []
-    for path in concatenated_paths:
-        activations_list = []
-        for i in range(len(derived_graph.texture)):
-            activations = [TimeFrequency(activation.t_a, activation.xi) for activation in path if activation.i == i]
-            activations_list.append(Activations(*activations))
-        activation_stack = ActivationsStack(*activations_list)
-        activation_stacks.append(activation_stack)
-
-    return shortest_paths, activation_stacks, derived_graph
-
-
-def find_minimal_activations_no_sync(activations_graph: DerivedActivationsGraph,
-                                     derivation_order=None, verbose=False, folder_save=None,
-                                     load=False, max_shortest_paths=10):
-    # Differentiate the graph
-    if derivation_order is None:
-        texture_length = (activations_graph.texture.extension.end - activations_graph.texture.extension.start)
-        order_texture = texture_length // activations_graph.texture.tatum
-
-        derivation_order = order_texture - 1
-
-    if verbose:
-        logging.info('Number of derivatives: %d' % derivation_order)
-
-    derived_graph = activations_graph
-
-    # Save graph
-    if folder_save is not None:
-        file_name = 'derivative_graph-0.gpickle'
-        nx.write_gpickle(derived_graph, folder_save / file_name)
-
-    # Try to load last derived graph
-    last_loaded = False
-    if load and folder_save is not None:
-        start_load = time.time()
-        file_name = 'derivative_graph-%d.gpickle' % derivation_order
-        if os.path.isfile(folder_save / file_name):
-            derived_graph = nx.read_gpickle(folder_save / file_name)
-            last_loaded = True
-        if last_loaded and verbose:
-            logging.info('Time to load graph: %.3f s' % (time.time() - start_load))
-
-    if not last_loaded:
-        start_all = time.time()
-        for k in range(derivation_order):
-            if verbose:
-                logging.info('Computing derivative %d...' % (k + 1))
-            file_name = 'derivative_graph-%d.gpickle' % (k + 1)
-
-            # Try to load graph
-            if load and folder_save is not None:
-                start_load = time.time()
-                try:
-                    derived_graph = nx.read_gpickle(folder_save / file_name)
-                    logging.info('Time to load graph: %.3f' % (time.time() - start_load))
-                    continue
-                except FileNotFoundError:
-                    pass
-
-            # Differentiate graph
-            start = time.time()
-            derived_graph = derived_graph.derive()
-            logging.info('Time to derive graph: %.3f' % (time.time() - start))
-
-            # Save graph
-            if folder_save is not None:
-                nx.write_gpickle(derived_graph, folder_save / file_name)
-
-        if verbose:
-            logging.info('Time to derive graph: %.3f s' % (time.time() - start_all))
-            logging.info('Derivative of %d order graph: %s' % (derivation_order, derived_graph))
-
-    # Add start and end nodes
-    start = time.time()
-    derived_graph.add_start_end_nodes()
-    if verbose:
-        logging.info('Time to add start and end nodes: %.3f s' % (time.time() - start))
-
-    # Weight graph
-    start = time.time()
-    derived_graph.weight_graph()
-    if verbose:
-        logging.info('Time to weight graph: %.3f s' % (time.time() - start))
-        logging.info('Weighted graph: %s' % derived_graph)
-
-    # Save graph
-    if folder_save is not None:
-        file_name = 'weighted_graph-%d.gpickle' % derivation_order
-        nx.write_gpickle(derived_graph, folder_save / file_name)
-
-    # Find the shortest paths
-    start = time.time()
-    try:
-        # All shortest paths
         shortest_paths = []
         shortest_paths_generator = nx.all_shortest_paths(derived_graph, derived_graph.start, derived_graph.end,
                                                          weight='weight')
@@ -304,6 +196,7 @@ def find_minimal_activations_no_sync(activations_graph: DerivedActivationsGraph,
             shortest_paths.append(shortest_path)
             n += 1
             if n == max_shortest_paths:
+                logging.info('Maximum number of shortest paths reached.')
                 break
         logging.info('Time to find shortest paths: %.3f' % (time.time() - start))
         logging.info('Number of shortest paths: %d' % len(shortest_paths))
