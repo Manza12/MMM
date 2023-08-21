@@ -119,14 +119,13 @@ def find_minimal_activations(activations_graph: DerivedActivationsGraph,
     # Try to load last derived graph
     last_loaded = False
     if load and folder_save is not None:
-        start = time.time()
+        start_load = time.time()
         file_name = 'derivative_graph-%d.gpickle' % derivation_order
         if os.path.isfile(folder_save / file_name):
             derived_graph = nx.read_gpickle(folder_save / file_name)
             last_loaded = True
-        if verbose:
-            print('Time to load graph: %.3f s' % (time.time() - start))
-            print('Derivative of %d order graph: %s' % (derivation_order, derived_graph))
+        if last_loaded and verbose:
+            print('Time to load graph: %.3f s' % (time.time() - start_load))
 
     if not last_loaded:
         start_all = time.time()
@@ -137,9 +136,13 @@ def find_minimal_activations(activations_graph: DerivedActivationsGraph,
 
             # Try to load graph
             if load and folder_save is not None:
-                if os.path.isfile(folder_save / file_name):
+                start_load = time.time()
+                try:
                     derived_graph = nx.read_gpickle(folder_save / file_name)
+                    print('Time to load graph: %.3f' % (time.time() - start_load))
                     continue
+                except FileNotFoundError:
+                    pass
 
             # Differentiate graph
             start = time.time()

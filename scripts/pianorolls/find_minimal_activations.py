@@ -98,12 +98,14 @@ if plot:
 # Find minimal activations
 start = time.time()
 shortest_paths, min_activation_stacks, derived_graph = \
-    find_minimal_activations(derived_graph, folder_save=folder, verbose=True, load=True)
+    find_minimal_activations(derived_graph, folder_save=folder, verbose=True, load=False)
 print('Time to find minimal activations: %.3f s' % (time.time() - start))
 print()
 
 # Pick a single path
-assert len(shortest_paths) == 1
+if len(shortest_paths) > 1:
+    print('Found %d shortest paths' % len(shortest_paths))
+    print('Picking the first path')
 shortest_path = shortest_paths[0]
 min_activation_stack = min_activation_stacks[0]
 
