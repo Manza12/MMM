@@ -419,7 +419,7 @@ def plot_activations_graph(graph: ActivationsGraph, fig_size=(9., 6.), pad_f=0.5
     return fig
 
 
-def plot_tonal_graph_vertices(graph: TonalGraph, fig_size=(8., 4.), pad_f=0., shortest_path=None, weighted=False):
+def plot_tonal_graph(graph: TonalGraph, fig_size=(8., 4.), pad_f=0., shortest_path=None, weighted=False):
     fig = plt.figure(figsize=fig_size)
 
     # Compute number of elements
@@ -467,7 +467,7 @@ def plot_tonal_graph_vertices(graph: TonalGraph, fig_size=(8., 4.), pad_f=0., sh
         modulation_artist = nx.draw_networkx_edges(graph, pos, edgelist=modulation_list,
                                                    width=0.2, node_size=750)
         continuation_artist = nx.draw_networkx_edges(graph, pos, edgelist=continuation_list,
-                                                     node_size=750)
+                                                     width=2, node_size=750)
     else:
         nx.draw_networkx_edges(graph, pos, node_size=750)
         artificial_artist = None
@@ -477,7 +477,7 @@ def plot_tonal_graph_vertices(graph: TonalGraph, fig_size=(8., 4.), pad_f=0., sh
     if shortest_path is not None:
         edge_list = [(shortest_path[i], shortest_path[i+1]) for i in range(len(shortest_path)-1)]
         shortest_artist = nx.draw_networkx_edges(graph, pos, edgelist=edge_list,
-                                                 edge_color='r', width=2, node_size=750)
+                                                 edge_color='r', width=3, node_size=750)
     else:
         shortest_artist = None
 

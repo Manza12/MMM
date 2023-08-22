@@ -7,7 +7,7 @@ from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.music import Rhythm, Hit, Texture, Harmony, Chord, PianoRoll, PianoRollStack, ActivationsStack, \
     Activations, TimeFrequency, TimePoint, TimeShift, FrequencyPoint, RomanNumeral
 from mmm.pianorolls.morphology import dilation, erosion
-from mmm.pianorolls.plot import plot_piano_roll, plot_activations_stack, plot_tonal_graph_vertices
+from mmm.pianorolls.plot import plot_piano_roll, plot_activations_stack, plot_tonal_graph
 
 # Path
 piece = 'moonlight_3rd_53-56'
@@ -172,10 +172,10 @@ plot_activations_stack(activations_harmony, time_label='Time (m, b)',
 plt.savefig(folder / Path('activations_harmony.pdf'))
 
 # Plot graph
-plot_tonal_graph_vertices(tonal_graph)
+plot_tonal_graph(tonal_graph)
 plt.savefig(folder / Path('tonal_graph.pdf'))
 
-plot_tonal_graph_vertices(tonal_graph_path, shortest_path=shortest_path, weighted=True)
+plot_tonal_graph(tonal_graph_path, shortest_path=shortest_path, weighted=True)
 plt.savefig(folder / Path('tonal_graph-shortest_path.pdf'))
 
 plt.show()
