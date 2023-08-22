@@ -419,9 +419,28 @@ def plot_activations_graph(graph: ActivationsGraph, fig_size=(9., 6.), pad_f=0.5
     return fig
 
 
-def plot_tonal_graph_vertices(graph: TonalGraph, fig_size=(8., 4.)):
+def plot_tonal_graph_vertices(graph: TonalGraph, fig_size=(8., 4.), pad_f=0.):
     fig = plt.figure(figsize=fig_size)
 
+    # Compute number of elements
+    n_elements = np.zeros_like(graph.array, dtype=np.int)
+    for m in range(graph.array.shape[-2]):
+        for n_s in range(graph.array.shape[-1]):
+            n_elements[m, n_s] = len(graph.array[m, n_s])
+
+    max_f = np.max(n_elements, axis=-1)
+    offset = np.cumsum(max_f + pad_f * max_f.astype(bool))
+    offset = np.concatenate(([0], offset))
+
+    # Assign positions
+    for m in range(graph.activations.array.shape[-2]):
+        for n_s in range(graph.activations.array.shape[-1]):
+            nodes = graph.array[m, n_s]
+            for n, node in enumerate(nodes):
+                y = n + offset[m] + (max_f[m] - n_elements[m, n_s]) / 2 + pad_f / 2
+                graph.nodes[node]['pos'] = (n_s, y)
+
+    # Plot graph
     pos = nx.get_node_attributes(graph, 'pos')
     labels = nx.get_node_attributes(graph, 'label')
 
@@ -434,19 +453,26 @@ def plot_tonal_graph_vertices(graph: TonalGraph, fig_size=(8., 4.)):
     y_lim = (-1, np.sum(graph.offsets)-0.5)
     plt.ylim(y_lim)
 
-    # Plot grid
+    # Grid time
     for n in range(graph.activations.array.shape[-1]):
         t = graph.activations.origin.time + n * graph.activations.tatum
         plt.text(n, -1, '%s' % t, ha='center', va='center')
 
-    off = 0
-    for m in range(graph.activations.array.shape[-2]):
-        xi = graph.activations.origin.frequency + m * graph.activations.step
-        if graph.offsets[m] == 0:
-            continue
-        plt.text(-1, off, '%s' % xi, ha='center', va='center')
+    # Plot vertical line
+    x = 0 - 0.5
+    plt.plot([x, x], [-2, offset[-1] - 0.5], 'k--', linewidth=0.5)
 
-        off += graph.offsets[m]
+    # Grid frequency
+    for m in range(graph.activations.array.shape[-2]):
+        if max_f[m] == 0:
+            continue
+        xi = graph.activations.origin.frequency + m * graph.activations.step
+        y = offset[m] + (max_f[m] - 1) / 2 + pad_f / 2
+        plt.text(-1., y, str(xi), ha='center', va='center')
+
+        # Plot horizontal lines
+        y = offset[m] - 0.5
+        plt.plot([-1.5, graph.activations.array.shape[-1] - 0.5], [y, y], 'k--', linewidth=0.5)
 
     plt.text(-1, -1, r'$t/\xi$', ha='center', va='center', fontdict={'fontsize': 15})
 
