@@ -2,7 +2,8 @@ import torch
 import numpy as np
 from multimethod import multimethod
 from nnMorpho.binary_operators import erosion as binary_erosion
-from .music import Activations, PianoRoll, PianoRollStack, TimeFrequency, ActivationsStack, Texture
+from .music import Activations, PianoRoll, PianoRollStack, TimeFrequency, ActivationsStack, Texture, Harmony, \
+    TimeShift, ChromaRoll, ChromaChord, ActivationsChroma
 
 
 @multimethod
@@ -45,7 +46,7 @@ def erosion(piano_roll: PianoRoll, structuring_element: PianoRoll):
         raise NotImplementedError
 
     # Tatum
-    if structuring_element.tatum != piano_roll.tatum:
+    if structuring_element.tatum != piano_roll.tatum and structuring_element.tatum != TimeShift(0):
         new_tatum = piano_roll.tatum.gcd(structuring_element.tatum,
                                          piano_roll.origin.time - structuring_element.origin.time)
         piano_roll = piano_roll.change_tatum(new_tatum)
@@ -84,3 +85,35 @@ def erosion(piano_roll: PianoRoll, texture: Texture):
     for rhythm in texture:
         result.append(erosion(piano_roll, rhythm))
     return result
+
+
+@multimethod
+def erosion(chroma_roll: ChromaRoll, harmony: Harmony):
+    result = ActivationsStack()
+    for chord in harmony:
+        result.append(erosion_cylindrical(chroma_roll, chord))
+    return result
+
+
+def erosion_cylindrical(chroma_roll: ChromaRoll, chord: ChromaChord):
+    # Erosion
+    eroded_array = np.zeros_like(chroma_roll.array)
+    for n in range(chroma_roll.array.shape[-1]):
+        for m in range(chroma_roll.array.shape[-2]):
+            value = True
+            for i in range(chord.array.shape[-2]):
+                chord_on = chord.array[i, 0]
+                chroma_roll_on = chroma_roll.array[(m + i) % 12, n]
+                if chord_on and not chroma_roll_on:
+                    value = False
+                    break
+            eroded_array[m, n] = value
+
+    # ActivationsChroma
+    f, t = np.where(eroded_array)
+    values = [TimeFrequency(
+        chroma_roll.origin.time + t[i] * chroma_roll.tatum,
+        chroma_roll.origin.frequency + f[i] * chroma_roll.step) for i in range(len(f))]
+    activations = ActivationsChroma(*values)
+
+    return activations

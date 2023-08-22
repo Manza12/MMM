@@ -545,6 +545,9 @@ class ChromaShift(FrequencyShift):
         assert isinstance(other, int)
         return ChromaShift((self.value * other) % 12)
 
+    def __rmul__(self, other):
+        return ChromaShift.__mul__(self, other)
+
 
 class Chroma(FrequencyPoint):
     def __init__(self, number: int):
@@ -995,20 +998,9 @@ class PianoRoll:
             self.origin = TimeFrequency(self.origin.time + early * self.tatum, self.origin.frequency + low * self.step)
         else:
             return PianoRoll(self.array[low: self.array.shape[0] - high, early: self.array.shape[1] - later],
-                             TimeFrequency(self.origin.time + low * self.tatum,
-                                           self.origin.frequency + early * self.step),
+                             TimeFrequency(self.origin.time + early * self.tatum,
+                                           self.origin.frequency + low * self.step),
                              self.tatum, self.step)
-
-    # def combine(self, other: PianoRoll, inplace: bool = False):
-    #     if inplace:
-    #         new_piano_roll = self + other
-    #         self.array = new_piano_roll.array
-    #         self.origin = new_piano_roll.origin
-    #         self.tatum = new_piano_roll.tatum
-    #         self.step = new_piano_roll.step
-    #         del new_piano_roll
-    #     else:
-    #         return self + other
 
     @classmethod
     def empty_like(cls, piano_roll: PianoRoll):
@@ -1039,6 +1031,10 @@ class PianoRoll:
 
 
 class ChromaRoll(PianoRoll):
+    @multimethod
+    def __init__(self):
+        super().__init__()
+
     @multimethod
     def __init__(self, array: np.ndarray, origin: TimeFrequency, tatum: TimeShift, step: FrequencyShift):
         assert array.shape[-2] == 12
@@ -1171,7 +1167,7 @@ class Chord(PianoRoll):
 
         # Creation of the PianoRoll
         if len(frequencies) == 0:
-            PianoRoll.__init__(self, np.zeros((0, 1), dtype=np.uint8), TimeFrequency(),
+            PianoRoll.__init__(self, np.zeros((0, 1), dtype=bool), TimeFrequency(),
                                TimeShift(0, 1), FrequencyShift(1))
         else:
             min_freq = min(frequencies)
@@ -1185,9 +1181,9 @@ class Chord(PianoRoll):
                 raise WrongNature('Chord nature must be either "shift" or "point"')
 
             size = ambitus + 1
-            array = np.zeros((size, 1), dtype=np.uint8)
+            array = np.zeros((size, 1), dtype=bool)
             for p in frequencies:
-                array[p - min_freq] = 1
+                array[p - min_freq] = True
 
             PianoRoll.__init__(self, array, TimeFrequency(TimeShift(0), frequency_origin),
                                TimeShift(0, 1), FrequencyShift(1))
@@ -1218,6 +1214,34 @@ class Chord(PianoRoll):
         assert self.nature == chord.nature, 'Supremum should be done between two Chords of the same nature.'
         new_frequencies = list(set(self.frequencies).union(chord.frequencies))
         return Chord(*new_frequencies, nature=self.nature)
+
+
+class ChromaChord(Chord, ChromaRoll):
+    def __init__(self, *frequencies: int, nature: str = 'shift'):
+        for f in frequencies:
+            assert 0 <= f < 12, 'ChromaChord frequencies must be between 0 and 11'
+
+        self.frequencies = sorted(frequencies)
+        self.nature = nature
+
+        # Creation of the PianoRoll
+        if len(frequencies) == 0:
+            PianoRoll.__init__(self, np.zeros((12, 1), dtype=bool), TimeFrequency(),
+                               TimeShift(0, 1), FrequencyShift(1))
+        else:
+            if nature == 'shift':
+                frequency_origin = ChromaShift(0)
+            elif nature == 'point':
+                frequency_origin = Chroma(0)
+            else:
+                raise WrongNature('Chord nature must be either "shift" or "point"')
+
+            array = np.zeros((12, 1), dtype=bool)
+            for p in frequencies:
+                array[p] = True
+
+            ChromaRoll.__init__(self, array, TimeFrequency(TimeShift(0), frequency_origin),
+                                TimeShift(0, 1), ChromaShift(1))
 
 
 class Harmony(PianoRollStack):
@@ -1356,6 +1380,89 @@ class Activations(list, PianoRoll):
         return dilation(self, other)
 
 
+class ActivationsChroma(Activations, ChromaRoll):
+    @multimethod
+    def __init__(self):
+        Activations.__init__(self)
+        ChromaRoll.__init__(self)
+
+    @multimethod
+    def __init__(self, *values: TimeFrequency):
+        if len(values) == 0:
+            ChromaRoll.__init__(self)
+            Activations.__init__(self)
+            return
+
+        if len({type(v.time) for v in values}) > 1:
+            raise WrongNature('Activations must be of the same time type')
+        if len({type(v.frequency) for v in values}) > 1:
+            raise WrongNature('Activations must be of the same frequency type')
+
+        Activations.__init__(self, *values)
+
+        # Time
+        origin_time = min([a.time for a in values])
+        tatum = TimeShift.gcd(*[(a.time - origin_time) for a in values])
+        duration = max([a.time for a in values]) - origin_time
+
+        # Frequency
+        origin_frequency = type(values[0].frequency)(0)
+        step = ChromaShift(1)
+
+        # Time-Frequency
+        origin = TimeFrequency(origin_time, origin_frequency)
+        array = np.zeros((12, duration // tatum + 1), dtype=bool)
+        for a in values:
+            idx_t = (a.time - origin_time) // tatum
+            idx_f = (a.frequency - origin_frequency) // step
+            array[idx_f, idx_t] = True
+
+        # ChromaRoll
+        ChromaRoll.__init__(self, array, origin, tatum, step)
+
+    def reduce(self, inplace: bool = False):
+        early = 0
+        for i in range(self.array.shape[1]):
+            if (self.array[:, i] == 0).all():
+                early += 1
+            else:
+                break
+        later = 0
+        for i in range(self.array.shape[1]-1, 0, -1):
+            if (self.array[:, i] == 0).all():
+                later += 1
+            else:
+                break
+
+        if inplace:
+            self.array = self.array[:, early: self.array.shape[1] - later]
+            self.origin = TimeFrequency(self.origin.time + early * self.tatum, self.origin.frequency)
+        else:
+            return PianoRoll(self.array[:, early: self.array.shape[1] - later],
+                             TimeFrequency(self.origin.time + early * self.tatum,
+                                           self.origin.frequency),
+                             self.tatum, self.step)
+
+    @property
+    def extension(self):
+        time_extension = TimeExtension(
+            self.origin.time,
+            self.origin.time + self.array.shape[-1] * self.tatum
+        )
+        frequency_extension = FrequencyExtension(
+            self.origin.frequency,
+            self.origin.frequency + self.step * 11
+        )
+
+        return Extension(time_extension, frequency_extension)
+
+    def change_extension(self, new_extension: Extension):
+        self.change_time_extension(new_extension.time)
+
+    def append(self, element: TimeFrequency) -> None:
+        raise NotImplementedError('Change of array not implemented yet.')
+
+
 class ActivationsStack(List[Activations]):
     def __init__(self, *activations_list: Activations):
         super().__init__(activations_list)
@@ -1364,10 +1471,13 @@ class ActivationsStack(List[Activations]):
         if new_tatum is None:
             new_tatum = self[0].tatum.gcd(*[a.tatum for a in self[1:]])
         for a in self:
-            a.change_tatum(new_tatum, inplace=inplace)
+            if len(a) != 0:
+                a.change_tatum(new_tatum, inplace=inplace)
 
     def change_extension(self, extension: Extension):
         for i, a in enumerate(self):
+            if len(a) == 0:
+                continue
             a.change_extension(extension)
 
     def synchronize(self):

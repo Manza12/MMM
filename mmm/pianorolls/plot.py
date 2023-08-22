@@ -247,9 +247,9 @@ def plot_activations_stack(activations_stack: ActivationsStack,
                            legend=False, legend_params=None,
                            **kwargs):
     assert len(activations_stack) >= 1
-    assert len({a.tatum for a in activations_stack}) == 1
-    assert len({a.extension for a in activations_stack}) == 1
-    assert len({a.frequency_nature for a in activations_stack}) == 1
+    assert len({a.tatum for a in activations_stack if len(a) != 0}) == 1
+    assert len({a.extension for a in activations_stack if len(a) != 0}) == 1
+    assert len({a.frequency_nature for a in activations_stack if len(a) != 0}) == 1
     a_master = activations_stack[0]
 
     if time_label is None:
@@ -275,6 +275,8 @@ def plot_activations_stack(activations_stack: ActivationsStack,
     ax = fig.add_subplot(111)
 
     for activations in activations_stack:
+        if len(activations) == 0:
+            continue
         plot_activations(activations.array, activations.time_vector, activations.frequency_vector,
                          freq_label=freq_label, time_label=time_label,
                          marker_color=None, marker_size=marker_size,
