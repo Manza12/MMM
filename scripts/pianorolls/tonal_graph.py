@@ -175,7 +175,7 @@ plt.savefig(folder / Path('activations_harmony.pdf'))
 plot_tonal_graph_vertices(tonal_graph)
 plt.savefig(folder / Path('tonal_graph.pdf'))
 
-plot_tonal_graph_vertices(tonal_graph_path, shortest_path=shortest_path)
+plot_tonal_graph_vertices(tonal_graph_path, shortest_path=shortest_path, weighted=True)
 plt.savefig(folder / Path('tonal_graph-shortest_path.pdf'))
 
 plt.show()

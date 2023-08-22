@@ -419,7 +419,7 @@ def plot_activations_graph(graph: ActivationsGraph, fig_size=(9., 6.), pad_f=0.5
     return fig
 
 
-def plot_tonal_graph_vertices(graph: TonalGraph, fig_size=(8., 4.), pad_f=0., shortest_path=None):
+def plot_tonal_graph_vertices(graph: TonalGraph, fig_size=(8., 4.), pad_f=0., shortest_path=None, weighted=False):
     fig = plt.figure(figsize=fig_size)
 
     # Compute number of elements
@@ -449,7 +449,31 @@ def plot_tonal_graph_vertices(graph: TonalGraph, fig_size=(8., 4.), pad_f=0., sh
     labels = nx.get_node_attributes(graph, 'label')
 
     nx.draw_networkx_labels(graph, pos, labels=labels, font_size=12)
-    nx.draw_networkx_edges(graph, pos, node_size=750)
+
+    if weighted:
+        modulation_list = []
+        continuation_list = []
+        artificial_list = []
+        for edge in graph.edges:
+            if edge[0] == 'S' or edge[1] == 'E':
+                artificial_list.append(edge)
+            elif edge[0][1] == edge[1][1]:
+                continuation_list.append(edge)
+            else:
+                modulation_list.append(edge)
+
+        artificial_artist = nx.draw_networkx_edges(graph, pos, edgelist=artificial_list,
+                                                   width=0.8, style='dashed', node_size=750)
+        modulation_artist = nx.draw_networkx_edges(graph, pos, edgelist=modulation_list,
+                                                   width=0.2, node_size=750)
+        continuation_artist = nx.draw_networkx_edges(graph, pos, edgelist=continuation_list,
+                                                     node_size=750)
+    else:
+        nx.draw_networkx_edges(graph, pos, node_size=750)
+        artificial_artist = None
+        modulation_artist = None
+        continuation_artist = None
+
     if shortest_path is not None:
         edge_list = [(shortest_path[i], shortest_path[i+1]) for i in range(len(shortest_path)-1)]
         shortest_artist = nx.draw_networkx_edges(graph, pos, edgelist=edge_list,
@@ -497,12 +521,28 @@ def plot_tonal_graph_vertices(graph: TonalGraph, fig_size=(8., 4.), pad_f=0., sh
                 p.set_transform(trans)
                 return [p]
 
-        plt.legend(shortest_artist, ['Shortest path'], loc='upper right',
-                   handler_map={shortest_artist[0]: ArrowHandler()})
+        class DashedArrowHandler(HandlerPatch):
+            def create_artists(self, legend, orig_handle, x_descent, y_descent, width, height, font_size, trans):
+                p = patches.Arrow(0, 3, 15, 0, width=5)
+                self.update_prop(p, orig_handle, legend)
+                p.set_transform(trans)
+                return [p]
+
+        if weighted:
+            plt.legend([artificial_artist[0], modulation_artist[0], continuation_artist[0], shortest_artist[0]],
+                       ['Artificial', 'Modulation', 'Same tonic', 'Shortest path'], loc='upper center',
+                       handler_map={artificial_artist[0]: DashedArrowHandler(),
+                                    modulation_artist[0]: ArrowHandler(),
+                                    continuation_artist[0]: ArrowHandler(),
+                                    shortest_artist[0]: ArrowHandler()},
+                       ncol=4)
+        else:
+            plt.legend(shortest_artist, ['Shortest path'], loc='upper right',
+                       handler_map={shortest_artist[0]: ArrowHandler()})
 
     # Adjust limits
     x_lim = [-1.5, graph.activations.array.shape[-1] - 0.4 + 1]
-    y_lim = [-2, offset[-1] - 0.5 + 1]
+    y_lim = [-2, offset[-1] - 0.5 + 1.5]
 
     plt.xlim(x_lim)
     plt.ylim(y_lim)
