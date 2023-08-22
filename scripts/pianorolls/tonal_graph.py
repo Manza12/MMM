@@ -100,6 +100,8 @@ midi_file = create_midi(piano_roll, tempo=120)
 midi_path = folder / Path(piece + '.mid')
 midi_file.save(midi_path)
 
+piano_roll.change_tatum(TimeShift(1, 2), inplace=True)
+
 # Get activations
 activations_stack = erosion(piano_roll, Texture(Rhythm(Hit('0', '1/2'))))
 activations = activations_stack[0]

@@ -419,7 +419,7 @@ def plot_activations_graph(graph: ActivationsGraph, fig_size=(9., 6.), pad_f=0.5
     return fig
 
 
-def plot_tonal_graph_vertices(graph: TonalGraph, fig_size=(9., 6.)):
+def plot_tonal_graph_vertices(graph: TonalGraph, fig_size=(8., 4.)):
     fig = plt.figure(figsize=fig_size)
 
     pos = nx.get_node_attributes(graph, 'pos')
