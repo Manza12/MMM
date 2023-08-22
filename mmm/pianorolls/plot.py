@@ -1,5 +1,5 @@
 from . import *
-from .graphs import ActivationsGraph
+from .graphs import ActivationsGraph, TonalGraph
 from .music import TimePoint, PianoRoll, ChromaRoll, ActivationsStack
 from .utils import round_half_up
 
@@ -412,6 +412,43 @@ def plot_activations_graph(graph: ActivationsGraph, fig_size=(9., 6.), pad_f=0.5
 
     plt.xlim(x_lim)
     plt.ylim(y_lim)
+
+    plt.tight_layout()
+    plt.axis('off')
+
+    return fig
+
+
+def plot_tonal_graph_vertices(graph: TonalGraph, fig_size=(9., 6.)):
+    fig = plt.figure(figsize=fig_size)
+
+    pos = nx.get_node_attributes(graph, 'pos')
+    labels = nx.get_node_attributes(graph, 'label')
+
+    nx.draw_networkx_labels(graph, pos, labels=labels, font_size=12)
+    nx.draw_networkx_edges(graph, pos, node_size=1000)
+
+    # Limits
+    x_lim = (-1, graph.array.shape[1]-0.5)
+    plt.xlim(x_lim)
+    y_lim = (-1, np.sum(graph.offsets)-0.5)
+    plt.ylim(y_lim)
+
+    # Plot grid
+    for n in range(graph.activations.array.shape[-1]):
+        t = graph.activations.origin.time + n * graph.activations.tatum
+        plt.text(n, -1, '%s' % t, ha='center', va='center')
+
+    off = 0
+    for m in range(graph.activations.array.shape[-2]):
+        xi = graph.activations.origin.frequency + m * graph.activations.step
+        if graph.offsets[m] == 0:
+            continue
+        plt.text(-1, off, '%s' % xi, ha='center', va='center')
+
+        off += graph.offsets[m]
+
+    plt.text(-1, -1, r'$t/\xi$', ha='center', va='center', fontdict={'fontsize': 15})
 
     plt.tight_layout()
     plt.axis('off')

@@ -178,3 +178,33 @@ roman_numeral_to_factors_dict = {
         '7': 9
     },
 }
+
+chord_to_roman_numeral_dict = {
+    # Triads
+    frozenset({0, 4, 7}): 'I',
+    frozenset({0, 3, 7}): 'i',
+    frozenset({2, 5, 9}): 'ii',
+    frozenset({2, 5, 8}): 'iiº',
+    frozenset({5, 9, 0}): 'IV',
+    frozenset({5, 8, 0}): 'iv',
+    frozenset({7, 11, 2}): 'V',
+    frozenset({7, 0, 2}): 'V45',
+    frozenset({9, 0, 4}): 'vi',
+    frozenset({8, 0, 3}): 'VI',
+    frozenset({2, 5, 11}): 'viiº',
+    frozenset({1, 5, 8}): 'N',
+
+    # Seventh chords
+    frozenset({0, 4, 7, 11}): 'I7',
+    frozenset({0, 3, 7, 10}): 'i7',
+    frozenset({2, 5, 9, 0}): 'ii7',
+    frozenset({2, 5, 8, 0}): 'iiº7',
+    frozenset({5, 9, 0, 4}): 'IV7',
+    frozenset({5, 8, 0, 3}): 'iv7',
+    frozenset({7, 11, 2, 5}): 'V7',
+    frozenset({7, 0, 2, 5}): 'V457',
+    frozenset({9, 0, 4, 7}): 'vi7',
+    frozenset({8, 0, 3, 7}): 'VI7',
+    frozenset({2, 5, 11, 9}): 'viiº7',
+    frozenset({2, 5, 11, 8}): '7º',
+}

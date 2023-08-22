@@ -1,10 +1,12 @@
 import matplotlib.pyplot as plt
 from pathlib import Path
+
+from mmm.pianorolls.graphs import TonalGraph
 from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.music import Rhythm, Hit, Texture, Harmony, Chord, PianoRoll, PianoRollStack, ActivationsStack, \
     Activations, TimeFrequency, TimePoint, TimeShift, FrequencyPoint, RomanNumeral
 from mmm.pianorolls.morphology import dilation, erosion
-from mmm.pianorolls.plot import plot_piano_roll, plot_activations_stack
+from mmm.pianorolls.plot import plot_piano_roll, plot_activations_stack, plot_tonal_graph_vertices
 
 # Path
 piece = 'moonlight_3rd_53-56'
@@ -125,6 +127,15 @@ activations_harmony: ActivationsStack = erosion(activations_chroma, harmony)
 activations_harmony.change_tatum(piano_roll.tatum, inplace=True)
 activations_harmony.change_extension(activations_chroma.extension)
 
+# Remove empty activations
+for activations, chord in zip(activations_harmony, harmony):
+    if len(activations) == 0:
+        activations_harmony.remove(activations)
+        harmony.remove(chord)
+
+# Tonal graph
+tonal_graph = TonalGraph(activations_harmony, harmony, activations)
+
 # Plot activations input
 plot_piano_roll(activations, time_label='Time (m, b)', tight_frame=False,
                 x_tick_start=TimePoint(0), x_tick_step=TimeShift('1'),
@@ -150,5 +161,9 @@ plot_activations_stack(activations_harmony, time_label='Time (m, b)',
                            'outside': True,
                        })
 plt.savefig(folder / Path('activations_harmony.pdf'))
+
+# Plot graph
+plot_tonal_graph_vertices(tonal_graph, )
+plt.savefig(folder / Path('tonal_graph.pdf'))
 
 plt.show()

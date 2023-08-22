@@ -1,6 +1,11 @@
 from __future__ import annotations
+
+import networkx as nx
+
 from . import *
-from .music import PianoRoll, Texture, Rhythm, TimePoint, FrequencyPoint, ActivationsStack, Activations
+from .music import PianoRoll, Texture, Rhythm, TimePoint, FrequencyPoint, ActivationsStack, Activations, Harmony, \
+    RomanNumeral
+from .dictionaries import chord_to_roman_numeral_dict
 
 
 class ActivationNode:
@@ -317,3 +322,84 @@ class DerivedActivationsGraph(Graph):
             weight = len(new_activations) + len(new_time_a)
 
             self.edges[edge]['weight'] = weight
+
+
+class TonalGraph(nx.DiGraph):
+    def __init__(self, activations_harmony: ActivationsStack, harmony: Harmony, activations: Activations,
+                 terminal_nodes=False, bonus_seventh=0.1, weight_type=int, weight_fn=None
+                 ):
+        super().__init__()
+
+        self.harmony = harmony
+        self.activations = activations
+        self.activations_harmony = activations_harmony
+
+        activations_stack = activations_harmony.to_array()
+        shape = activations_stack.shape
+
+        self.array = np.empty(shape[1:], dtype=object)
+        self.offsets = np.zeros(shape[1], dtype=int)
+
+        if terminal_nodes:
+            self.add_node('S', label='$S$')
+            self.graph['start'] = 'S'
+            previous_nodes = ['S']
+        else:
+            previous_nodes = []
+
+        for t in range(shape[-1]):
+            current_nodes = []
+            for f in range(shape[-2]):
+                self.array[f, t] = []
+                off = 0
+                for i in range(shape[0]):
+                    if activations_harmony[i].array[f, t]:
+                        roman_numeral: RomanNumeral = harmony[i]
+
+                        node = (t, f, i)
+
+                        frequencies = frozenset([int(f) % 12 for f in roman_numeral.frequencies])
+                        label = chord_to_roman_numeral_dict[frequencies]
+
+                        off += 1
+
+                        self.add_node(node, label=label)
+                        self.array[f, t].append(node)
+                        current_nodes.append(node)
+
+                        for p_node in previous_nodes:
+                            if weight_fn is None:
+                                try:
+                                    weight = p_node[1] != node[1]
+                                except IndexError:
+                                    weight = 0
+                                if len(harmony[node[2]]) == 4:
+                                    weight -= bonus_seventh
+                            else:
+                                weight = weight_fn(p_node, node, bonus_seventh)
+                            self.add_edge(p_node, node, weight=weight_type(weight))
+            if len(current_nodes) != 0:
+                previous_nodes = current_nodes
+
+        if terminal_nodes:
+            self.add_node('E', label='$E$')
+            self.graph['end'] = 'E'
+            for node in previous_nodes:
+                self.add_edge(node, 'E', weight=0)
+
+        # Assign positions
+        offset = 0
+        for xi in range(shape[1]):
+            max_n = 0
+            for t in range(shape[2]):
+                nodes = self.array[xi, t]
+                max_n = max(max_n, len(nodes))
+                for n, node in enumerate(nodes):
+                    self.nodes[node]['pos'] = (t, n + offset - max_n / 2 + 0.5)
+
+            self.offsets[xi] = max_n
+            offset += max_n
+
+        if terminal_nodes:
+            self.nodes['S']['pos'] = (-1, np.sum(offset) / 2)
+            self.nodes['E']['pos'] = (shape[2], np.sum(offset) / 2)
