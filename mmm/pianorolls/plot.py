@@ -419,7 +419,7 @@ def plot_activations_graph(graph: ActivationsGraph, fig_size=(9., 6.), pad_f=0.5
     return fig
 
 
-def plot_tonal_graph_vertices(graph: TonalGraph, fig_size=(8., 4.), pad_f=0.):
+def plot_tonal_graph_vertices(graph: TonalGraph, fig_size=(8., 4.), pad_f=0., shortest_path=None):
     fig = plt.figure(figsize=fig_size)
 
     # Compute number of elements
@@ -440,12 +440,22 @@ def plot_tonal_graph_vertices(graph: TonalGraph, fig_size=(8., 4.), pad_f=0.):
                 y = n + offset[m] + (max_f[m] - n_elements[m, n_s]) / 2 + pad_f / 2
                 graph.nodes[node]['pos'] = (n_s, y)
 
+    if shortest_path is not None:
+        graph.nodes['S']['pos'] = (-0.5, offset[-1] / 2 + pad_f / 2)
+        graph.nodes['E']['pos'] = (graph.activations.array.shape[-1], offset[-1] / 2 + pad_f / 2)
+
     # Plot graph
     pos = nx.get_node_attributes(graph, 'pos')
     labels = nx.get_node_attributes(graph, 'label')
 
     nx.draw_networkx_labels(graph, pos, labels=labels, font_size=12)
-    nx.draw_networkx_edges(graph, pos, node_size=1000)
+    nx.draw_networkx_edges(graph, pos, node_size=750)
+    if shortest_path is not None:
+        edge_list = [(shortest_path[i], shortest_path[i+1]) for i in range(len(shortest_path)-1)]
+        shortest_artist = nx.draw_networkx_edges(graph, pos, edgelist=edge_list,
+                                                 edge_color='r', width=2, node_size=750)
+    else:
+        shortest_artist = None
 
     # Limits
     x_lim = (-1, graph.array.shape[1]-0.5)
@@ -459,7 +469,7 @@ def plot_tonal_graph_vertices(graph: TonalGraph, fig_size=(8., 4.), pad_f=0.):
         plt.text(n, -1, '%s' % t, ha='center', va='center')
 
     # Plot vertical line
-    x = 0 - 0.5
+    x = 0 - 0.75
     plt.plot([x, x], [-2, offset[-1] - 0.5], 'k--', linewidth=0.5)
 
     # Grid frequency
@@ -475,6 +485,27 @@ def plot_tonal_graph_vertices(graph: TonalGraph, fig_size=(8., 4.), pad_f=0.):
         plt.plot([-1.5, graph.activations.array.shape[-1] - 0.5], [y, y], 'k--', linewidth=0.5)
 
     plt.text(-1, -1, r'$t/\xi$', ha='center', va='center', fontdict={'fontsize': 15})
+
+    if shortest_path is not None:
+        import matplotlib.patches as patches
+        from matplotlib.legend_handler import HandlerPatch
+
+        class ArrowHandler(HandlerPatch):
+            def create_artists(self, legend, orig_handle, x_descent, y_descent, width, height, font_size, trans):
+                p = patches.Arrow(0, 3, 15, 0, color='r', width=5)
+                self.update_prop(p, orig_handle, legend)
+                p.set_transform(trans)
+                return [p]
+
+        plt.legend(shortest_artist, ['Shortest path'], loc='upper right',
+                   handler_map={shortest_artist[0]: ArrowHandler()})
+
+    # Adjust limits
+    x_lim = [-1.5, graph.activations.array.shape[-1] - 0.4 + 1]
+    y_lim = [-2, offset[-1] - 0.5 + 1]
+
+    plt.xlim(x_lim)
+    plt.ylim(y_lim)
 
     plt.tight_layout()
     plt.axis('off')

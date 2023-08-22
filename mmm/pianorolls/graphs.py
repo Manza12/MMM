@@ -342,7 +342,6 @@ class TonalGraph(nx.DiGraph):
 
         if terminal_nodes:
             self.add_node('S', label='$S$')
-            self.graph['start'] = 'S'
             previous_nodes = ['S']
         else:
             previous_nodes = []
@@ -383,7 +382,6 @@ class TonalGraph(nx.DiGraph):
 
         if terminal_nodes:
             self.add_node('E', label='$E$')
-            self.graph['end'] = 'E'
             for node in previous_nodes:
                 self.add_edge(node, 'E', weight=0)
 

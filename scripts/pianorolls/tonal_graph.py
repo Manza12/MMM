@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from pathlib import Path
+import networkx as nx
 
 from mmm.pianorolls.graphs import TonalGraph
 from mmm.pianorolls.midi import create_midi
@@ -138,6 +139,12 @@ for activations, chord in zip(activations_harmony, harmony):
 # Tonal graph
 tonal_graph = TonalGraph(activations_harmony, harmony, activations)
 
+# Tonal graph - path
+tonal_graph_path = TonalGraph(activations_harmony, harmony, activations, terminal_nodes=True)
+
+# Shortest path
+shortest_path = nx.shortest_path(tonal_graph_path, 'S', 'E', weight='weight')
+
 # Plot activations input
 plot_piano_roll(activations, time_label='Time (m, b)', tight_frame=False,
                 x_tick_start=TimePoint(0), x_tick_step=TimeShift('1'),
@@ -165,7 +172,10 @@ plot_activations_stack(activations_harmony, time_label='Time (m, b)',
 plt.savefig(folder / Path('activations_harmony.pdf'))
 
 # Plot graph
-plot_tonal_graph_vertices(tonal_graph, )
+plot_tonal_graph_vertices(tonal_graph)
 plt.savefig(folder / Path('tonal_graph.pdf'))
+
+plot_tonal_graph_vertices(tonal_graph_path, shortest_path=shortest_path)
+plt.savefig(folder / Path('tonal_graph-shortest_path.pdf'))
 
 plt.show()
