@@ -9,12 +9,12 @@ from mmm.pianorolls.plot import plot_piano_roll, plot_activations_graph, plot_ac
 from mmm.pianorolls.graphs import ActivationsGraph, DerivedActivationsGraph
 
 # Parameters
-full = False
+full = True
 sync = True
 sparse = True
 
-load = True
-log = False
+load = False
+log = True
 TimePoint.__str__ = lambda self: '(%s, %s)' % (self.beat, self.offset)
 
 # Path
