@@ -273,6 +273,9 @@ def plot_activations_stack(activations_stack: ActivationsStack,
         fig.suptitle(fig_title)
 
     ax = fig.add_subplot(111)
+    cm = plt.get_cmap('gist_rainbow')
+    n_colors = len(activations_stack)
+    ax.set_prop_cycle(color=[cm(1. * i / n_colors) for i in range(n_colors)])
 
     for activations in activations_stack:
         if len(activations) == 0:
@@ -312,8 +315,16 @@ def plot_activations_stack(activations_stack: ActivationsStack,
     if legend:
         if legend_params is None:
             legend_params = {}
-        plt.legend(fig.axes[0].collections, [r'$A_{%d}$' % (j + 1) for j in range(len(activations_stack))],
-                   **legend_params)
+        labels = legend_params.pop('labels', [r'$A_{%d}$' % (j + 1) for j in range(len(activations_stack))])
+
+        if legend_params.pop('outside', False):
+            # Put a legend to the right of the current axis
+            box = ax.get_position()
+            ax.set_position([box.x0, box.y0 + 0.08, box.width * 0.85, box.height])
+            plt.legend(fig.axes[0].collections, labels, **legend_params,
+                       loc='center left', bbox_to_anchor=(1, 0.5))
+        else:
+            plt.legend(fig.axes[0].collections, labels, **legend_params)
 
     # Update the limits
     if tight_frame:
@@ -324,7 +335,8 @@ def plot_activations_stack(activations_stack: ActivationsStack,
         plt.ylim([-1.5, a_master.array.shape[0] + 0.5])
 
     # Tight layout
-    plt.tight_layout()
+    if legend_params.pop('outside', False):
+        plt.tight_layout()
 
     return fig
 

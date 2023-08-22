@@ -1244,6 +1244,12 @@ class ChromaChord(Chord, ChromaRoll):
                                 TimeShift(0, 1), ChromaShift(1))
 
 
+class RomanNumeral(ChromaChord):
+    def __init__(self, *frequencies: int, nature: str = 'shift', label: str):
+        super().__init__(*frequencies, nature=nature)
+        self.label = label
+
+
 class Harmony(PianoRollStack):
     def __init__(self, *chords: Chord):
         if len({chord.nature for chord in chords}) > 1:

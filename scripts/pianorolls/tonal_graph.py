@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.music import Rhythm, Hit, Texture, Harmony, Chord, PianoRoll, PianoRollStack, ActivationsStack, \
-    Activations, TimeFrequency, TimePoint, TimeShift, FrequencyPoint, ChromaChord
+    Activations, TimeFrequency, TimePoint, TimeShift, FrequencyPoint, RomanNumeral
 from mmm.pianorolls.morphology import dilation, erosion
 from mmm.pianorolls.plot import plot_piano_roll, plot_activations_stack
 
@@ -107,18 +107,18 @@ activations_chroma = activations.to_chroma_roll()
 
 # Erode harmony
 harmony = Harmony(
-    ChromaChord(0, 4, 7),
-    ChromaChord(0, 3, 7),
-    ChromaChord(2, 5, 9),
-    ChromaChord(2, 5, 8),
-    ChromaChord(0, 5, 9),
-    ChromaChord(0, 5, 8),
-    ChromaChord(2, 7, 11),
-    ChromaChord(0, 2, 7),
-    ChromaChord(0, 4, 9),
-    ChromaChord(0, 3, 8),
-    ChromaChord(2, 5, 11),
-    ChromaChord(1, 5, 8),
+    RomanNumeral(0, 4, 7, label='I'),
+    RomanNumeral(0, 3, 7, label='i'),
+    RomanNumeral(2, 5, 9, label='ii'),
+    RomanNumeral(2, 5, 8, label='ii°'),
+    RomanNumeral(0, 5, 9, label='IV'),
+    RomanNumeral(0, 5, 8, label='iv'),
+    RomanNumeral(2, 7, 11, label='V'),
+    RomanNumeral(0, 2, 7, label='V$^{45}$'),
+    RomanNumeral(0, 4, 9, label='vi'),
+    RomanNumeral(0, 3, 8, label='VI'),
+    RomanNumeral(2, 5, 11, label='vii°'),
+    RomanNumeral(1, 5, 8, label='N'),
 )
 
 activations_harmony: ActivationsStack = erosion(activations_chroma, harmony)
@@ -139,13 +139,15 @@ plt.savefig(folder / Path('activations_chroma.pdf'))
 # Plot activations harmony
 plot_activations_stack(activations_harmony, time_label='Time (m, b)',
                        tight_frame=False,
-                       x_tick_start=TimePoint(0), x_tick_step=TimeShift('1/2'),
-                       fig_size=(400, 260), marker_size=10,
+                       x_tick_start=TimePoint(0), x_tick_step=TimeShift('1'),
+                       fig_size=(600, 300), marker_size=10,
                        legend=True,
                        legend_params={
                            'columnspacing': 0.2,
                            'labelspacing': 0.,
-                           'handletextpad': 0.1
+                           'handletextpad': 0.1,
+                           'labels': [rn.label for i, rn in enumerate(harmony) if len(activations_harmony[i]) != 0],
+                           'outside': True,
                        })
 plt.savefig(folder / Path('activations_harmony.pdf'))
 
