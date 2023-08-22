@@ -541,6 +541,10 @@ class ChromaShift(FrequencyShift):
         else:
             return Chroma((self.value + other.value) % 12)
 
+    def __mul__(self, other):
+        assert isinstance(other, int)
+        return ChromaShift((self.value * other) % 12)
+
 
 class Chroma(FrequencyPoint):
     def __init__(self, number: int):
@@ -1036,22 +1040,40 @@ class PianoRoll:
 
 class ChromaRoll(PianoRoll):
     @multimethod
-    def __init__(self, array: np.ndarray, origin_time: Time, tatum: TimeShift, step: FrequencyShift):
+    def __init__(self, array: np.ndarray, origin: TimeFrequency, tatum: TimeShift, step: FrequencyShift):
         assert array.shape[-2] == 12
-        origin = TimeFrequency(origin_time, Chroma(0))
         super().__init__(array, origin, tatum, step)
 
     @multimethod
     def __init__(self, piano_roll: PianoRoll):
         array = np.zeros((12, piano_roll.array.shape[1]), piano_roll.array.dtype)
-        origin = TimeFrequency(piano_roll.origin.time, type(piano_roll.origin.frequency)(0))
+        if piano_roll.origin.frequency.nature == 'shift':
+            origin_frequency = ChromaShift(0)
+        elif piano_roll.origin.frequency.nature == 'point':
+            origin_frequency = Chroma(0)
+        else:
+            raise ValueError('Invalid nature of origin frequency')
+        origin = TimeFrequency(piano_roll.origin.time, origin_frequency)
         for i in range(12):
             idx = (i - piano_roll.origin.frequency.value) % 12
             try:
                 array[i, :] = np.max(piano_roll.array[idx::12, :], 0)
             except ValueError:
                 pass
-        self.__init__(array, origin, piano_roll.tatum, piano_roll.step)
+        self.__init__(array, origin, piano_roll.tatum, ChromaShift(1))
+
+    @property
+    def extension(self):
+        time_extension = TimeExtension(
+            self.origin.time,
+            self.origin.time + self.array.shape[-1] * self.tatum
+        )
+        frequency_extension = FrequencyExtension(
+            self.origin.frequency,
+            self.origin.frequency + self.step * 11
+        )
+
+        return Extension(time_extension, frequency_extension)
 
 
 class PianoRollStack(List[PianoRoll]):
