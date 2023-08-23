@@ -293,6 +293,27 @@ class TimePoint(Time):
         return TimePoint(0, time_signature=time_signature)
 
 
+class TimeSeconds(TimePoint):
+    def __init__(self, value: float):
+        super().__init__(frac(value), time_signature=(1, 1))
+        self.value = value
+
+    def __str__(self):
+        return str(self.value)
+
+    def __add__(self, other: TimeShift):
+        assert isinstance(other, TimeShift), 'TimeSeconds can only be added with TimeShift.'
+        return TimeSeconds(float(self.value + other.value))
+
+    def __sub__(self, other: Union[TimeSeconds, TimeShift]):
+        assert isinstance(other, TimeSeconds) or isinstance(other, TimeShift), \
+            "Substraction is made between TimeSeconds and TimeSeconds or TimeSeconds and TimeShift"
+        if isinstance(other, TimeSeconds):
+            return TimeShift(frac(self.value - other.value))
+        else:
+            return TimeSeconds(float(self.value - other.value))
+
+
 class TimeExtension:
     def __init__(self, start: Time, end: Time):
         assert type(start) == type(end)

@@ -1,6 +1,6 @@
 from . import *
 from .graphs import ActivationsGraph, TonalGraph
-from .music import TimePoint, PianoRoll, ChromaRoll, ActivationsStack
+from .music import TimePoint, PianoRoll, ChromaRoll, ActivationsStack, TimeSeconds
 from .utils import round_half_up
 
 
@@ -162,7 +162,10 @@ def plot_piano_roll(piano_roll: PianoRoll,
                     tight_frame=True,
                     **kwargs):
     if time_label is None:
-        time_label = 'Time (wholes)'
+        if isinstance(piano_roll.origin.time, TimeSeconds):
+            time_label = 'Time (s)'
+        else:
+            time_label = 'Time (wholes)'
     elif time_label == 'Time (m, b)':
         TimePoint.__str__ = lambda self: f'({self.measure}, {self.beat})'
 
