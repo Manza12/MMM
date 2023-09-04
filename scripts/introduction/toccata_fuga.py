@@ -2,7 +2,7 @@ from mmm import *
 from mmm.pianorolls.music import TimeShift
 from mmm.pianorolls.plot import plot_piano_roll
 from mmm.spectrograms.layers import create_stft_layer, apply_stft_layer
-from mmm.spectrograms.procedures.io import read_wav
+from mmm.spectrograms.procedures.io import read_wav, load_or_compute
 from mmm.spectrograms.plot import plot_stft
 from mmm.pianorolls.midi import read_midi_seconds
 
@@ -28,8 +28,9 @@ file_path = audio_folder / (name + '.wav')
 
 x = read_wav(file_path)
 
-# Create STFT layer
-stft_layer = create_stft_layer()
+# Load STFT layer
+objects_folder = data_folder / Path('objects')
+stft_layer = load_or_compute('stft_layer', objects_folder, {'stft_layer': True}, create_stft_layer)
 
 # Apply STFT layer
 spectrogram = apply_stft_layer(x, stft_layer)

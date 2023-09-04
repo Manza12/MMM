@@ -7,6 +7,7 @@ import matplotlib.ticker as tick
 import matplotlib.widgets as wid
 
 mpl.rcParams['mathtext.fontset'] = 'cm'
+mpl.rcParams['backend'] = 'QtAgg'
 
 _ = [np]
 _ = [Path, Union, List, Optional, Tuple, Set, Iterable, Dict, Any, Type]
