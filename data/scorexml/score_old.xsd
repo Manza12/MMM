@@ -1,0 +1,267 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <!-- Plain types -->
+    <xs:simpleType name="nature">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="point"/>
+            <xs:enumeration value="shift"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="positive">
+        <xs:restriction base="xs:positiveInteger">
+            <xs:minInclusive value="1"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+<!--    <xs:simpleType name="note">-->
+<!--        <xs:restriction base="xs:string">-->
+<!--            <xs:enumeration value="C"/>-->
+<!--            <xs:enumeration value="C#"/>-->
+<!--            <xs:enumeration value="Db"/>-->
+<!--            <xs:enumeration value="D"/>-->
+<!--            <xs:enumeration value="D#"/>-->
+<!--            <xs:enumeration value="Eb"/>-->
+<!--            <xs:enumeration value="E"/>-->
+<!--            <xs:enumeration value="F"/>-->
+<!--            <xs:enumeration value="F#"/>-->
+<!--            <xs:enumeration value="Gb"/>-->
+<!--            <xs:enumeration value="G"/>-->
+<!--            <xs:enumeration value="G#"/>-->
+<!--            <xs:enumeration value="Ab"/>-->
+<!--            <xs:enumeration value="A"/>-->
+<!--            <xs:enumeration value="A#"/>-->
+<!--            <xs:enumeration value="Bb"/>-->
+<!--            <xs:enumeration value="B"/>-->
+<!--        </xs:restriction>-->
+<!--    </xs:simpleType>-->
+
+<!--    <xs:simpleType name="orientation">-->
+<!--        <xs:restriction base="xs:string">-->
+<!--            <xs:enumeration value="+"/>-->
+<!--            <xs:enumeration value="-"/>-->
+<!--        </xs:restriction>-->
+<!--    </xs:simpleType>-->
+
+    <!-- Time -->
+    <xs:complexType name="time">
+        <xs:attribute name="num" type="xs:integer" use="required"/>
+        <xs:attribute name="den" type="positive" use="required"/>
+        <xs:attribute name="nat" type="nature" default="shift"/>
+    </xs:complexType>
+
+    <xs:complexType name="time-shift">
+        <xs:attribute name="num" type="xs:integer" use="required"/>
+        <xs:attribute name="den" type="positive" use="required"/>
+        <xs:attribute name="nat" fixed="shift"/>
+    </xs:complexType>
+
+    <xs:element name="hit">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="start" type="time"/>
+                <xs:element name="duration" type="time-shift"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="rhythm">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="hit" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="id"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="texture">
+        <xs:complexType>
+            <xs:choice>
+                <xs:sequence>
+                    <xs:element ref="rhythm" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:element name="id" type="xs:string"/>
+            </xs:choice>
+            <xs:attribute name="id"/>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Frequency -->
+    <xs:complexType name="frequency">
+        <xs:attribute name="value" type="xs:integer" use="required"/>
+        <xs:attribute name="nat" type="nature" default="shift"/>
+    </xs:complexType>
+
+    <xs:complexType name="frequency-point">
+        <xs:simpleContent>
+            <xs:extension base="frequency">
+                <xs:attribute name="nat" fixed="point"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:element name="pitch" type="frequency"/>
+
+<!--    <xs:element name="frequency-point">-->
+<!--        <xs:complexType>-->
+<!--            <xs:attribute name="value" type="frequency-point"/>-->
+<!--        </xs:complexType>-->
+<!--    </xs:element>-->
+
+    <xs:element name="chord">
+        <xs:complexType>
+            <xs:choice>
+                <xs:sequence>
+                    <xs:element ref="pitch" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:sequence>
+                    <xs:element name="degree"/>
+                    <xs:element name="factor" maxOccurs="unbounded">
+                        <xs:complexType>
+                            <xs:attribute name="octave" default="0" type="xs:integer"/>
+                            <xs:attribute name="value" type="xs:string"/>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:element name="id" type="xs:string"/>
+            </xs:choice>
+            <xs:attribute name="id"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="harmony">
+        <xs:complexType>
+            <xs:choice>
+                <xs:sequence>
+                    <xs:element ref="chord" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:element name="id" type="xs:string"/>
+            </xs:choice>
+            <xs:attribute name="id"/>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Time-Frequency -->
+    <xs:complexType name="time-frequency">
+        <xs:sequence>
+            <xs:element name="time" type="time"/>
+            <xs:element name="frequency" type="frequency"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="activation" type="time-frequency"/>
+
+    <xs:element name="activations">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="activation" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="harmonic-texture">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="texture"/>
+                <xs:element ref="harmony"/>
+            </xs:sequence>
+            <xs:attribute name="id"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="chord-texture">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="texture"/>
+                <xs:element ref="chord"/>
+            </xs:sequence>
+            <xs:attribute name="id"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="component">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="activations"/>
+                    <xs:choice>
+                        <xs:element ref="component"/>
+                        <xs:element ref="harmonic-texture"/>
+                        <xs:element ref="chord-texture"/>
+                    </xs:choice>
+                </xs:sequence>
+            </xs:sequence>
+            <xs:attribute name="id"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="component">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="activations"/>
+                    <xs:choice>
+                        <xs:element ref="component"/>
+                        <xs:element ref="harmonic-texture"/>
+                        <xs:element ref="chord-texture"/>
+                    </xs:choice>
+                </xs:sequence>
+            </xs:sequence>
+            <xs:attribute name="id"/>
+        </xs:complexType>
+    </xs:element>
+
+<!--    <xs:element name="pair">-->
+<!--        <xs:complexType>-->
+<!--            <xs:sequence>-->
+<!--                <xs:element ref="activations"/>-->
+<!--                <xs:choice>-->
+<!--                    <xs:element ref="component"/>-->
+<!--                    <xs:element ref="harmonic-texture"/>-->
+<!--                    <xs:element ref="chord-texture"/>-->
+<!--                    <xs:element ref="harmonic-texture-sequence"/>-->
+<!--                    <xs:element ref="chord-texture-sequence"/>-->
+<!--                </xs:choice>-->
+<!--            </xs:sequence>-->
+<!--            <xs:attribute name="id"/>-->
+<!--            <xs:attribute name="on" type="xs:boolean" default="true"/>-->
+<!--        </xs:complexType>-->
+<!--    </xs:element>-->
+
+    <xs:element name="score-tree">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="name" minOccurs="0" type="xs:string"/>
+                <xs:element name="composer" minOccurs="0" type="xs:string"/>
+                <xs:element name="textures" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element ref="texture" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="chords" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element ref="chord" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="harmonies" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element ref="harmony" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="components">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element ref="component" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

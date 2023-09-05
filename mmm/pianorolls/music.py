@@ -759,7 +759,7 @@ class PianoRoll:
         self_reduced = self.reduce()
         other_reduced = other.reduce()
         if self_reduced.array.shape == other_reduced.array.shape:
-            same_array = (self_reduced.array == other_reduced.array).all()
+            same_array = np.all(self_reduced.array == other_reduced.array)
             same_origin = self_reduced.origin == other_reduced.origin
             same_tatum = self_reduced.tatum == other_reduced.tatum
             same_step = self_reduced.step == other_reduced.step
@@ -991,25 +991,25 @@ class PianoRoll:
     def reduce(self, inplace: bool = False):
         low = 0
         for i in range(self.array.shape[0]):
-            if (self.array[i, :] == 0).all():
+            if np.all(self.array[i, :] == 0):
                 low += 1
             else:
                 break
         high = 0
         for i in range(self.array.shape[0]-1, 0, -1):
-            if (self.array[i, :] == 0).all():
+            if np.all(self.array[i, :] == 0):
                 high += 1
             else:
                 break
         early = 0
         for i in range(self.array.shape[1]):
-            if (self.array[:, i] == 0).all():
+            if np.all(self.array[:, i] == 0):
                 early += 1
             else:
                 break
         later = 0
         for i in range(self.array.shape[1]-1, 0, -1):
-            if (self.array[:, i] == 0).all():
+            if np.all(self.array[:, i] == 0):
                 later += 1
             else:
                 break

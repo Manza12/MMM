@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<score-tree xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance" xsd:noNamespaceSchemaLocation="score.xsd">
+    <name>Test</name>
+    <composer>Gon</composer>
+    <component-tree id="S">
+        <activations>
+            <activation>
+                <time num="0" den="1" nat="point"/>
+                <frequency value="60" nat="point"/>
+            </activation>
+        </activations>
+        <component-tree id="A">
+            <activations>
+                <activation>
+                    <time num="0" den="1"/>
+                    <frequency value="0"/>
+                </activation>
+            </activations>
+            <harmonic-texture>
+                <texture>
+                    <rhythm>
+                        <hit>
+                            <start num="0" den="1"/>
+                            <duration num="1" den="4"/>
+                        </hit>
+                    </rhythm>
+                </texture>
+                <harmony>
+                    <chord>
+                        <degree>I</degree>
+                        <factor value="1"/>
+                        <factor value="3"/>
+                        <factor value="5"/>
+                    </chord>
+                </harmony>
+            </harmonic-texture>
+        </component-tree>
+        <component-tree id="B">
+            <activations>
+                <activation>
+                    <time num="1" den="4"/>
+                    <frequency value="0"/>
+                </activation>
+            </activations>
+            <component-tree id="B1">
+                <activations>
+                    <activation>
+                        <time num="0" den="1"/>
+                        <frequency value="0"/>
+                    </activation>
+                </activations>
+                <harmonic-texture>
+                    <texture>
+                        <rhythm>
+                            <hit>
+                                <start num="0" den="1"/>
+                                <duration num="1" den="8"/>
+                            </hit>
+                            <hit>
+                                <start num="1" den="8"/>
+                                <duration num="1" den="8"/>
+                            </hit>
+                        </rhythm>
+                    </texture>
+                    <harmony>
+                        <chord>
+                            <degree>ii</degree>
+                            <factor value="1"/>
+                            <factor value="3"/>
+                        </chord>
+                    </harmony>
+                </harmonic-texture>
+            </component-tree>
+            <component-tree>
+                <activations>
+                    <activation>
+                        <time num="1" den="4"/>
+                        <frequency value="0"/>
+                    </activation>
+                </activations>
+                <harmonic-texture>
+                    <texture>
+                        <rhythm>
+                            <hit>
+                                <start num="0" den="1"/>
+                                <duration num="1" den="8"/>
+                            </hit>
+                            <hit>
+                                <start num="1" den="8"/>
+                                <duration num="1" den="8"/>
+                            </hit>
+                        </rhythm>
+                    </texture>
+                    <harmony>
+                        <chord>
+                            <degree>V</degree>
+                            <factor value="1"/>
+                            <factor value="3"/>
+                            <factor value="7"/>
+                        </chord>
+                    </harmony>
+                </harmonic-texture>
+            </component-tree>
+        </component-tree>
+    </component-tree>
+</score-tree>
