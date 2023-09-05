@@ -27,6 +27,98 @@
                 </hit>
             </rhythm>
         </texture>
+        <texture id="Bass 1">
+            <rhythm>
+                <hit>
+                    <start num="0" den="4"/>
+                    <duration num="1" den="4"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="3" den="4"/>
+                    <duration num="1" den="4"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="Melody 1">
+            <rhythm>
+                <hit>
+                    <start num="0" den="16"/>
+                    <duration num="1" den="8"/>
+                </hit>
+                <hit>
+                    <start num="15" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="2" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="14" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="3" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="13" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="4" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="12" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="5" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="11" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="6" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="10" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="7" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="9" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="8" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+        </texture>
     </textures>
     <component-tree>
         <activations>
@@ -35,21 +127,21 @@
                 <frequency value="60" nat="point"/>
             </activation>
         </activations>
-        <component-tree id="Th.A">
+        <component-tree id="A">
             <activations>
                 <activation>
                     <time num="0" den="1"/>
                     <frequency value="0"/>
                 </activation>
             </activations>
-            <component-tree id="Th.A-Ph.1">
+            <component-tree id="A1">
                 <activations>
                     <activation>
                         <time num="0" den="1"/>
                         <frequency value="0"/>
                     </activation>
                 </activations>
-                <component-tree id="Th.A-Ph.1-LH">
+                <component-tree id="A1-LH">
                     <activations>
                         <activation>
                             <time num="0" den="1"/>
@@ -228,7 +320,7 @@
                         </chord-texture>
                     </component-tree>
                 </component-tree>
-                <component-tree id="Th.A-Ph.1-RH">
+                <component-tree id="A1-RH">
                     <activations>
                         <activation>
                             <time num="0" den="1"/>
@@ -399,6 +491,169 @@
                             </chord>
                         </chord-texture>
                     </component-tree>
+                </component-tree>
+            </component-tree>
+            <component-tree id="A2">
+                <activations>
+                    <activation>
+                        <time num="4" den="1"/>
+                        <frequency value="0"/>
+                    </activation>
+                </activations>
+                <component-tree id="A2-1">
+                    <activations>
+                        <activation>
+                            <time num="0" den="1"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <chord-texture>
+                        <texture>
+                            <id>Melody 1</id>
+                        </texture>
+                        <chord>
+                            <degree>Maj</degree>
+                            <factor value="6"/>
+                            <factor value="7"/>
+                            <factor value="1" octave="1"/>
+                            <factor value="2" octave="1"/>
+                            <factor value="3" octave="1"/>
+                            <factor value="4" octave="1"/>
+                            <factor value="5" octave="1"/>
+                            <factor value="6" octave="1"/>
+                        </chord>
+                    </chord-texture>
+                    <harmonic-texture>
+                        <texture>
+                            <id>Bass 1</id>
+                        </texture>
+                        <harmony>
+                            <chord>
+                                <pitch value="5"/>
+                            </chord>
+                            <chord>
+                                <pitch value="-7"/>
+                                <pitch value="0"/>
+                            </chord>
+                        </harmony>
+                    </harmonic-texture>
+                </component-tree>
+                <component-tree id="A2-2">
+                    <activations>
+                        <activation>
+                            <time num="1" den="1"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <chord-texture>
+                        <texture>
+                            <id>Melody 1</id>
+                        </texture>
+                        <chord>
+                            <degree>Maj</degree>
+                            <factor value="5"/>
+                            <factor value="6"/>
+                            <factor value="7"/>
+                            <factor value="1" octave="1"/>
+                            <factor value="2" octave="1"/>
+                            <factor value="3" octave="1"/>
+                            <factor value="4" octave="1"/>
+                            <factor value="5" octave="1"/>
+                        </chord>
+                    </chord-texture>
+                    <harmonic-texture>
+                        <texture>
+                            <id>Bass 1</id>
+                        </texture>
+                        <harmony>
+                            <chord>
+                                <pitch value="-8"/>
+                                <pitch value="0"/>
+                            </chord>
+                            <chord>
+                                <pitch value="-8"/>
+                                <pitch value="0"/>
+                            </chord>
+                        </harmony>
+                    </harmonic-texture>
+                </component-tree>
+                <component-tree id="A2-3">
+                    <activations>
+                        <activation>
+                            <time num="2" den="1"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <chord-texture>
+                        <texture>
+                            <id>Melody 1</id>
+                        </texture>
+                        <chord>
+                            <degree>Maj</degree>
+                            <factor value="4"/>
+                            <factor value="5"/>
+                            <factor value="6"/>
+                            <factor value="7"/>
+                            <factor value="1" octave="1"/>
+                            <factor value="2" octave="1"/>
+                            <factor value="3" octave="1"/>
+                            <factor value="4" octave="1"/>
+                        </chord>
+                    </chord-texture>
+                    <harmonic-texture>
+                        <texture>
+                            <id>Bass 1</id>
+                        </texture>
+                        <harmony>
+                            <chord>
+                                <pitch value="-10"/>
+                                <pitch value="0"/>
+                            </chord>
+                            <chord>
+                                <pitch value="-10"/>
+                                <pitch value="-1"/>
+                            </chord>
+                        </harmony>
+                    </harmonic-texture>
+                </component-tree>
+                <component-tree id="A2-4">
+                    <activations>
+                        <activation>
+                            <time num="3" den="1"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <chord-texture>
+                        <texture>
+                            <id>Melody 1</id>
+                        </texture>
+                        <chord>
+                            <degree>Maj</degree>
+                            <factor value="3"/>
+                            <factor value="4"/>
+                            <factor value="5"/>
+                            <factor value="6"/>
+                            <factor value="7"/>
+                            <factor value="1" octave="1"/>
+                            <factor value="2" octave="1"/>
+                            <factor value="3" octave="1"/>
+                        </chord>
+                    </chord-texture>
+                    <harmonic-texture>
+                        <texture>
+                            <id>Bass 1</id>
+                        </texture>
+                        <harmony>
+                            <chord>
+                                <pitch value="-12"/>
+                                <pitch value="0"/>
+                            </chord>
+                            <chord>
+                                <pitch value="-12"/>
+                                <pitch value="-8"/>
+                            </chord>
+                        </harmony>
+                    </harmonic-texture>
                 </component-tree>
             </component-tree>
         </component-tree>

@@ -1182,6 +1182,7 @@ class Texture(PianoRollStack):
 
 
 class Chord(PianoRoll):
+    # @multimethod
     def __init__(self, *frequencies: int, nature: str = 'shift'):
         self.frequencies = sorted(frequencies)
         self.nature = nature
@@ -1208,6 +1209,14 @@ class Chord(PianoRoll):
 
             PianoRoll.__init__(self, array, TimeFrequency(TimeShift(0), frequency_origin),
                                TimeShift(0, 1), FrequencyShift(1))
+
+    # @multimethod
+    # def __init__(self, *frequencies: Frequency):
+    #     # Check nature
+    #     assert len(list({frequency.nature for frequency in frequencies})) == 1, \
+    #         'Frequencies must be of the same nature'
+    #
+    #     self.__init__(*[f.value for f in frequencies], nature=frequencies[0].nature)
 
     @classmethod
     def from_degree(cls, degree: str, factors: List[Dict[str, str]]):

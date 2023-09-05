@@ -121,7 +121,8 @@ class ScoreTree:
                         pitches = []
                         for child in element:
                             pitches.append(self.decode(child))
-                        return Chord(*pitches)
+                        nature = pitches[0].nature
+                        return Chord(*[p.value for p in pitches], nature=nature)
         elif element.tag == 'harmony':
             if element[0].tag == 'id':
                 return self.objects[element[0].text]
@@ -131,7 +132,14 @@ class ScoreTree:
                     chords.append(self.decode(child))
                 return Harmony(*chords)
         elif element.tag == 'pitch':
-            return Frequency(element.attrib['value'])
+            if 'nat' not in element.attrib.keys():
+                element.attrib['nat'] = 'shift'
+            if element.attrib['nat'] == 'shift':
+                return FrequencyShift(int(element.attrib['value']))
+            elif element.attrib['nat'] == 'point':
+                return Frequency(int(element.attrib['value']))
+            else:
+                raise ValueError
         elif element.tag == 'activations':
             acts = []
             for child in element:
