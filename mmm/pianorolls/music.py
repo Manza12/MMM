@@ -849,6 +849,8 @@ class PianoRoll:
         frequency_slice = key[1]
         if frequency_slice.step is not None:
             raise NotImplementedError()
+        if frequency_slice == slice(None):
+            frequency_slice = slice(self.extension.frequency.lower, self.extension.frequency.higher, None)
 
         new_origin = TimeFrequency(time_slice.start, frequency_slice.start)
 

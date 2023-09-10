@@ -1,6 +1,7 @@
 from . import *
 
-from .dictionaries import number_to_chroma_spanish_dict, number_to_chroma_french_dict, number_to_chroma_english_dict
+from .dictionaries import number_to_chroma_spanish_dict, number_to_chroma_french_dict, number_to_chroma_english_dict, \
+    pitch_to_note_number_dict, note_value_to_denominator_dict
 
 
 def lcm(x, y):
@@ -89,6 +90,95 @@ def midi_numbers_to_chromas(midi_numbers):
             chromas_vector.append(midi_number_to_chroma(midi_number % 12))
 
     return chromas_vector
+
+
+def pitch_to_note_number(step: str, octave: int, alter: int) -> int:
+    result = (octave + 1) * 12
+
+    result += pitch_to_note_number_dict[step]
+
+    if alter:
+        result += alter
+
+    return result
+
+
+def duration_whole_to_unicode(duration: Union[float, frac]) -> str:
+    duration = frac(duration)
+    if int(duration * 64) == duration * 64:
+        pass
+    else:
+        raise NotImplementedError('duration %f not implemented.' % duration)
+
+    if duration < 0:
+        result = '-'
+        duration = -duration
+    else:
+        result = ''
+
+    while duration >= 1.:
+        if not result == '':
+            result += '+ '
+        result += u'𝅝 '
+        duration -= 1
+
+    while duration >= 1/2:
+        if not result == '':
+            result += '+ '
+        result += u'𝅗𝅥 '
+        duration -= 1/2
+
+    while duration >= 1/4:
+        if not result == '':
+            result += '+ '
+        result += u'𝅘𝅥 '
+        duration -= 1/4
+
+    while duration >= 1/8:
+        if not result == '':
+            result += '+ '
+        result += u'𝅘𝅥𝅮 '
+        duration -= 1/8
+
+    while duration >= 1/16:
+        if not result == '':
+            result += '+ '
+        result += u'𝅘𝅥𝅯 '
+        duration -= 1/16
+
+    while duration >= 1/32:
+        if not result == '':
+            result += '+ '
+        result += u'𝅘𝅥𝅰 '
+        duration -= 1/32
+
+    while duration >= 1/64:
+        if not result == '':
+            result += '+ '
+        result += u'𝅘𝅥𝅱 '
+        duration -= 1/64
+
+    if not duration == 0:
+        raise NotImplementedError('duration not implemented.')
+    else:
+        return result
+
+
+def beat_unit_to_tuple(beat_unit, beat_unit_dot) -> tuple:
+    numerator = 1
+    if beat_unit is None:
+        return 0, 1
+    else:
+        try:
+            denominator = note_value_to_denominator_dict[beat_unit]
+        except KeyError:
+            raise ValueError('Unimplemented beat_unit %s' % beat_unit)
+
+    if beat_unit_dot:
+        denominator *= 2
+        numerator = 2 * numerator + 1
+
+    return numerator, denominator
 
 
 def nature_of_sum(a: Optional[str], b: Optional[str]) -> Optional[str]:

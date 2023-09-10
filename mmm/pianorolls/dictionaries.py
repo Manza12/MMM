@@ -1,5 +1,15 @@
 from .parameters import SHARP, FLAT
 
+note_value_to_denominator_dict = {
+    'whole': 1,
+    'half': 2,
+    'quarter': 4,
+    'eighth': 8,
+    '16th': 16,
+    '32nd': 32,
+    '64th': 64,
+    '128th': 128,
+}
 
 number_to_chroma_spanish_dict = {
     0: 'Do',
@@ -44,6 +54,16 @@ number_to_chroma_french_dict = {
     9: '\x1B[0mla\x1B[0m',
     10: '\x1B[0msi' + FLAT + '\x1B[0m',
     11: '\x1B[0msi\x1B[0m'
+}
+
+pitch_to_note_number_dict = {
+    'C': 0,
+    'D': 2,
+    'E': 4,
+    'F': 5,
+    'G': 7,
+    'A': 9,
+    'B': 11
 }
 
 roman_numeral_to_factors_dict = {
