@@ -249,6 +249,8 @@ def plot_activations_stack(activations_stack: ActivationsStack,
                            tight_frame=True,
                            legend=False, legend_params=None,
                            **kwargs):
+    if legend_params is None:
+        legend_params = {}
     assert len(activations_stack) >= 1
     assert len({a.tatum for a in activations_stack if len(a) != 0}) == 1
     assert len({a.extension for a in activations_stack if len(a) != 0}) == 1
