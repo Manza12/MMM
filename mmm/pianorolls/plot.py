@@ -261,6 +261,8 @@ def plot_activations_stack(activations_stack: ActivationsStack,
         time_label = 'Time (wholes)'
     elif time_label == 'Time (m, b)':
         TimePoint.__str__ = lambda self: f'({self.measure}, {self.beat})'
+    elif time_label == 'Time (measure)':
+        TimePoint.__str__ = lambda self: f'{self.measure}'
 
     if freq_label is None:
         if a_master.frequency_nature == 'point':
