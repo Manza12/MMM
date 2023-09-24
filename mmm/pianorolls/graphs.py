@@ -326,7 +326,7 @@ class DerivedActivationsGraph(Graph):
 
 class TonalGraph(nx.DiGraph):
     def __init__(self, activations_harmony: ActivationsStack, harmony: Harmony, activations: Activations,
-                 terminal_nodes=False, bonus_seventh=0.1, weight_type=int, weight_fn=None
+                 terminal_nodes=False, bonus_seventh=0.1, weight_type=int, weight_fn=None, complete=True
                  ):
         super().__init__()
 
@@ -376,7 +376,12 @@ class TonalGraph(nx.DiGraph):
                                     weight -= bonus_seventh
                             else:
                                 weight = weight_fn(p_node, node, bonus_seventh)
-                            self.add_edge(p_node, node, weight=weight_type(weight))
+
+                            if complete:
+                                self.add_edge(p_node, node, weight=weight_type(weight))
+                            else:
+                                if p_node[1] == node[1]:
+                                    self.add_edge(p_node, node, weight=weight_type(weight))
             if len(current_nodes) != 0:
                 previous_nodes = current_nodes
 

@@ -840,8 +840,8 @@ class PianoRoll:
         return type(self)(self.array, self.origin - other, self.tatum, self.step)
 
     def __getitem__(self, key):
-        assert isinstance(key, tuple) and len(key) == 2, 'PianoRoll can be indexed with 2 dimensions.'
-        assert isinstance(key[0], slice) and isinstance(key[1], slice), 'PianoRoll can be indexed with slices.'
+        assert isinstance(key, tuple) and len(key) == 2, 'PianoRoll can only be indexed with 2 dimensions.'
+        assert isinstance(key[0], slice) and isinstance(key[1], slice), 'PianoRoll can only be indexed with slices.'
         time_slice = key[0]
         if time_slice.step is not None:
             raise NotImplementedError()
@@ -849,15 +849,19 @@ class PianoRoll:
         frequency_slice = key[1]
         if frequency_slice.step is not None:
             raise NotImplementedError()
-        if frequency_slice == slice(None):
-            frequency_slice = slice(self.extension.frequency.lower, self.extension.frequency.higher, None)
 
-        new_origin = TimeFrequency(time_slice.start, frequency_slice.start)
+        f_start = frequency_slice.start if frequency_slice.start is not None else self.extension.frequency.lower
+        f_stop = frequency_slice.stop if frequency_slice.stop is not None else self.extension.frequency.higher
 
-        f_0 = (frequency_slice.start - self.origin.frequency) // self.step
-        f_1 = (frequency_slice.stop - self.origin.frequency) // self.step
-        t_0 = (time_slice.start - self.origin.time) // self.tatum
-        t_1 = (time_slice.stop - self.origin.time) // self.tatum
+        t_start = time_slice.start if time_slice.start is not None else self.extension.time.start
+        t_stop = time_slice.stop if time_slice.stop is not None else self.extension.time.end
+
+        new_origin = TimeFrequency(t_start, f_start)
+
+        f_0 = (f_start - self.origin.frequency) // self.step
+        f_1 = (f_stop - self.origin.frequency) // self.step
+        t_0 = (t_start - self.origin.time) // self.tatum
+        t_1 = (t_stop - self.origin.time) // self.tatum
         new_array = self.array[f_0: f_1, t_0: t_1]
 
         return type(self)(new_array, new_origin, self.tatum, self.step)
@@ -982,7 +986,7 @@ class PianoRoll:
             if not inplace:
                 return PianoRoll(self.array, self.origin, self.tatum, self.step)
 
-    def change_type(self, new_type: np.dtype, inplace: bool = False):
+    def change_type(self, new_type: Union[np.dtype, Type[bool]], inplace: bool = False):
         if inplace:
             self.array = self.array.astype(new_type)
         else:
@@ -1526,11 +1530,33 @@ class ActivationsStack(List[Activations]):
         return ActivationsStack(*activations_list)
 
     def to_array(self):
-        assert len({a.tatum for a in self}) == 1, 'All activations must have the same tatum'
-        assert len({a.step for a in self}) == 1, 'All activations must have the same step'
-        assert len({a.extension for a in self}) == 1, 'All activations must have the same extension'
+        if len({a.tatum for a in self}) != 1:
+            new_tatum = self[0].tatum.gcd(*[a.tatum for a in self[1:]])
+            a_list = []
+            for a in self:
+                a_list.append(a.change_tatum(new_tatum))
+        else:
+            a_list = self
 
-        return np.stack([a.array for a in self])
+        assert len({a.step for a in a_list}) == 1, 'All activations must have the same step'
+
+        if len({a.extension for a in a_list}) != 1:
+            new_extension = a_list[0].extension
+            for a in a_list[1:]:
+                a_ext = a.extension
+                new_extension = new_extension.union(a_ext)
+            for a in a_list:
+                a.change_extension(new_extension)
+
+        assert len({a.extension for a in a_list}) == 1, 'All activations must have the same extension'
+
+        return np.stack([a.array for a in a_list])
+
+    def contract(self) -> Activations:
+        result = Activations()
+        for a in self:
+            result = PianoRoll.__add__(result, a)
+        return result
 
 
 class ScoreTree:
