@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 
 mpl.rcParams['mathtext.fontset'] = 'cm'
+mpl.rcParams['backend'] = 'QtAgg'
 
 graph = nx.DiGraph()
 

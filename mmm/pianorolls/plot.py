@@ -178,7 +178,7 @@ def plot_piano_roll(piano_roll: PianoRoll,
         else:
             freq_label = 'Shift (semitones)'
 
-    if piano_roll.array.dtype == np.bool:
+    if piano_roll.array.dtype == bool:
         fig = plot_activations(piano_roll.array, piano_roll.time_vector, piano_roll.frequency_vector,
                                freq_label=freq_label, time_label=time_label,
                                marker_color=marker_color, marker_size=marker_size,
@@ -273,7 +273,7 @@ def plot_activations_stack(activations_stack: ActivationsStack,
         else:
             freq_label = 'Shift (semitones)'
 
-    assert a_master.array.dtype == np.bool
+    assert a_master.array.dtype == bool
     fig = plt.figure(figsize=(fig_size[0] / dpi, fig_size[1] / dpi), dpi=dpi)
 
     if fig_title:
@@ -353,7 +353,7 @@ def plot_activations_graph(graph: ActivationsGraph, fig_size=(9., 6.), pad_f=0.5
     fig = plt.figure(figsize=fig_size)
 
     # Compute number of elements
-    n_elements = np.zeros_like(graph.array, dtype=np.int)
+    n_elements = np.zeros_like(graph.array, dtype=int)
     for m in range(graph.array.shape[-2]):
         for n_s in range(graph.array.shape[-1]):
             n_elements[m, n_s] = len(graph.array[m, n_s])
@@ -430,7 +430,7 @@ def plot_tonal_graph(graph: TonalGraph, fig_size=(8., 4.), pad_f=0., shortest_pa
     fig = plt.figure(figsize=fig_size)
 
     # Compute number of elements
-    n_elements = np.zeros_like(graph.array, dtype=np.int)
+    n_elements = np.zeros_like(graph.array, dtype=np.int16)
     for m in range(graph.array.shape[-2]):
         for n_s in range(graph.array.shape[-1]):
             n_elements[m, n_s] = len(graph.array[m, n_s])

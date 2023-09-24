@@ -65,7 +65,7 @@ activations_texture: ActivationsStack = erosion(piano_roll, texture)
 activations_texture.change_extension(piano_roll.extension)
 
 # Create graph
-graph = ActivationsGraph(piano_roll, activations_texture.to_array(), texture)
+graph = ActivationsGraph(piano_roll, activations_texture, texture)
 
 # Figures
 if plot:

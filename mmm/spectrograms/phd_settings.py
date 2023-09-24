@@ -67,27 +67,32 @@ woodblock = {
     'horizontal_thin': {
         'x_lim': (0.08, 0.17),
         'y_lim': (0, 20000),
-        'name': 'horizontal_thin'
+        'name': 'horizontal_thin',
+        'fig_size': (5., 4.)
     },
     'horizontal_top_hat': {
         'x_lim': (0.08, 0.17),
         'y_lim': (0, 20000),
-        'name': 'horizontal_top_hat'
+        'name': 'horizontal_top_hat',
+        'fig_size': (5., 4.)
     },
     'horizontal_threshold': {
         'x_lim': (0.08, 0.17),
         'y_lim': (0, 20000),
-        'name': 'horizontal_threshold'
+        'name': 'horizontal_threshold',
+        'fig_size': (5., 4.)
     },
     'vertical_filtered': {
         'x_lim': (0.08, 0.17),
         'y_lim': (0, 20000),
-        'name': 'vertical_filtered'
+        'name': 'vertical_filtered',
+        'fig_size': (5., 4.)
     },
     'lines_transient': {
         'x_lim': (0.05, 0.25),
         'y_lim': (0, 20000),
-        'name': 'lines_transient'
+        'name': 'lines_transient',
+        'fig_size': (4., 4.)
     },
     'input_transient': {
         'x_lim': (0., 0.6),
@@ -100,7 +105,7 @@ marimba = {
     'lines_sinusoids': {
         'x_lim': (0.05, 0.6),
         'y_lim': (0, 4500),
-        'sharexy': 'all',
+        # 'sharexy': 'all',
         'fig_size': (4, 3),
         'full_screen': False,
         'name': 'lines_sinusoids'
@@ -108,14 +113,14 @@ marimba = {
     'input_sinusoids': {
         'x_lim': (0.05, 0.6),
         'y_lim': (0, 3200),
-        'sharexy': 'all',
+        # 'sharexy': 'all',
         'fig_size': (6, 3),
         'name': 'input_sinusoids'
     },
     'lines_transient': {
         'x_lim': (0.05, 0.35),
         'y_lim': (0, 22050),
-        'sharexy': 'all',
+        # 'sharexy': 'all',
         'cb': False,
         'fig_size': (3., 4.),
         'full_screen': False,
@@ -127,7 +132,7 @@ marimba = {
         'fig_size': (4., 4.),
         'cb_1': False,
         'cb_2': True,
-        'sharexy': 'all',
+        # 'sharexy': 'all',
         'name': 'input_transient'
     },
 }
@@ -136,7 +141,7 @@ gong = {
     'input_noise': {
         'x_lim': (0., 1.7),
         'y_lim': (0, 22050),
-        'sharexy': 'all',
+        # 'sharexy': 'all',
         'cb_1': False,
         'fig_size': (6., 3.),
         'full_screen': False,
@@ -145,7 +150,7 @@ gong = {
     'input_sinusoids': {
         'x_lim': (0., 1.7),
         'y_lim': (0, 22050),
-        'sharexy': 'all',
+        # 'sharexy': 'all',
         'fig_size': (6., 3.),
         'cb_1': False,
         'name': 'input_sinusoids'
@@ -153,7 +158,7 @@ gong = {
     'input_transient': {
         'x_lim': (0., 1.7),
         'y_lim': (0, 22050),
-        'sharexy': 'all',
+        # 'sharexy': 'all',
         'fig_size': (6., 3.),
         'cb_1': False,
         'name': 'input_transient'
@@ -161,7 +166,7 @@ gong = {
     'input_output': {
         'x_lim': (0., 1.75),
         'y_lim': (0, 22050),
-        'sharexy': 'all',
+        # 'sharexy': 'all',
         'full_screen': False,
         'name': 'input_output'
     },
@@ -171,20 +176,20 @@ violin = {
     'input_noise': {
         'x_lim': (0., 1.75),
         'y_lim': (0, 10000),
-        'sharexy': 'all',
+        # 'sharexy': 'all',
         'full_screen': False,
         'name': 'input_noise'
     },
     'input_sinusoids': {
         'x_lim': (0., 1.75),
         'y_lim': (0, 10000),
-        'sharexy': 'all',
+        # 'sharexy': 'all',
         'name': 'input_sinusoids'
     },
     'input_output': {
         'x_lim': (0., 1.75),
         'y_lim': (0, 10000),
-        'sharexy': 'all',
+        # 'sharexy': 'all',
         'full_screen': False,
         'name': 'input_output'
     },
@@ -194,7 +199,7 @@ violin_vibrato = {
     'lines_sinusoids': {
         'x_lim': (0.4, 1.2),
         'y_lim': (1000, 5500),
-        'sharexy': 'all',
+        # 'sharexy': 'all',
         'fig_size': (4., 4.),
         'full_screen': False,
         'name': 'lines_sinusoids'
@@ -202,7 +207,7 @@ violin_vibrato = {
     'input_sinusoids': {
         'x_lim': (0.4, 1.2),
         'y_lim': (1000, 5500),
-        'sharexy': 'all',
+        # 'sharexy': 'all',
         'name': 'input_sinusoids'
     },
 }
@@ -213,7 +218,7 @@ piano = {
         'x_lim': (0.3, 1.3),
         'y_lim': (0, 5000),
         'cb_1': False,
-        'sharexy': 'all',
+        # 'sharexy': 'all',
         'fig_size': (6, 3),
         'name': 'input_sinusoids'
     },
@@ -221,7 +226,7 @@ piano = {
         'x_lim': (0.3, 1.3),
         'y_lim': (0, 5000),
         'cb_1': False,
-        'sharexy': 'all',
+        # 'sharexy': 'all',
         'fig_size': (6, 3),
         'name': 'input_noise'
     },
@@ -230,16 +235,75 @@ piano = {
         'y_lim': (0, 5000),
         'cb_1': False,
         'fig_size': (6, 3),
-        'sharexy': 'all',
+        # 'sharexy': 'all',
         'name': 'input_transient'
     },
     'input_output': {
         'x_lim': (0.3, 1.3),
         'y_lim': (0, 5000),
         'cb_1': False,
-        'sharexy': 'all',
+        # 'sharexy': 'all',
         'name': 'input_output'
     },
+}
+
+interferences = {
+    # 'input_sinusoids': {
+    #     'x_lim': (0., 0.5),
+    #     'y_lim': (0, 5000),
+    #     'cb_1': False,
+    #     'sharexy': 'all',
+    #     'fig_size': (6, 3),
+    #     'name': 'input_sinusoids'
+    # },
+    'vertical_thin': {
+        'x_lim': (0., 0.5),
+        'y_lim': (0, 2000),
+        'name': 'vertical_thin'
+    },
+    'vertical_top_hat': {
+        'x_lim': (0., 0.5),
+        'y_lim': (0, 2000),
+        'name': 'vertical_top_hat'
+    },
+    'vertical_threshold': {
+        'x_lim': (0., 0.5),
+        'y_lim': (0, 2000),
+        'name': 'vertical_threshold'
+    },
+    'horizontal_filtered': {
+        'x_lim': (0., 0.5),
+        'y_lim': (0, 2000),
+        'name': 'horizontal_filtered'
+    },
+    'lines_sinusoids': {
+        'x_lim': (0., 0.5),
+        'y_lim': (0, 2000),
+        'name': 'lines_sinusoids'
+    },
+    # 'input_noise': {
+    #     'x_lim': (0., 0.5),
+    #     'y_lim': (0, 5000),
+    #     'cb_1': False,
+    #     'sharexy': 'all',
+    #     'fig_size': (6, 3),
+    #     'name': 'input_noise'
+    # },
+    # 'input_transient': {
+    #     'x_lim': (0., 0.5),
+    #     'y_lim': (0, 5000),
+    #     'cb_1': False,
+    #     'fig_size': (6, 3),
+    #     'sharexy': 'all',
+    #     'name': 'input_transient'
+    # },
+    # 'input_output': {
+    #     'x_lim': (0., 0.5),
+    #     'y_lim': (0, 5000),
+    #     'cb_1': False,
+    #     'sharexy': 'all',
+    #     'name': 'input_output'
+    # },
 }
 
 settings = {
@@ -249,4 +313,5 @@ settings = {
     'violin': violin,
     'violin_vibrato': violin_vibrato,
     'piano': piano,
+    'interferences': interferences
 }
