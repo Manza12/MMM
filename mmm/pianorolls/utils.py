@@ -53,6 +53,8 @@ def midi_number_to_pitch(number: Optional[int], language: str = 'english') -> Op
         return None
     chroma = midi_number_to_chroma(number % 12, language=language)
     octave = number // 12 - 1
+    if language in ['french', 'spanish']:
+        octave = octave - 1
 
     return chroma + str(octave)
 

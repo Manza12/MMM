@@ -166,8 +166,10 @@ def plot_piano_roll(piano_roll: PianoRoll,
             time_label = 'Time (s)'
         else:
             time_label = 'Time (wholes)'
-    elif time_label == 'Time (m, b)':
+    elif time_label in ['Time (m, b)', 'Temps (mesure, temps)']:
         TimePoint.__str__ = lambda self: f'({self.measure}, {self.beat})'
+    elif time_label in ['Time (m)', 'Temps (mesure)']:
+        TimePoint.__str__ = lambda self: f'{self.measure}'
 
     if freq_label is None:
         if piano_roll.frequency_nature == 'point':
@@ -261,7 +263,7 @@ def plot_activations_stack(activations_stack: ActivationsStack,
         time_label = 'Time (wholes)'
     elif time_label == 'Time (m, b)':
         TimePoint.__str__ = lambda self: f'({self.measure}, {self.beat})'
-    elif time_label == 'Time (measure)':
+    elif time_label in ['Time (measure)', 'Temps (mesure)']:
         TimePoint.__str__ = lambda self: f'{self.measure}'
 
     if freq_label is None:
@@ -537,7 +539,7 @@ def plot_tonal_graph(graph: TonalGraph, fig_size=(8., 4.), pad_f=0., shortest_pa
 
         if weighted:
             plt.legend([artificial_artist[0], modulation_artist[0], continuation_artist[0], shortest_artist[0]],
-                       ['Artificial', 'Modulation', 'Same tonic', 'Shortest path'], loc='upper center',
+                       ['Artificiel', 'Modulation', 'Même tonique', 'Plus court chemin'], loc='upper center',
                        handler_map={artificial_artist[0]: DashedArrowHandler(),
                                     modulation_artist[0]: ArrowHandler(),
                                     continuation_artist[0]: ArrowHandler(),

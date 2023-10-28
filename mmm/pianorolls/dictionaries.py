@@ -42,19 +42,34 @@ number_to_chroma_english_dict = {
 }
 
 number_to_chroma_french_dict = {
-    0: '\x1B[3mdo\x1B[0m',
-    1: '\x1B[3mdo' + SHARP + '\x1B[0m',
-    2: '\x1B[3mré\x1B[0m',
-    3: '\x1B[0mmi\x1B[0m' + FLAT,
-    4: '\x1B[0mmi\x1B[0m',
-    5: '\x1B[0mfa\x1B[0m',
-    6: '\x1B[0mfa' + SHARP + '\x1B[0m',
-    7: '\x1B[0msol\x1B[0m',
-    8: '\x1B[0mla' + FLAT + '\x1B[0m',
-    9: '\x1B[0mla\x1B[0m',
-    10: '\x1B[0msi' + FLAT + '\x1B[0m',
-    11: '\x1B[0msi\x1B[0m'
+    0: 'do',
+    1: 'do' + SHARP,
+    2: 'ré',
+    3: 'mi' + FLAT,
+    4: 'mi',
+    5: 'fa',
+    6: 'fa' + SHARP,
+    7: 'sol',
+    8: 'la' + FLAT,
+    9: 'la',
+    10: 'si' + FLAT,
+    11: 'si'
 }
+
+# number_to_chroma_french_dict = {
+#     0: '\x1B[3mdo\x1B[0m',
+#     1: '\x1B[3mdo' + SHARP + '\x1B[0m',
+#     2: '\x1B[3mré\x1B[0m',
+#     3: '\x1B[0mmi\x1B[0m' + FLAT,
+#     4: '\x1B[0mmi\x1B[0m',
+#     5: '\x1B[0mfa\x1B[0m',
+#     6: '\x1B[0mfa' + SHARP + '\x1B[0m',
+#     7: '\x1B[0msol\x1B[0m',
+#     8: '\x1B[0mla' + FLAT + '\x1B[0m',
+#     9: '\x1B[0mla\x1B[0m',
+#     10: '\x1B[0msi' + FLAT + '\x1B[0m',
+#     11: '\x1B[0msi\x1B[0m'
+# }
 
 pitch_to_note_number_dict = {
     'C': 0,
