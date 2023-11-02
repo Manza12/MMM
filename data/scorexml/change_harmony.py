@@ -5,14 +5,23 @@ name = 'sonata_16_2nd'  # 'sonata_16', 'hungarian', 'moonlight'
 file_path = Path(name + '.xml')
 
 # Change
-change = 'major_to_minor'  # 'minor_to_major'
+change = 'major_to_minor_N'  # 'minor_to_major'
 
 # Paths
 input_file = open(file_path, 'r')
 output_file = open(Path(name + '_' + change[-5:] + '.xml'), 'w')
 
 # Correspondences
-major_to_minor = {
+major_to_minor_N = {
+    'I': 'i',
+    'ii': 'iiº',
+    'IV': 'iv',
+    'vi': 'VI',
+
+    'Maj': 'MinN',
+}
+
+major_to_minor_H = {
     'I': 'i',
     'ii': 'iiº',
     'IV': 'iv',

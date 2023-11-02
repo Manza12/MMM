@@ -1228,8 +1228,13 @@ class Chord(PianoRoll):
     def from_degree(cls, degree: str, factors: List[Dict[str, str]]):
         degree_dict = roman_numeral_to_factors_dict[degree]
         note_numbers = []
-        for factor in factors:
-            note_numbers.append(degree_dict[factor['value']] + 12 * int(factor.get('octave', 0)))
+        factor = None
+        try:
+            for factor in factors:
+                value = degree_dict[factor['value']] + 12 * int(factor.get('octave', 0))
+                note_numbers.append(value)
+        except KeyError:
+            raise ValueError("Factor '%s' of '%s' not found." % (factor['value'], degree))
         return cls(*note_numbers, nature='shift')
 
     def __len__(self):
