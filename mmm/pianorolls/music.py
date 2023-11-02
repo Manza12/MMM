@@ -1329,6 +1329,8 @@ class HarmonicTexture(PianoRoll):
         for rhythm, chord in zip(texture, harmony):
             rhythm: Rhythm
             chord: Chord
+            if rhythm.array.size == 0:
+                continue
             rhythmed_chord = PianoRoll(chord.array * rhythm.array,
                                        TimeFrequency(rhythm.origin.time, chord.origin.frequency),
                                        rhythm.tatum, chord.step)
