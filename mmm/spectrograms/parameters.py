@@ -7,13 +7,21 @@ WIN_LENGTH = 2048  # samples
 OVERSAMPLING = 2  # no unit
 N_FFT = WIN_LENGTH * OVERSAMPLING  # samples
 FREQUENCY_PRECISION = FS / N_FFT  # Hz
-TIME_RESOLUTION = 0.001  # s
+TIME_RESOLUTION = 0.01  # s
 HOP_LENGTH = int(FS * TIME_RESOLUTION)  # samples
 WINDOW = 'blackman'  # ('gaussian', 1/100) or 'hann'
 PAD_MODE = 'constant'  # 'constant' or 'reflect'
 OUTPUT_FORMAT = 'Complex'  # 'Magnitude' or 'Complex'
 FREQ_SCALE = 'no'  # 'no', 'linear', 'log', 'mel', 'cqt_hz', 'cqt_note'
 CENTER = True  # True or False
+
+# CQT parameters
+F_MIN = 440*2**-3  # Hz
+F_MAX = 440*2**5  # Hz
+BINS_PER_OCTAVE = 24  # no unit
+N_BINS = None
+FILTER_SCALE = 2  # no unit
+NORM = 1  # 1 or 2
 
 # Spectrogram parameters
 EPS = np.finfo(np.float32).eps

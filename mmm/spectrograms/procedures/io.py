@@ -3,7 +3,7 @@ from .. import *
 from ..parameters import FS
 
 
-def read_wav(file_path: Path):
+def read_wav(file_path: Path, start: Optional[float] = None, end: Optional[float] = None):
     warnings.filterwarnings("ignore", category=wav.WavFileWarning)
     fs, data = wav.read(file_path)
 
@@ -11,6 +11,17 @@ def read_wav(file_path: Path):
 
     if issubclass(data.dtype.type, numbers.Integral):
         data = data / np.iinfo(data.dtype).max
+
+    if start is not None and end is not None:
+        start = int(start * FS)
+        end = int(end * FS)
+        data = data[start: end]
+    elif start is not None:
+        start = int(start * FS)
+        data = data[start:]
+    elif end is not None:
+        end = int(end * FS)
+        data = data[:end]
 
     return data
 
@@ -53,7 +64,7 @@ def try_to_read_wav(file_path):
     return data
 
 
-def load_or_compute(name, folder, load, function, extension='.pickle', verbose=True) -> np.ndarray:
+def load_or_compute(name, folder, load, function, extension='.pickle', verbose=True):
     path = folder / (name + extension)
 
     if load[name]:
