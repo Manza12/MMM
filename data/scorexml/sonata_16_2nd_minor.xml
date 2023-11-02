@@ -181,6 +181,98 @@
                 </hit>
             </rhythm>
         </texture>
+        <texture id="Apoyatura-Bordadura">
+            <rhythm>
+                <hit>
+                    <start num="2" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="1" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="3" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="0" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="Cadenza melodica">
+            <rhythm>
+                <hit>
+                    <start num="1" den="4"/>
+                    <duration num="1" den="4"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="0" den="16"/>
+                    <duration num="3" den="16"/>
+                </hit>
+                <hit>
+                    <start num="7" den="32"/>
+                    <duration num="1" den="32"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="3" den="16"/>
+                    <duration num="1" den="32"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="Bass contrapunctum">
+            <rhythm>
+                <hit>
+                    <start num="0" den="4"/>
+                    <duration num="1" den="2"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="0" den="4"/>
+                    <duration num="1" den="4"/>
+                </hit>
+                <hit>
+                    <start num="2" den="4"/>
+                    <duration num="1" den="4"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="1" den="4"/>
+                    <duration num="1" den="2"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="Retardo cadencia">
+            <rhythm>
+                <hit>
+                    <start num="0" den="4"/>
+                    <duration num="1" den="2"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="1" den="4"/>
+                    <duration num="1" den="4"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="0" den="4"/>
+                    <duration num="1" den="4"/>
+                </hit>
+            </rhythm>
+        </texture>
     </textures>
     <component-tree>
         <activations>
@@ -203,7 +295,7 @@
                         <frequency value="0"/>
                     </activation>
                 </activations>
-                <component-tree id="A1-LH">
+                <component-tree id="LH">
                     <activations>
                         <activation>
                             <time num="0" den="1"/>
@@ -553,14 +645,14 @@
                         </chord-texture>
                     </component-tree>
                 </component-tree>
-                <component-tree id="A1-RH">
+                <component-tree id="RH">
                     <activations>
                         <activation>
                             <time num="0" den="1"/>
                             <frequency value="0"/>
                         </activation>
                     </activations>
-                    <component-tree>
+                    <component-tree id="1">
                         <activations>
                             <activation>
                                 <time num="0" den="1"/>
@@ -572,7 +664,7 @@
                                 <id>Melody 1</id>
                             </texture>
                             <chord>
-                                <degree>MinH</degree>
+                                <degree>MinN</degree>
                                 <factor value="1"/>
                                 <factor value="2"/>
                                 <factor value="3"/>
@@ -581,7 +673,7 @@
                             </chord>
                         </chord-texture>
                     </component-tree>
-                    <component-tree>
+                    <component-tree id="2">
                         <activations>
                             <activation>
                                 <time num="6" den="4"/>
@@ -593,7 +685,7 @@
                                 <id>Melody 2</id>
                             </texture>
                             <chord>
-                                <degree>Min</degree>
+                                <degree>MinN</degree>
                                 <factor value="1"/>
                                 <factor value="2"/>
                                 <factor value="3"/>
@@ -606,7 +698,7 @@
                             </chord>
                         </chord-texture>
                     </component-tree>
-                    <component-tree>
+                    <component-tree id="3">
                         <activations>
                             <activation>
                                 <time num="12" den="4"/>
@@ -628,6 +720,144 @@
                                 <factor value="1" octave="1"/>
                             </chord>
                         </chord-texture>
+                    </component-tree>
+                </component-tree>
+                <component-tree id="Coda">
+                    <activations>
+                        <activation>
+                            <time num="18" den="4"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <component-tree id="RH">
+                        <activations>
+                            <activation>
+                                <time num="0" den="4"/>
+                                <frequency value="0"/>
+                            </activation>
+                        </activations>
+                        <component-tree id="1">
+                        <activations>
+                            <activation>
+                                <time num="0" den="4"/>
+                                <frequency value="0"/>
+                            </activation>
+                        </activations>
+                        <chord-texture>
+                            <texture>
+                                <id>Apoyatura-Bordadura</id>
+                            </texture>
+                            <chord>
+                                <degree>iv</degree>
+                                <factor value="4+"/>
+                                <factor value="5" octave="1"/>
+                                <factor value="6" octave="1"/>
+                            </chord>
+                        </chord-texture>
+                    </component-tree>
+                    <component-tree id="2">
+                        <activations>
+                            <activation>
+                                <time num="1" den="4"/>
+                                <frequency value="0"/>
+                            </activation>
+                        </activations>
+                        <chord-texture>
+                            <texture>
+                                <id>Apoyatura-Bordadura</id>
+                            </texture>
+                            <chord>
+                                <degree>iv</degree>
+                                <factor value="2+"/>
+                                <factor value="3"/>
+                                <factor value="4"/>
+                            </chord>
+                        </chord-texture>
+                    </component-tree>
+                    <component-tree id="3">
+                        <activations>
+                            <activation>
+                                <time num="2" den="4"/>
+                                <frequency value="0"/>
+                            </activation>
+                        </activations>
+                        <chord-texture>
+                            <texture>
+                                <id>Apoyatura-Bordadura</id>
+                            </texture>
+                            <chord>
+                                <degree>iv</degree>
+                                <factor value="7"/>
+                                <factor value="1"/>
+                                <factor value="2"/>
+                            </chord>
+                        </chord-texture>
+                    </component-tree>
+                    <component-tree id="4">
+                        <activations>
+                            <activation>
+                                <time num="3" den="4"/>
+                                <frequency value="0"/>
+                            </activation>
+                        </activations>
+                        <chord-texture>
+                            <texture>
+                                <id>Cadenza melodica</id>
+                            </texture>
+                            <chord>
+                                <degree>V</degree>
+                                <factor value="5"/>
+                                <factor value="6m"/>
+                                <factor value="7"/>
+                            </chord>
+                        </chord-texture>
+                    </component-tree>
+                    </component-tree>
+                    <component-tree id="LH">
+                        <activations>
+                            <activation>
+                                <time num="0" den="4"/>
+                                <frequency value="-24"/>
+                            </activation>
+                        </activations>
+                        <component-tree id="1">
+                            <activations>
+                                <activation>
+                                    <time num="0" den="4"/>
+                                    <frequency value="0"/>
+                                </activation>
+                            </activations>
+                            <chord-texture>
+                                <texture>
+                                    <id>Bass contrapunctum</id>
+                                </texture>
+                                <chord>
+                                    <degree>iv</degree>
+                                    <factor value="1"/>
+                                    <factor value="3"/>
+                                    <factor value="5"/>
+                                </chord>
+                            </chord-texture>
+                        </component-tree>
+                        <component-tree id="2">
+                            <activations>
+                                <activation>
+                                    <time num="3" den="4"/>
+                                    <frequency value="0"/>
+                                </activation>
+                            </activations>
+                            <chord-texture>
+                                <texture>
+                                    <id>Retardo cadencia</id>
+                                </texture>
+                                <chord>
+                                    <degree>V</degree>
+                                    <factor value="1"/>
+                                    <factor value="3"/>
+                                    <factor value="4" octave="1"/>
+                                </chord>
+                            </chord-texture>
+                        </component-tree>
                     </component-tree>
                 </component-tree>
             </component-tree>

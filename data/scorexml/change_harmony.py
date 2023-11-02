@@ -6,10 +6,11 @@ file_path = Path(name + '.xml')
 
 # Change
 change = 'major_to_minor_N'  # 'minor_to_major'
+name += '_' + 'minor'
 
 # Paths
 input_file = open(file_path, 'r')
-output_file = open(Path(name + '_' + change[-5:] + '.xml'), 'w')
+output_file = open(Path(name + '.xml'), 'w')
 
 # Correspondences
 major_to_minor_N = {
