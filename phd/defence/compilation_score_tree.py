@@ -5,7 +5,7 @@ from time import time
 
 
 # Path
-name = 'sonata_16_2nd_minor'
+name = 'sonata_16_2nd_arpeggio'
 root_folder = Path('..') / Path('..')
 data_folder = root_folder / Path('data')
 output_folder = root_folder / Path('phd') / Path('defence')
@@ -26,7 +26,7 @@ print("Time to compile into piano roll: %.3f s" % (time() - start))
 
 # Create MIDI
 start = time()
-score_midi = create_midi(piano_roll, tempo=60)
+score_midi = create_midi(piano_roll, tempo=60, instrument=49)  # 49: 'String Ensemble 1'
 score_midi.save(output_folder / (name + '.mid'))
 print("Time to create and save MIDI: %.3f s" % (time() - start))
 
