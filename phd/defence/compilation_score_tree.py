@@ -5,7 +5,7 @@ from time import time
 
 
 # Path
-name = 'sonata_16_2nd_arpeggio'
+name = 'sonata_16_2nd_arpeggio_24'
 root_folder = Path('..') / Path('..')
 data_folder = root_folder / Path('data')
 output_folder = root_folder / Path('phd') / Path('defence')
