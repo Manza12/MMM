@@ -26,7 +26,7 @@ print("Time to compile into piano roll: %.3f s" % (time() - start))
 
 # Create MIDI
 start = time()
-score_midi = create_midi(piano_roll, tempo=60, instrument=49)  # 49: 'String Ensemble 1'
+score_midi = create_midi(piano_roll, tempo=60)  # 49: 'String Ensemble 1'
 score_midi.save(output_folder / (name + '.mid'))
 print("Time to create and save MIDI: %.3f s" % (time() - start))
 

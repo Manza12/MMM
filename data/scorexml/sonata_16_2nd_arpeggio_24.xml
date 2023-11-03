@@ -45,43 +45,43 @@
             <rhythm/>
             <rhythm>
                 <hit>
-                    <start num="0" den="1"/>
+                    <start num="0" den="2"/>
                     <duration num="1" den="2"/>
                 </hit>
                 <hit>
-                    <start num="15" den="24"/>
-                    <duration num="1" den="16"/>
+                    <start num="16" den="24"/>
+                    <duration num="1" den="24"/>
                 </hit>
                 <hit>
                     <start num="22" den="24"/>
-                    <duration num="1" den="16"/>
+                    <duration num="2" den="24"/>
                 </hit>
             </rhythm>
             <rhythm>
                 <hit>
-                    <start num="13" den="24"/>
-                    <duration num="1" den="16"/>
+                    <start num="14" den="24"/>
+                    <duration num="2" den="24"/>
                 </hit>
                 <hit>
-                    <start num="16" den="24"/>
-                    <duration num="1" den="16"/>
+                    <start num="17" den="24"/>
+                    <duration num="1" den="24"/>
                 </hit>
             </rhythm>
             <rhythm>
                 <hit>
                     <start num="12" den="24"/>
-                    <duration num="1" den="16"/>
+                    <duration num="2" den="24"/>
                 </hit>
                 <hit>
                     <start num="18" den="24"/>
-                    <duration num="3" den="16"/>
+                    <duration num="4" den="24"/>
                 </hit>
             </rhythm>
         </texture>
         <texture id="Melody 2">
             <rhythm>
                 <hit>
-                    <start num="24" den="24"/>
+                    <start num="4" den="4"/>
                     <duration num="1" den="4"/>
                 </hit>
             </rhythm>
@@ -89,58 +89,58 @@
             <rhythm>
                 <hit>
                     <start num="22" den="24"/>
-                    <duration num="1" den="16"/>
+                    <duration num="2" den="24"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="17" den="24"/>
+                    <duration num="1" den="24"/>
                 </hit>
             </rhythm>
             <rhythm>
                 <hit>
                     <start num="16" den="24"/>
-                    <duration num="1" den="16"/>
-                </hit>
-            </rhythm>
-            <rhythm>
-                <hit>
-                    <start num="15" den="24"/>
-                    <duration num="1" den="16"/>
+                    <duration num="1" den="24"/>
                 </hit>
                 <hit>
                     <start num="18" den="24"/>
-                    <duration num="3" den="16"/>
+                    <duration num="4" den="24"/>
                 </hit>
             </rhythm>
             <rhythm>
                 <hit>
-                    <start num="13" den="24"/>
-                    <duration num="1" den="16"/>
+                    <start num="14" den="24"/>
+                    <duration num="2" den="24"/>
                 </hit>
             </rhythm>
             <rhythm>
                 <hit>
                     <start num="12" den="24"/>
-                    <duration num="1" den="16"/>
+                    <duration num="2" den="24"/>
                 </hit>
             </rhythm>
             <rhythm>
                 <hit>
-                    <start num="0" den="24"/>
+                    <start num="0" den="8"/>
                     <duration num="3" den="8"/>
                 </hit>
                 <hit>
-                    <start num="10" den="24"/>
-                    <duration num="1" den="16"/>
+                    <start num="11" den="24"/>
+                    <duration num="1" den="24"/>
                 </hit>
             </rhythm>
             <rhythm>
                 <hit>
-                    <start num="9" den="24"/>
-                    <duration num="1" den="16"/>
+                    <start num="10" den="24"/>
+                    <duration num="1" den="24"/>
                 </hit>
             </rhythm>
         </texture>
         <texture id="Melody 3">
             <rhythm>
                 <hit>
-                    <start num="6" den="24"/>
+                    <start num="2" den="8"/>
                     <duration num="1" den="8"/>
                 </hit>
             </rhythm>
@@ -148,42 +148,42 @@
             <rhythm>
                 <hit>
                     <start num="4" den="24"/>
-                    <duration num="1" den="16"/>
+                    <duration num="2" den="24"/>
                 </hit>
                 <hit>
-                    <start num="9" den="24"/>
+                    <start num="3" den="8"/>
                     <duration num="1" den="8"/>
                 </hit>
             </rhythm>
             <rhythm>
                 <hit>
-                    <start num="12" den="24"/>
+                    <start num="4" den="8"/>
                     <duration num="1" den="8"/>
                 </hit>
                 <hit>
                     <start num="22" den="24"/>
-                    <duration num="1" den="16"/>
+                    <duration num="2" den="24"/>
                 </hit>
             </rhythm>
             <rhythm>
                 <hit>
                     <start num="0" den="24"/>
-                    <duration num="3" den="16"/>
+                    <duration num="4" den="24"/>
                 </hit>
                 <hit>
-                    <start num="15" den="24"/>
+                    <start num="5" den="8"/>
                     <duration num="1" den="8"/>
                 </hit>
             </rhythm>
             <rhythm>
                 <hit>
                     <start num="18" den="24"/>
-                    <duration num="3" den="16"/>
+                    <duration num="4" den="24"/>
                 </hit>
             </rhythm>
             <rhythm>
                 <hit>
-                    <start num="24" den="24"/>
+                    <start num="4" den="4"/>
                     <duration num="1" den="4"/>
                 </hit>
             </rhythm>
@@ -191,24 +191,32 @@
         <texture id="Apoyatura-Bordadura">
             <rhythm>
                 <hit>
-                    <start num="3" den="24"/>
-                    <duration num="1" den="16"/>
+                    <start num="4" den="24"/>
+                    <duration num="1" den="24"/>
                 </hit>
             </rhythm>
             <rhythm>
                 <hit>
                     <start num="1" den="24"/>
-                    <duration num="1" den="16"/>
+                    <duration num="1" den="24"/>
                 </hit>
                 <hit>
-                    <start num="4" den="24"/>
-                    <duration num="1" den="16"/>
+                    <start num="3" den="24"/>
+                    <duration num="1" den="24"/>
+                </hit>
+                <hit>
+                    <start num="5" den="24"/>
+                    <duration num="1" den="24"/>
                 </hit>
             </rhythm>
             <rhythm>
                 <hit>
                     <start num="0" den="24"/>
-                    <duration num="1" den="16"/>
+                    <duration num="1" den="24"/>
+                </hit>
+                <hit>
+                    <start num="2" den="24"/>
+                    <duration num="1" den="24"/>
                 </hit>
             </rhythm>
         </texture>
@@ -222,24 +230,24 @@
             <rhythm>
                 <hit>
                     <start num="0" den="24"/>
-                    <duration num="3" den="16"/>
+                    <duration num="4" den="24"/>
                 </hit>
                 <hit>
-                    <start num="7" den="32"/>
-                    <duration num="1" den="32"/>
+                    <start num="5" den="24"/>
+                    <duration num="1" den="24"/>
                 </hit>
             </rhythm>
             <rhythm>
                 <hit>
                     <start num="4" den="24"/>
-                    <duration num="1" den="32"/>
+                    <duration num="1" den="24"/>
                 </hit>
             </rhythm>
         </texture>
         <texture id="Bass contrapunctum">
             <rhythm>
                 <hit>
-                    <start num="0" den="4"/>
+                    <start num="0" den="2"/>
                     <duration num="1" den="2"/>
                 </hit>
             </rhythm>
@@ -256,14 +264,14 @@
             <rhythm>
                 <hit>
                     <start num="1" den="4"/>
-                    <duration num="1" den="2"/>
+                    <duration num="2" den="4"/>
                 </hit>
             </rhythm>
         </texture>
         <texture id="Retardo cadencia">
             <rhythm>
                 <hit>
-                    <start num="0" den="4"/>
+                    <start num="0" den="2"/>
                     <duration num="1" den="2"/>
                 </hit>
             </rhythm>
