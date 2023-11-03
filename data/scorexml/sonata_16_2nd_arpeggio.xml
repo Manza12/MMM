@@ -45,7 +45,7 @@
             <rhythm/>
             <rhythm>
                 <hit>
-                    <start num="0" den="1"/>
+                    <start num="0" den="2"/>
                     <duration num="1" den="2"/>
                 </hit>
                 <hit>
@@ -81,7 +81,7 @@
         <texture id="Melody 2">
             <rhythm>
                 <hit>
-                    <start num="16" den="16"/>
+                    <start num="4" den="4"/>
                     <duration num="1" den="4"/>
                 </hit>
             </rhythm>
@@ -122,7 +122,7 @@
             </rhythm>
             <rhythm>
                 <hit>
-                    <start num="0" den="16"/>
+                    <start num="0" den="8"/>
                     <duration num="3" den="8"/>
                 </hit>
                 <hit>
@@ -140,7 +140,7 @@
         <texture id="Melody 3">
             <rhythm>
                 <hit>
-                    <start num="4" den="16"/>
+                    <start num="2" den="8"/>
                     <duration num="1" den="8"/>
                 </hit>
             </rhythm>
@@ -151,13 +151,13 @@
                     <duration num="1" den="16"/>
                 </hit>
                 <hit>
-                    <start num="6" den="16"/>
+                    <start num="3" den="8"/>
                     <duration num="1" den="8"/>
                 </hit>
             </rhythm>
             <rhythm>
                 <hit>
-                    <start num="8" den="16"/>
+                    <start num="4" den="8"/>
                     <duration num="1" den="8"/>
                 </hit>
                 <hit>
@@ -171,7 +171,7 @@
                     <duration num="3" den="16"/>
                 </hit>
                 <hit>
-                    <start num="10" den="16"/>
+                    <start num="5" den="8"/>
                     <duration num="1" den="8"/>
                 </hit>
             </rhythm>
@@ -183,7 +183,7 @@
             </rhythm>
             <rhythm>
                 <hit>
-                    <start num="16" den="16"/>
+                    <start num="4" den="4"/>
                     <duration num="1" den="4"/>
                 </hit>
             </rhythm>
@@ -231,7 +231,7 @@
             </rhythm>
             <rhythm>
                 <hit>
-                    <start num="3" den="16"/>
+                    <start num="6" den="32"/>
                     <duration num="1" den="32"/>
                 </hit>
             </rhythm>
@@ -239,7 +239,7 @@
         <texture id="Bass contrapunctum">
             <rhythm>
                 <hit>
-                    <start num="0" den="4"/>
+                    <start num="0" den="2"/>
                     <duration num="1" den="2"/>
                 </hit>
             </rhythm>
@@ -256,14 +256,14 @@
             <rhythm>
                 <hit>
                     <start num="1" den="4"/>
-                    <duration num="1" den="2"/>
+                    <duration num="2" den="4"/>
                 </hit>
             </rhythm>
         </texture>
         <texture id="Retardo cadencia">
             <rhythm>
                 <hit>
-                    <start num="0" den="4"/>
+                    <start num="0" den="2"/>
                     <duration num="1" den="2"/>
                 </hit>
             </rhythm>
