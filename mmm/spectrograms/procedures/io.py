@@ -1,9 +1,15 @@
-from .. import *
-
+from mmm.spectrograms import *
 from ..parameters import FS
 
 
-def read_wav(file_path: Path, start: Optional[float] = None, end: Optional[float] = None):
+def take_excerpt(file_path: Path, start: float, end: float):
+    data = read_wav(file_path)
+    n_start = int(start * FS)
+    n_end = int(end * FS)
+    return data[n_start: n_end]
+
+
+def read_wav(file_path: Path):
     warnings.filterwarnings("ignore", category=wav.WavFileWarning)
     fs, data = wav.read(file_path)
 
@@ -11,17 +17,6 @@ def read_wav(file_path: Path, start: Optional[float] = None, end: Optional[float
 
     if issubclass(data.dtype.type, numbers.Integral):
         data = data / np.iinfo(data.dtype).max
-
-    if start is not None and end is not None:
-        start = int(start * FS)
-        end = int(end * FS)
-        data = data[start: end]
-    elif start is not None:
-        start = int(start * FS)
-        data = data[start:]
-    elif end is not None:
-        end = int(end * FS)
-        data = data[:end]
 
     return data
 
@@ -67,7 +62,7 @@ def try_to_read_wav(file_path):
 def load_or_compute(name, folder, load, function, extension='.pickle', verbose=True):
     path = folder / (name + extension)
 
-    if load[name]:
+    if load.get(name, False):
         if extension == '.pickle':
             result = try_to_load_pickle(path, verbose=verbose, name=name)
         elif extension == '.wav':
@@ -77,7 +72,7 @@ def load_or_compute(name, folder, load, function, extension='.pickle', verbose=T
     else:
         result = None
 
-    if not load[name] or result is None:
+    if not load.get(name, False) or result is None:
         result = function()
         save_pickle(path, result)
 
@@ -111,3 +106,8 @@ def write_signals(signals, paths, components):
         output = signals['output']
         output_path = audio_folder / 'output.wav'
         write_wav(output_path, output)
+
+    if components['denoised']:
+        denoised = signals['denoised']
+        denoised_path = audio_folder / 'denoised.wav'
+        write_wav(denoised_path, denoised)

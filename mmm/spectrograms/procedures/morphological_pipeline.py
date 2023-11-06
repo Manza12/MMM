@@ -1,30 +1,32 @@
-from ..processing import *
-from ..procedures.io import load_or_compute
+from mmm.spectrograms.processing import *
+from .io import load_or_compute
 
 
-def apply_morphology_input(spectrograms, arrays_folder, load):
+def apply_morphology_input(spectrograms, arrays_folder, load, parameters):
     spectrogram = spectrograms['input']
 
     print('\nMorphology - Input')
 
+    # Closing
+    spectrogram_closing = load_or_compute('closing', arrays_folder, load,
+                                          lambda: apply_closing(spectrogram, parameters))
+
     # Reconstruction by erosion
     spectrogram_reconstruction_erosion = load_or_compute('reconstruction_erosion', arrays_folder, load,
-                                                         lambda: apply_reconstruction_by_erosion(spectrogram))
+                                                         lambda: apply_reconstruction_by_erosion(spectrogram_closing,
+                                                                                                 spectrogram,
+                                                                                                 parameters))
 
-    # Erosion
-    spectrogram_erosion = load_or_compute('erosion', arrays_folder, load,
-                                          lambda: apply_erosion(spectrogram_reconstruction_erosion))
-
+    spectrograms['closing'] = spectrogram_closing
     spectrograms['reconstruction_erosion'] = spectrogram_reconstruction_erosion
-    spectrograms['erosion'] = spectrogram_erosion
 
 
-def apply_morphology_noise(spectrograms, arrays_folder, load):
+def apply_morphology_noise(spectrograms, arrays_folder, load, parameters):
     print('\nMorphology - Noise')
 
     # Opening for get noise component
     spectrogram_opening = load_or_compute('opening', arrays_folder, load,
-                                          lambda: apply_opening(spectrograms['erosion']))
+                                          lambda: apply_opening(spectrograms['reconstruction_erosion'], parameters))
 
     spectrograms['opening'] = spectrogram_opening
 
@@ -35,7 +37,7 @@ def apply_morphology_sinusoids(spectrograms, arrays_folder, load):
 
     # Vertical Thinning
     spectrogram_vertical_thin = load_or_compute('vertical_thin', arrays_folder, load,
-                                                lambda: apply_vertical_thinning(spectrograms['erosion']))
+                                                lambda: apply_vertical_thinning(spectrograms['reconstruction_erosion']))
 
     # Vertical top-hat
     spectrogram_vertical_top_hat = load_or_compute('vertical_top_hat', arrays_folder, load,
@@ -89,11 +91,11 @@ def apply_morphology_transient(spectrograms, arrays_folder, load):
     spectrograms['vertical_filtered'] = spectrogram_vertical_filtered
 
 
-def apply_morphology(spectrograms, paths, load, components):
+def apply_morphology(spectrograms, paths, load, components, parameters):
     if components['input']:
-        apply_morphology_input(spectrograms, paths['arrays_folder'], load)
+        apply_morphology_input(spectrograms, paths['arrays_folder'], load, parameters)
     if components['noise']:
-        apply_morphology_noise(spectrograms, paths['arrays_folder'], load)
+        apply_morphology_noise(spectrograms, paths['arrays_folder'], load, parameters)
     if components['sinusoids']:
         apply_morphology_sinusoids(spectrograms, paths['arrays_folder'], load)
     if components['transient']:

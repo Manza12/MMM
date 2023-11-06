@@ -1,11 +1,11 @@
 from mmm import *
 from mmm.spectrograms.layers import create_stft_layer, apply_stft_layer, create_cqt_layer, apply_cqt_layer
-from mmm.spectrograms.procedures.io import read_wav, load_or_compute
+from mmm.spectrograms.procedures.io import take_excerpt, load_or_compute
 from mmm.spectrograms.plot import plot_stft, plot_cqt
 
 # Parameters
 phd = True
-name = 'anastasia'
+name = 'sinusoids'
 
 # Paths
 project_folder = Path('..') / Path('..')
@@ -23,7 +23,7 @@ print('Getting input...')
 
 file_path = audio_folder / (name + '.wav')
 
-x = read_wav(file_path, 3., 30.)
+x = take_excerpt(file_path, 3., 5.)
 
 # Load STFT layer
 objects_folder = data_folder / Path('objects')

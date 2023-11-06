@@ -1,6 +1,7 @@
 import mido
 from . import *
-from .music import PianoRoll, TimeShift, FrequencyShift, TimeFrequency, TimePoint, FrequencyPoint, TimeSeconds
+from .music import PianoRoll, TimeShift, FrequencyShift, TimeFrequency, TimePoint, FrequencyPoint, TimeSeconds, \
+    TimeSignature
 
 
 def create_midi(piano_roll: PianoRoll, velocity: int = 64, tempo: int = 60, ticks_per_beat: Optional[int] = None,
@@ -102,7 +103,7 @@ def create_midi(piano_roll: PianoRoll, velocity: int = 64, tempo: int = 60, tick
     return midi_file
 
 
-def read_midi(file_path: Path, keep_velocity: bool = False):
+def read_midi(file_path: Path, keep_velocity: bool = False, time_signature: TimeSignature = TimeSignature(4, 4)):
     midi_file = mido.MidiFile(file_path)
 
     # Time and frequency extension
@@ -172,7 +173,8 @@ def read_midi(file_path: Path, keep_velocity: bool = False):
     tatum = TimeShift(1, 4 * midi_file.ticks_per_beat)
     step = FrequencyShift(1)
     # dynamics = {v: v for v in range(0, 128)} if keep_velocity else None
-    piano_roll = PianoRoll(np.max(array, axis=0), origin=TimeFrequency(TimePoint(0), FrequencyPoint(min_midi_number)),
+    piano_roll = PianoRoll(np.max(array, axis=0), origin=TimeFrequency(TimePoint(0, time_signature=time_signature),
+                                                                       FrequencyPoint(min_midi_number)),
                            tatum=tatum, step=step)
     return piano_roll
 

@@ -1,3 +1,5 @@
+import matplotlib.pyplot as plt
+
 from . import *
 from .parameters import TIME_RESOLUTION, FREQUENCY_PRECISION
 from .tfst import TFST
@@ -97,14 +99,17 @@ def plot_time_frequency(a, t, f, v_min=0, v_max=1, c_map='Greys',
 
 def plot_stft(spectrogram: np.ndarray, v_min: float, v_max: float, title: str = '',
               c_map: str = 'afmhot', fig_size: (float, float) = (6., 4.),
-              full_screen: bool = False, cb: bool = True):
+              full_screen: bool = False, cb: bool = True, ax: Optional[plt.Axes] = None):
     frequency_vector = create_frequency_vector()
     time_vector = create_time_vector(spectrogram.shape[-1])
 
-    fig = plt.figure(figsize=fig_size)
-    fig.canvas.manager.set_window_title(title)
+    if ax is None:
+        fig = plt.figure(figsize=fig_size)
+        fig.canvas.manager.set_window_title(title)
 
-    ax = fig.subplots()
+        ax = fig.subplots()
+    else:
+        fig = ax.get_figure()
 
     if len(spectrogram.shape) == 3:
         spectrogram = spectrogram[0, :, :]

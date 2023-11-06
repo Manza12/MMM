@@ -47,6 +47,40 @@ def reconstruction_erosion(marker: Optional[torch.Tensor], condition: torch.Tens
     return x_recons
 
 
+def reconstruction_erosion_stack(marker: Optional[torch.Tensor], condition: torch.Tensor,
+                                 max_iterations: int, verbose=False, verbose_it_step=10):
+    start = time.time()
+
+    if verbose:
+        print('Starting reconstruction by erosion stack...')
+
+    if marker is None:
+        marker = torch.zeros_like(condition)
+
+    x_stack = np.zeros((max_iterations, *marker.shape), dtype=np.float32)
+    x_stack[0, :, :] = marker.cpu().numpy()
+
+    i = 0
+    while True:
+        x_in = torch.from_numpy(x_stack[i, :, :]).to(DEVICE)
+        x_out = erosion_geodesic(x_in, condition)
+        x_stack[i+1, :, :] = x_out.cpu().numpy()
+
+        i += 1
+
+        if i == max_iterations-1 or np.all(np.equal(x_stack[i+1, :, :], x_stack[i, :, :])):
+            break
+
+        if verbose:
+            if i % verbose_it_step == 0:
+                print("it:", i)
+
+    if verbose:
+        print('Time to apply reconstruction by erosion: %.3f seconds' % (time.time() - start))
+
+    return x_stack
+
+
 def reconstruction_dilation(marker: Optional[torch.Tensor], condition: torch.Tensor, iterations: Optional[int] = None,
                             verbose=False, verbose_it_step=10):
     start = time.time()
