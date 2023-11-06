@@ -1,3 +1,5 @@
 .idea
 *__pycache__*
 data/objects/*
+phd/defence/results/*
+sandbox/spectrogram_reconstruction_stack.pickle
