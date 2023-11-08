@@ -5,8 +5,6 @@ from pathlib import Path
 from mmm.spectrograms.procedures.io import load_pickle
 from mmm.spectrograms.parameters import TIME_RESOLUTION, FREQUENCY_PRECISION
 
-# plt.style.use('dark_background')
-
 
 # Parameters
 name = 'anastasia'
@@ -45,64 +43,56 @@ plt.axis('off')
 plt.subplots_adjust(left=0, right=1, top=1, bottom=0, wspace=0, hspace=0)
 plt.savefig(animations_folder / Path('animation_spectrogram_image.png'))
 
+# Animation
+n_frames = 30
+fps = 30
+video_format = 'mp4'  # 'gif' or 'mp4'
+zoom = 1.2
+
 # Creating 3D figure
 fig = plt.figure(figsize=(6, 6))
 ax = plt.axes(projection='3d')
 ax.invert_yaxis()
 plt.axis('off')
 plt.subplots_adjust(left=0, right=1, top=1, bottom=0, wspace=0, hspace=0)
-
-# Animation
-n_frames = 90
-fps = 30
-video_format = 'mp4'  # 'gif' or 'mp4'
-zoom = 1.2
+ax.set_box_aspect(aspect=None, zoom=zoom)
+ax.set_facecolor((227/255, 232/255, 237/255, 1))
 
 
-def init():
-    ax.plot_surface(x, y, z, cmap='afmhot', edgecolor='none')
+poly = ax.plot_surface(x, y, z, cmap='afmhot', edgecolor='none')
 
-    ax.view_init(elev=90, azim=0)
-    ax.set_box_aspect(aspect=None, zoom=zoom)
-    ax.set_facecolor((227/255, 232/255, 237/255, 1))
-
-    plt.savefig(animations_folder / Path('animation_spectrogram_start.png'))
-    return fig,
+# cb = plt.colorbar()
+# canvas = FigureCanvasTkAgg(figure, root)
 
 
-def animate(frame, verbose=False):
-    if frame < 15:
-        elev = 90
-        azim = 0
-    elif frame < 75:
-        elev = 90 - (frame - 15)
-        azim = frame - 15
+def animate(frame, verbose=True):
+    if frame < 30:
+        poly.set_clims(-100-frame, -frame)
+
+        # # Update plot
+        # canvas.flush_events()
+        # canvas.draw()
     else:
-        elev = 30
-        azim = 60
-    ax.view_init(elev=elev, azim=azim)
+        pass
 
     # Print percentage
-    if frame % 5 == 0:
-        print("Progress: {:.0f}%".format(frame / n_frames * 100))
     if verbose:
-        print(frame, elev, azim)
+        if frame % 5 == 0:
+            print("Progress: {:.0f}%".format(frame / n_frames * 100))
+
     return fig,
 
 
 # Animate
-anim = animation.FuncAnimation(fig, animate, init_func=init,
-                               frames=n_frames, interval=20, blit=True)
+anim = animation.FuncAnimation(fig, animate, frames=n_frames, interval=20, blit=True)
 
 # Save
 if video_format == 'mp4':
     FFwriter = animation.FFMpegWriter(fps=fps)
-    animation_path = animations_folder / Path('animation_spectrogram.mp4')
+    animation_path = animations_folder / Path('animation_spectrogram_up_down.mp4')
     anim.save(str(animation_path), writer=FFwriter)
 elif video_format == 'gif':
-    animation_path = animations_folder / Path('animation_spectrogram.gif')
+    animation_path = animations_folder / Path('animation_spectrogram_up_down.gif')
     anim.save(str(animation_path),  writer='imagemagick', fps=24)
 else:
     raise ValueError('Unknown video format.')
-
-plt.savefig(animations_folder / Path('animation_spectrogram_end.png'))
