@@ -8,7 +8,7 @@ from mmm.spectrograms.parameters import TIME_RESOLUTION, MIN_DB
 
 # Parameters
 name = 'anastasia'
-fps = 24
+fps = 60
 duration = 12.  # seconds
 video_format = 'mp4'  # 'gif' or 'mp4'
 
@@ -25,7 +25,7 @@ spectrogram = np.load(str(spectrogram_path))
 current_spectrogram = np.zeros_like(spectrogram) + MIN_DB
 current_spectrogram = current_spectrogram[0]
 
-figure, ax = plt.subplots(figsize=(8., 4.))
+figure, ax = plt.subplots(figsize=(8., 4.5), dpi=600)
 
 cqt_layer = create_cqt_layer()
 
