@@ -23,7 +23,7 @@ print('Getting input...')
 
 file_path = audio_folder / (name + '.wav')
 
-x = take_excerpt(file_path, 2., 14.)
+x = take_excerpt(file_path, 2.5, 2.5 + 11.88)
 
 # Load STFT layer
 objects_folder = data_folder / Path('objects')
@@ -35,7 +35,15 @@ spectrogram_cqt_numpy = spectrogram_cqt.cpu().numpy()
 np.save(str(output_folder / (name + '_spectrogram_cqt.npy')), spectrogram_cqt_numpy)
 
 # Plot STFT
-plot_cqt(spectrogram_cqt_numpy, cqt_layer, -120, 0, fig_size=(8., 4.))
+tight = True
+
+plot_cqt(spectrogram_cqt_numpy, cqt_layer, -120, 0, fig_size=(8., 4.), colorbar=not tight)
+
+if tight:
+    plt.axis('off')
+    plt.tight_layout()
+    plt.subplots_adjust(left=0, right=1, top=1, bottom=0, wspace=0, hspace=0)
+
 plt.savefig(output_folder / (name + '_spectrogram_cqt.jpeg'))
 
 plt.show()

@@ -140,7 +140,7 @@ def plot_stft(spectrogram: np.ndarray, v_min: float, v_max: float, title: str = 
 
 
 def plot_cqt(spectrogram: np.ndarray, cqt_layer: cqt.CQT, v_min: float, v_max: float, title: str = '',
-             c_map: str = 'afmhot', fig_size: (float, float) = (6., 4.), ax=None):
+             c_map: str = 'afmhot', fig_size: (float, float) = (6., 4.), ax=None, colorbar=True):
     if ax is None:
         fig = plt.figure(figsize=fig_size)
         ax = fig.subplots()
@@ -164,7 +164,8 @@ def plot_cqt(spectrogram: np.ndarray, cqt_layer: cqt.CQT, v_min: float, v_max: f
     ax.set_ylabel('Frequency (Hz)')
 
     # Colorbar
-    fig.colorbar(im, ax=ax, format="%2.0f dB")
+    if colorbar:
+        fig.colorbar(im, ax=ax, format="%2.0f dB")
 
     plt.tight_layout()
 

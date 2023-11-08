@@ -8,7 +8,7 @@ from mmm.spectrograms.parameters import TIME_RESOLUTION, MIN_DB
 
 # Parameters
 name = 'anastasia'
-fps = 60
+fps = 24
 duration = 12.  # seconds
 video_format = 'mp4'  # 'gif' or 'mp4'
 
@@ -28,7 +28,12 @@ current_spectrogram = current_spectrogram[0]
 figure, ax = plt.subplots(figsize=(8., 4.))
 
 cqt_layer = create_cqt_layer()
-plot_cqt(spectrogram, cqt_layer, MIN_DB, 0, ax=ax)
+
+plot_cqt(spectrogram, cqt_layer, MIN_DB, 0, ax=ax, colorbar=False)
+
+plt.axis('off')
+plt.tight_layout()
+plt.subplots_adjust(left=0, right=1, top=1, bottom=0, wspace=0, hspace=0)
 
 # Since plotting a single graph
 im = ax.get_images()[0]
@@ -53,6 +58,7 @@ if video_format == 'gif':
     animation.save(str(animation_path),  writer='imagemagick', fps=fps)
 elif video_format == 'mp4':
     FFwriter = FFMpegWriter(fps=fps)
-    animation.save('animation.mp4', writer=FFwriter)
+    animation_path = animations_folder / Path('animation_spectrogram.mp4')
+    animation.save(str(animation_path), writer=FFwriter)
 else:
     raise ValueError('Unknown video format: ' + video_format)
