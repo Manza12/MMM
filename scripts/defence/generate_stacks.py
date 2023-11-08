@@ -3,7 +3,7 @@ import time
 
 from mmm import *
 from mmm.spectrograms.layers import create_stft_layer, apply_stft_layer
-from mmm.spectrograms.morphology import reconstruction_erosion_stack
+from mmm.spectrograms.morphology import reconstruction_erosion_stack, greyscale_thinning_stack
 from mmm.spectrograms.parameters import TIME_RESOLUTION, FREQUENCY_PRECISION, WINDOW
 
 from mmm.spectrograms.procedures.io import load_or_compute, write_signals, take_excerpt, save_pickle
@@ -19,6 +19,12 @@ name = 'anastasia'
 settings = getattr(run_settings, name)
 load_any = True
 log = False
+
+generate = {
+    'reconstruction_erosion': False,
+    'vertical_thinning': True,
+    'horizontal_thinning': True,
+}
 
 components = {
     'input': True,
@@ -136,18 +142,30 @@ if operations['processing']:
     apply_morphology(spectrograms, paths, load, components, parameters)
 
 # Retrieve spectrogram stack
-spectrogram_closing = spectrograms['closing']
-# load_or_compute('reconstruction_stack', arrays_folder, load,
-#                 lambda: reconstruction_erosion_stack(spectrogram_closing, spectrogram,
-#                                                      max_iterations=500, verbose=True))
-spectrogram_stack = reconstruction_erosion_stack(spectrogram_closing, spectrogram,
-                                                 max_iterations=100, verbose=True)
-file_path = arrays_folder / ('spectrogram_reconstruction_stack' + '.pickle')
-save_pickle(file_path, spectrogram_stack)
+# Reconstruction erosion
+if generate['reconstruction_erosion']:
+    spectrogram_closing = spectrograms['closing']
+    spectrogram_stack_reconstruction = reconstruction_erosion_stack(spectrogram_closing, spectrogram,
+                                                                    max_iterations=100, verbose=True)
+    file_path = arrays_folder / ('spectrogram_reconstruction_stack' + '.pickle')
+    save_pickle(file_path, spectrogram_stack_reconstruction)
 
+# Thinning
+spectrogram_reconstruction = spectrograms['reconstruction_erosion']
 
-# Animation
+# Vertical thinning
+if generate['vertical_thinning']:
+    spectrogram_stack_thinning = greyscale_thinning_stack(spectrogram_reconstruction, direction='v',
+                                                          max_iterations=100, verbose=True)
+    file_path = arrays_folder / ('spectrogram_vertical_thinning_stack' + '.pickle')
+    save_pickle(file_path, spectrogram_stack_thinning)
 
+# Horizontal thinning
+if generate['horizontal_thinning']:
+    spectrogram_stack_thinning = greyscale_thinning_stack(spectrogram_reconstruction, direction='h',
+                                                          max_iterations=100, verbose=True)
+    file_path = arrays_folder / ('spectrogram_horizontal_thinning_stack' + '.pickle')
+    save_pickle(file_path, spectrogram_stack_thinning)
 
 # Synthesis
 signals = {'input': x}

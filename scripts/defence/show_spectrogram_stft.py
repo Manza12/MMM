@@ -15,7 +15,7 @@ data_folder = project_folder / Path('data')
 audio_folder = data_folder / Path('audio')
 midi_folder = data_folder / Path('midi')
 
-output_folder = project_folder / Path('phd') / Path('introduction')
+output_folder = project_folder / Path('phd') / Path('defence')
 output_folder.mkdir(parents=True, exist_ok=True)
 
 # Read wav file
@@ -38,6 +38,7 @@ spectrogram_stft = apply_stft_layer(x, stft_layer)
 spectrogram_stft_numpy = spectrogram_stft.cpu().numpy()
 
 # Plot STFT
-plot_stft(spectrogram_stft_numpy, -120, 0, fig_size=(6., 4.))
+plot_stft(spectrogram_stft_numpy, -120, 0, fig_size=(6., 4.), c_map='Greys')
+plt.savefig(output_folder / (name + '_grey_' + '_stft.jpeg'), transparent=True)
 
 plt.show()
