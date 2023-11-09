@@ -41,24 +41,16 @@
                 </hit>
             </rhythm>
         </texture>
-        <texture id="Melody 1">
+        <texture id="Melody 1 a">
             <rhythm>
                 <hit>
                     <start num="0" den="16"/>
                     <duration num="1" den="8"/>
                 </hit>
-                <hit>
-                    <start num="15" den="16"/>
-                    <duration num="1" den="16"/>
-                </hit>
             </rhythm>
             <rhythm>
                 <hit>
                     <start num="2" den="16"/>
-                    <duration num="1" den="16"/>
-                </hit>
-                <hit>
-                    <start num="14" den="16"/>
                     <duration num="1" den="16"/>
                 </hit>
             </rhythm>
@@ -67,18 +59,10 @@
                     <start num="3" den="16"/>
                     <duration num="1" den="16"/>
                 </hit>
-                <hit>
-                    <start num="13" den="16"/>
-                    <duration num="1" den="16"/>
-                </hit>
             </rhythm>
             <rhythm>
                 <hit>
                     <start num="4" den="16"/>
-                    <duration num="1" den="16"/>
-                </hit>
-                <hit>
-                    <start num="12" den="16"/>
                     <duration num="1" den="16"/>
                 </hit>
             </rhythm>
@@ -87,18 +71,10 @@
                     <start num="5" den="16"/>
                     <duration num="1" den="16"/>
                 </hit>
-                <hit>
-                    <start num="11" den="16"/>
-                    <duration num="1" den="16"/>
-                </hit>
             </rhythm>
             <rhythm>
                 <hit>
                     <start num="6" den="16"/>
-                    <duration num="1" den="16"/>
-                </hit>
-                <hit>
-                    <start num="10" den="16"/>
                     <duration num="1" den="16"/>
                 </hit>
             </rhythm>
@@ -107,6 +83,46 @@
                     <start num="7" den="16"/>
                     <duration num="1" den="16"/>
                 </hit>
+            </rhythm>
+        </texture>
+        <texture id="Melody 1 b">
+            <rhythm>
+                <hit>
+                    <start num="15" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="14" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="13" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="12" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="11" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="10" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
                 <hit>
                     <start num="9" den="16"/>
                     <duration num="1" den="16"/>
@@ -713,10 +729,25 @@
                     </activations>
                     <chord-texture>
                         <texture>
-                            <id>Melody 1</id>
+                            <id>Melody 1 a</id>
                         </texture>
                         <chord>
                             <degree>MinH</degree>
+                            <factor value="6"/>
+                            <factor value="7"/>
+                            <factor value="1" octave="1"/>
+                            <factor value="2" octave="1"/>
+                            <factor value="3" octave="1"/>
+                            <factor value="4" octave="1"/>
+                            <factor value="5" octave="1"/>
+                        </chord>
+                    </chord-texture>
+                    <chord-texture>
+                        <texture>
+                            <id>Melody 1 b</id>
+                        </texture>
+                        <chord>
+                            <degree>MinN</degree>
                             <factor value="6"/>
                             <factor value="7"/>
                             <factor value="1" octave="1"/>
@@ -753,10 +784,25 @@
                     </activations>
                     <chord-texture>
                         <texture>
-                            <id>Melody 1</id>
+                            <id>Melody 1 a</id>
                         </texture>
                         <chord>
-                            <degree>MinH</degree>
+                            <degree>MinM</degree>
+                            <factor value="5"/>
+                            <factor value="6"/>
+                            <factor value="7"/>
+                            <factor value="1" octave="1"/>
+                            <factor value="2" octave="1"/>
+                            <factor value="3" octave="1"/>
+                            <factor value="4" octave="1"/>
+                        </chord>
+                    </chord-texture>
+                    <chord-texture>
+                        <texture>
+                            <id>Melody 1 b</id>
+                        </texture>
+                        <chord>
+                            <degree>MinN</degree>
                             <factor value="5"/>
                             <factor value="6"/>
                             <factor value="7"/>
@@ -794,10 +840,25 @@
                     </activations>
                     <chord-texture>
                         <texture>
-                            <id>Melody 1</id>
+                            <id>Melody 1 a</id>
                         </texture>
                         <chord>
-                            <degree>MinH</degree>
+                            <degree>MinM</degree>
+                            <factor value="4"/>
+                            <factor value="5"/>
+                            <factor value="6"/>
+                            <factor value="7"/>
+                            <factor value="1" octave="1"/>
+                            <factor value="2" octave="1"/>
+                            <factor value="3" octave="1"/>
+                        </chord>
+                    </chord-texture>
+                    <chord-texture>
+                        <texture>
+                            <id>Melody 1 b</id>
+                        </texture>
+                        <chord>
+                            <degree>MinN</degree>
                             <factor value="4"/>
                             <factor value="5"/>
                             <factor value="6"/>
@@ -835,10 +896,25 @@
                     </activations>
                     <chord-texture>
                         <texture>
-                            <id>Melody 1</id>
+                            <id>Melody 1 a</id>
                         </texture>
                         <chord>
-                            <degree>MinH</degree>
+                            <degree>MinM</degree>
+                            <factor value="3"/>
+                            <factor value="4"/>
+                            <factor value="5"/>
+                            <factor value="6"/>
+                            <factor value="7"/>
+                            <factor value="1" octave="1"/>
+                            <factor value="2" octave="1"/>
+                        </chord>
+                    </chord-texture>
+                    <chord-texture>
+                        <texture>
+                            <id>Melody 1 b</id>
+                        </texture>
+                        <chord>
+                            <degree>MinN</degree>
                             <factor value="3"/>
                             <factor value="4"/>
                             <factor value="5"/>
@@ -892,8 +968,8 @@
                             <factor value="2"/>
                             <factor value="3"/>
                             <factor value="4"/>
-                            <factor value="5"/>
-                            <factor value="6"/>
+                            <factor value="5+"/>
+                            <factor value="6+"/>
                             <factor value="7+" octave="1"/>
                             <factor value="1" octave="1"/>
                             <factor value="2" octave="1"/>
