@@ -5,7 +5,7 @@ from time import time
 
 
 # Path
-name = 'anastasia'
+name = 'sonata_16_minor'
 root_folder = Path('..') / Path('..')
 data_folder = root_folder / Path('data')
 output_folder = root_folder / Path('phd') / Path('defence')
@@ -27,7 +27,7 @@ piano_roll.change_tatum(TimeShift(1, 16), inplace=True)
 
 # Create MIDI
 start = time()
-score_midi = create_midi(piano_roll, tempo=60, instrument=11)  # 49: 'String Ensemble 1'
+score_midi = create_midi(piano_roll, tempo=120, instrument=1, time_end=1)  # 49: 'String Ensemble 1'
 score_midi.save(output_folder / (name + '.mid'))
 print("Time to create and save MIDI: %.3f s" % (time() - start))
 
