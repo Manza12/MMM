@@ -203,7 +203,7 @@ def plot_piano_roll(piano_roll: PianoRoll,
 
     if x_tick_step is not None:
         if x_tick_start is None:
-            x_tick_start = TimePoint(0, 1)
+            x_tick_start = TimePoint(0, 1, time_signature=piano_roll.time_signature)
         # For Activations with zero tatum
         if x_tick_step / piano_roll.tatum == 0:
             ticks = np.array([0.])
