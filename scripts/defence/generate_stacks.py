@@ -2,7 +2,7 @@ import time
 
 from mmm import *
 from mmm.spectrograms.morphology import reconstruction_erosion_stack, greyscale_thinning_stack, \
-    reconstruction_dilation, greyscale_trimming_stack
+    greyscale_trimming_stack, greyscale_trimming, reconstruction_dilation_stack
 from mmm.spectrograms.parameters import TIME_RESOLUTION, FREQUENCY_PRECISION, MIN_LENGTH_SINUSOIDS
 
 from mmm.spectrograms.procedures.io import save_pickle, load_or_compute
@@ -16,8 +16,8 @@ generate = {
     'reconstruction_erosion': False,
     'vertical_thinning': False,
     'horizontal_thinning': False,
-    'horizontal_trimming': True,
-    'reconstruction_dilation': False,
+    'horizontal_trimming': False,
+    'reconstruction_dilation': True,
 }
 
 components = {
@@ -135,8 +135,13 @@ if generate['horizontal_trimming']:
 
 # Reconstruction by dilation
 if generate['reconstruction_dilation']:
-    spectrogram_trimming = spectrograms['trimming']
-    spectrogram_reconstruction = reconstruction_dilation(spectrogram_trimming, spectrogram)
+    min_length_bins = int(MIN_LENGTH_SINUSOIDS / TIME_RESOLUTION)
+    iterations = min_length_bins // 2
+
+    spectrogram_vertical_threshold = spectrograms['vertical_threshold']
+    spectrogram_trimming = greyscale_trimming(spectrogram_vertical_threshold, iterations, 'h')
+    spectrogram_reconstruction = reconstruction_dilation_stack(spectrogram_trimming, spectrogram_vertical_threshold,
+                                                               iterations)
 
     file_path = arrays_folder / ('spectrogram_reconstruction_dilation_stack' + '.pickle')
     save_pickle(file_path, spectrogram_reconstruction)

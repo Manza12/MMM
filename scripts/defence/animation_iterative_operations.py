@@ -3,16 +3,17 @@ from matplotlib.animation import FuncAnimation, FFMpegWriter
 import numpy as np
 from pathlib import Path
 from mmm.spectrograms.plot import plot_stft
-from mmm.spectrograms.parameters import TIME_RESOLUTION, FREQUENCY_PRECISION
+from mmm.spectrograms.parameters import TIME_RESOLUTION, FREQUENCY_PRECISION, MIN_DB
 
 # Parameters
 name = 'anastasia_excerpt'
 video_format = 'mp4'
 fps = 3
 n_frames = 40
+save_frames = True
 
-input_name = 'spectrogram_horizontal_trimming_stack.pickle'
-output_name = name + '_animation' + '_horizontal_trimming'
+input_name = 'spectrogram_reconstruction_dilation_stack.pickle'
+output_name = name + '_animation' + '_reconstruction_dilation'
 
 t_start = 0.
 t_end = 3.
@@ -35,7 +36,7 @@ n_frames = min(n_frames, stack.shape[0])
 # Plot
 figure, ax = plt.subplots(figsize=(10, 4))
 
-plot_stft(stack[0, :, :], v_min=-120, v_max=0, ax=ax)
+plot_stft(stack[0, :, :], v_min=MIN_DB, v_max=0, ax=ax)
 
 # Since plotting a single graph
 im = ax.get_images()[0]
@@ -47,6 +48,9 @@ ax.set_ylim(f_start // FREQUENCY_PRECISION, f_end // FREQUENCY_PRECISION)
 
 def animation_function(frame):
     im.set_data(stack[frame, :, :])
+    if save_frames:
+        output_frame_path = animations_folder / Path(output_name + '_%d' % frame + '.svg')
+        plt.savefig(str(output_frame_path))
     return im,
 
 
