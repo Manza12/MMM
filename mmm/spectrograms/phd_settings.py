@@ -107,23 +107,47 @@ anastasia_excerpt = {
     'end': None,
     'parameters': {},
     'plot': {
-        'input': {
-            'name': 'input',
-            'x_lim': (0., 3.),
-            'y_lim': (0, 2000),
-            'fig_size': (10., 4.),
-            'extension': 'svg',
-        },
-        'closing': {
-            'name': 'closing',
+        # 'input': {
+        #     'name': 'input',
+        #     'x_lim': (0., 3.),
+        #     'y_lim': (0, 2000),
+        #     'fig_size': (10., 4.),
+        #     'extension': 'svg',
+        # },
+        # 'closing': {
+        #     'name': 'closing',
+        #     'x_lim': (0., 3.),
+        #     'y_lim': (0, 2000),
+        #     'fig_size': (10., 4.),
+        #     'single': True,
+        #     'extension': 'svg',
+        # },
+        # 'reconstruction_erosion': {
+        #     'name': 'reconstruction_erosion',
+        #     'x_lim': (0., 3.),
+        #     'y_lim': (0, 2000),
+        #     'fig_size': (10., 4.),
+        #     'single': True,
+        #     'extension': 'svg',
+        # },
+        'vertical_thinning': {
+            'name': 'vertical_thinning',
             'x_lim': (0., 3.),
             'y_lim': (0, 2000),
             'fig_size': (10., 4.),
             'single': True,
             'extension': 'svg',
         },
-        'reconstruction_erosion': {
-            'name': 'reconstruction_erosion',
+        'vertical_top_hat': {
+            'name': 'vertical_top_hat',
+            'x_lim': (0., 3.),
+            'y_lim': (0, 2000),
+            'fig_size': (10., 4.),
+            'single': True,
+            'extension': 'svg',
+        },
+        'vertical_threshold': {
+            'name': 'vertical_threshold',
             'x_lim': (0., 3.),
             'y_lim': (0, 2000),
             'fig_size': (10., 4.),

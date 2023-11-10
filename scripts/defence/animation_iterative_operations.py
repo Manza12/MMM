@@ -11,7 +11,8 @@ video_format = 'mp4'
 fps = 10
 n_frames = 40
 
-output_name = name + '_animation_' + '_reconstruction_erosion'
+input_name = 'spectrogram_vertical_thinning_stack.pickle'
+output_name = name + '_animation_' + '_vertical_thinning'
 
 t_start = 0.
 t_end = 3.
@@ -27,7 +28,7 @@ arrays_folder = output_folder / Path('arrays')
 animations_folder = defence_folder / Path('animations')
 
 # Load
-load_path = arrays_folder / Path('spectrogram_reconstruction_stack.pickle')
+load_path = arrays_folder / Path(input_name)
 stack = np.load(str(load_path), allow_pickle=True)
 n_frames = min(n_frames, stack.shape[0])
 

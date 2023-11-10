@@ -3,7 +3,12 @@ from mmm.spectrograms.plot import plot_stft, plot_lines, plot_two_spectrogram
 from mmm.spectrograms.parameters import MIN_DB
 
 
-def plot_single(spectrogram, name, title, images_folder, v_min=MIN_DB, v_max=0, c_map='afmhot', paper=None):
+def plot_single(spectrogram, name, title, images_folder, v_min: Optional[float] = MIN_DB, v_max: Optional[float] = 0,
+                c_map='afmhot', paper=None):
+    if v_min is None:
+        v_min = spectrogram.min()
+    if v_max is None:
+        v_max = spectrogram.max()
     fig = plot_stft(spectrogram.cpu().numpy(), v_min=v_min, v_max=v_max, c_map=c_map, title=title,
                     fig_size=paper.get('fig_size', (6., 4.)) if paper is not None else (6., 4.))
 
@@ -200,23 +205,39 @@ def plot_noise(spectrograms, images_folder, settings):
 def plot_sinusoids(lines, spectrograms, images_folder, settings):
     # Vertical thinning spectrogram
     if settings.get('vertical_thin', None) is not None:
-        plot_compare(spectrograms['reconstruction_erosion'], spectrograms['vertical_thin'],
-                     'vertical_thin', 'Vertical thinning', images_folder,
-                     paper=settings['vertical_thin'])
+        if settings['vertical_thin'].get('single', False):
+            plot_single(spectrograms['vertical_thin'],
+                        'vertical_thin', 'Vertical thinning', images_folder,
+                        paper=settings['vertical_thin'])
+        else:
+            plot_compare(spectrograms['reconstruction_erosion'], spectrograms['vertical_thin'],
+                         'vertical_thin', 'Vertical thinning', images_folder,
+                         paper=settings['vertical_thin'])
 
     # Vertical top-hat spectrogram
     if settings.get('vertical_top_hat', None) is not None:
-        plot_compare(spectrograms['vertical_thin'], spectrograms['vertical_top_hat'],
-                     'vertical_top_hat', 'Vertical top-hat', images_folder,
-                     v_min_2=0, v_max_2=None, c_map_2='Greys',
-                     paper=settings['vertical_top_hat'])
+        if settings['vertical_top_hat'].get('single', False):
+            plot_single(spectrograms['vertical_top_hat'],
+                        'vertical_top_hat', 'Vertical top-hat', images_folder,
+                        v_min=0, v_max=None, c_map='Greys',
+                        paper=settings['vertical_top_hat'])
+        else:
+            plot_compare(spectrograms['vertical_thin'], spectrograms['vertical_top_hat'],
+                         'vertical_top_hat', 'Vertical top-hat', images_folder,
+                         v_min_2=0, v_max_2=None, c_map_2='Greys',
+                         paper=settings['vertical_top_hat'])
 
     # Vertical threshold spectrogram
     if settings.get('vertical_threshold', None) is not None:
-        plot_compare(spectrograms['vertical_top_hat'], spectrograms['vertical_threshold'],
-                     'vertical_threshold', 'Vertical threshold', images_folder,
-                     v_min_1=0, v_max_1=None, c_map_1='Greys',
-                     paper=settings['vertical_threshold'])
+        if settings['vertical_threshold'].get('single', False):
+            plot_single(spectrograms['vertical_threshold'],
+                        'vertical_threshold', 'Vertical threshold', images_folder,
+                        paper=settings['vertical_threshold'])
+        else:
+            plot_compare(spectrograms['vertical_top_hat'], spectrograms['vertical_threshold'],
+                         'vertical_threshold', 'Vertical threshold', images_folder,
+                         v_min_1=0, v_max_1=None, c_map_1='Greys',
+                         paper=settings['vertical_threshold'])
 
     # Horizontal filtered
     if settings.get('horizontal_filtered', None) is not None:
