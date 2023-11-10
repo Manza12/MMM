@@ -1,6 +1,6 @@
 from mmm import *
 from mmm.spectrograms.layers import create_cqt_layer, apply_cqt_layer
-from mmm.spectrograms.procedures.io import read_wav, load_or_compute
+from mmm.spectrograms.procedures.io import read_wav, load_or_compute, take_excerpt
 from mmm.spectrograms.plot import plot_cqt
 from mmm.pianorolls.music import TimeShift
 from mmm.pianorolls.plot import plot_piano_roll
@@ -26,7 +26,7 @@ print('Getting input...')
 
 file_path = audio_folder / (name + '.wav')
 
-x = read_wav(file_path, 3., 33.)
+x = take_excerpt(file_path, 3., 20.)
 
 # Load STFT layer
 objects_folder = data_folder / Path('objects')

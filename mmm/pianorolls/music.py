@@ -725,7 +725,7 @@ class PianoRoll:
         self.step: FrequencyShift = kwargs.get('step', FrequencyShift(0))
 
         self.dynamics: Optional[Dict[Any, int]] = kwargs.get('dynamics', None)
-        self.time_signature: TimeSignature = TimeSignature(4, 4)
+        self._time_signature: Optional[TimeSignature] = kwargs.get('time_signature', None)
         if 'time_signature' in kwargs:
             self.time_signature = TimeSignature(kwargs['time_signature'])
 
@@ -902,6 +902,17 @@ class PianoRoll:
     @property
     def frequency_vector(self):
         return FrequencyVector(self.origin.frequency, self.step)
+
+    @property
+    def time_signature(self):
+        if self._time_signature is None:
+            self._time_signature = TimeSignature(4, 4)
+        return self._time_signature
+
+    @time_signature.setter
+    def time_signature(self, time_signature: TimeSignature):
+        self._time_signature = time_signature
+        self.origin.time.time_signature = time_signature
 
     def measure(self, c: dict):
         assert isinstance(c, dict) and len(c) == 2, 'c must be a dict of 2 integers.'
