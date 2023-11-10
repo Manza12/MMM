@@ -148,11 +148,11 @@ def plot_input(spectrograms, images_folder, settings):
         if settings['reconstruction_erosion'].get('single', False):
             plot_single(spectrograms['reconstruction_erosion'],
                         'reconstruction_erosion', 'Reconstruction by erosion',
-                        images_folder, paper=settings['closing'])
+                        images_folder, paper=settings['reconstruction_erosion'])
         else:
             plot_compare(spectrograms['input'], spectrograms['reconstruction_erosion'],
                          'reconstruction_erosion', 'Reconstruction by erosion',
-                         images_folder, paper=settings['closing'])
+                         images_folder, paper=settings['reconstruction_erosion'])
 
 
 def plot_input_defence(spectrograms, images_folder, settings):

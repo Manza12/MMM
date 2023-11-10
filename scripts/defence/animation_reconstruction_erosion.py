@@ -9,7 +9,7 @@ from mmm.spectrograms.parameters import TIME_RESOLUTION, FREQUENCY_PRECISION
 name = 'anastasia_excerpt'
 video_format = 'mp4'
 fps = 10
-n_frames = 50
+n_frames = 40
 
 output_name = name + '_animation_' + '_reconstruction_erosion'
 
@@ -32,7 +32,7 @@ stack = np.load(str(load_path), allow_pickle=True)
 n_frames = min(n_frames, stack.shape[0])
 
 # Plot
-figure, ax = plt.subplots()
+figure, ax = plt.subplots(figsize=(10, 4))
 
 plot_stft(stack[0, :, :], v_min=-120, v_max=0, ax=ax)
 
