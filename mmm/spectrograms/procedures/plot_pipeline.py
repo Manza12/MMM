@@ -13,7 +13,8 @@ def plot_single(spectrogram, name, title, images_folder, v_min=MIN_DB, v_max=0, 
             fig.axes[0].set_xlim(paper['x_lim'][0] / TIME_RESOLUTION, paper['x_lim'][1] / TIME_RESOLUTION)
         if paper.get('y_lim', None) is not None:
             fig.axes[0].set_ylim(paper['y_lim'][0] / FREQUENCY_PRECISION, paper['y_lim'][1] / FREQUENCY_PRECISION)
-        fig.savefig(images_folder / (paper['name'] + '.pdf'), dpi=300)
+        extension = paper.get('extension', 'pdf')
+        fig.savefig(images_folder / (paper['name'] + '.' + extension), dpi=300)
     else:
         fig.savefig(images_folder / (name + '.pdf'), dpi=300)
 
@@ -134,15 +135,24 @@ def plot_input(spectrograms, images_folder, settings):
 
     # Closing spectrogram
     if settings.get('closing', None) is not None:
-        plot_compare(spectrograms['input'], spectrograms['closing'],
-                     'closing', 'Closing', images_folder,
-                     paper=settings['closing'])
+        if settings['closing'].get('single', False):
+            plot_single(spectrograms['closing'], 'closing', 'Closing',
+                        images_folder, paper=settings['closing'])
+        else:
+            plot_compare(spectrograms['input'], spectrograms['closing'],
+                         'closing', 'Closing', images_folder,
+                         paper=settings['closing'])
 
     # Reconstruction by erosion spectrogram
     if settings.get('reconstruction_erosion', None) is not None:
-        plot_compare(spectrograms['closing'], spectrograms['reconstruction_erosion'],
-                     'reconstruction_erosion', 'Reconstruction by erosion', images_folder,
-                     paper=settings['reconstruction_erosion'])
+        if settings['reconstruction_erosion'].get('single', False):
+            plot_single(spectrograms['reconstruction_erosion'],
+                        'reconstruction_erosion', 'Reconstruction by erosion',
+                        images_folder, paper=settings['closing'])
+        else:
+            plot_compare(spectrograms['input'], spectrograms['reconstruction_erosion'],
+                         'reconstruction_erosion', 'Reconstruction by erosion',
+                         images_folder, paper=settings['closing'])
 
 
 def plot_input_defence(spectrograms, images_folder, settings):

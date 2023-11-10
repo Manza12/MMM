@@ -2,11 +2,13 @@ from mmm.spectrograms import *
 from ..parameters import FS
 
 
-def take_excerpt(file_path: Path, start: float, end: float):
+def take_excerpt(file_path: Path, start: Optional[float], end: Optional[float]):
     data = read_wav(file_path)
-    n_start = int(start * FS)
-    n_end = int(end * FS)
-    return data[n_start: n_end]
+    if start is not None:
+        start = int(start * FS)
+    if end is not None:
+        end = int(end * FS)
+    return data[start: end]
 
 
 def read_wav(file_path: Path):
