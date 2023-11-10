@@ -8,11 +8,11 @@ from mmm.spectrograms.parameters import TIME_RESOLUTION, FREQUENCY_PRECISION
 # Parameters
 name = 'anastasia_excerpt'
 video_format = 'mp4'
-fps = 10
+fps = 3
 n_frames = 40
 
-input_name = 'spectrogram_vertical_thinning_stack.pickle'
-output_name = name + '_animation_' + '_vertical_thinning'
+input_name = 'spectrogram_horizontal_trimming_stack.pickle'
+output_name = name + '_animation' + '_horizontal_trimming'
 
 t_start = 0.
 t_end = 3.

@@ -1,8 +1,9 @@
 import time
 
 from mmm import *
-from mmm.spectrograms.morphology import reconstruction_erosion_stack, greyscale_thinning_stack
-from mmm.spectrograms.parameters import TIME_RESOLUTION, FREQUENCY_PRECISION
+from mmm.spectrograms.morphology import reconstruction_erosion_stack, greyscale_thinning_stack, \
+    reconstruction_dilation, greyscale_trimming_stack
+from mmm.spectrograms.parameters import TIME_RESOLUTION, FREQUENCY_PRECISION, MIN_LENGTH_SINUSOIDS
 
 from mmm.spectrograms.procedures.io import save_pickle, load_or_compute
 from mmm.spectrograms.procedures.morphological_pipeline import apply_morphology
@@ -12,9 +13,11 @@ start_full = time.time()
 name = 'anastasia_excerpt'
 
 generate = {
-    'reconstruction_erosion': True,
-    'vertical_thinning': True,
-    'horizontal_thinning': True,
+    'reconstruction_erosion': False,
+    'vertical_thinning': False,
+    'horizontal_thinning': False,
+    'horizontal_trimming': True,
+    'reconstruction_dilation': False,
 }
 
 components = {
@@ -118,6 +121,25 @@ if generate['horizontal_thinning']:
                                                           max_iterations=100, verbose=True)
     file_path = arrays_folder / ('spectrogram_horizontal_thinning_stack' + '.pickle')
     save_pickle(file_path, spectrogram_stack_thinning)
+
+# Horizontal trimming
+if generate['horizontal_trimming']:
+    min_length_bins = int(MIN_LENGTH_SINUSOIDS / TIME_RESOLUTION)
+    iterations = min_length_bins // 2
+
+    spectrogram_vertical_threshold = spectrograms['vertical_threshold']
+    spectrogram_trimming = greyscale_trimming_stack(spectrogram_vertical_threshold, iterations, 'h')
+
+    file_path = arrays_folder / ('spectrogram_horizontal_trimming_stack' + '.pickle')
+    save_pickle(file_path, spectrogram_trimming)
+
+# Reconstruction by dilation
+if generate['reconstruction_dilation']:
+    spectrogram_trimming = spectrograms['trimming']
+    spectrogram_reconstruction = reconstruction_dilation(spectrogram_trimming, spectrogram)
+
+    file_path = arrays_folder / ('spectrogram_reconstruction_dilation_stack' + '.pickle')
+    save_pickle(file_path, spectrogram_reconstruction)
 
 # End
 end_full = time.time()

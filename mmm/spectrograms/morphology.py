@@ -301,6 +301,40 @@ def greyscale_trimming(input_image: torch.Tensor, iterations: Optional[int] = No
     return x_thin
 
 
+def greyscale_trimming_stack(input_image: torch.Tensor, iterations: Optional[int] = None, direction: str = 'a',
+                             verbose=False, verbose_it_step=10, alpha=0):
+    start = time.time()
+
+    if verbose:
+        print('Starting %s trimming stack...' % direction)
+
+    x_stack = np.zeros((iterations, *input_image.shape), dtype=np.float32)
+    x_stack[0, :, :] = input_image.cpu().numpy()
+
+    i = 0
+    while True:
+        x_in = torch.from_numpy(x_stack[i, :, :]).to(DEVICE)
+        x_out = elementary_greyscale_trimming(x_in, direction, alpha=alpha)
+        x_stack[i+1, :, :] = x_out.cpu().numpy()
+
+        if np.all(np.equal(x_stack[i+1, :, :], x_stack[i, :, :])):
+            break
+
+        i += 1
+
+        if verbose:
+            if i % verbose_it_step == 0:
+                print("it:", i)
+
+        if i == iterations-1 or np.all(np.equal(x_stack[i+1, :, :], x_stack[i, :, :])):
+            break
+
+    if verbose:
+        print('Time to apply trimming: %.3f seconds' % (time.time() - start))
+
+    return x_stack
+
+
 def binary_thinning(image_input: torch.Tensor, iterations: Optional[int] = None, direction: str = 'h',
                     verbose=False, verbose_it_step=10):
     x_thin = torch.clone(image_input)
