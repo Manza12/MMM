@@ -182,9 +182,13 @@ def plot_input_defence(spectrograms, images_folder, settings):
 def plot_noise(spectrograms, images_folder, settings):
     # Opening spectrogram
     if settings.get('opening', None) is not None:
-        plot_compare(spectrograms['reconstruction_erosion'], spectrograms['opening'],
-                     'opening', 'Opening', images_folder,
-                     paper=settings['opening'])
+        if settings['opening'].get('single', False):
+            plot_single(spectrograms['opening'], 'opening', 'Opening',
+                        images_folder, paper=settings['opening'])
+        else:
+            plot_compare(spectrograms['reconstruction_erosion'], spectrograms['opening'],
+                         'opening', 'Opening', images_folder,
+                         paper=settings['opening'])
 
     # Filtered noise spectrogram
     if settings.get('filtered_noise', None) is not None:
