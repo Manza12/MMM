@@ -9,11 +9,12 @@ from mmm.spectrograms.parameters import TIME_RESOLUTION, FREQUENCY_PRECISION, MI
 name = 'anastasia_excerpt'
 video_format = 'mp4'
 fps = 3
-n_frames = 40
-save_frames = True
+n_frames = 10
+save_frames = False
 
-input_name = 'spectrogram_reconstruction_dilation_stack.pickle'
-output_name = name + '_animation' + '_reconstruction_dilation'
+operation = 'horizontal_thinning'
+input_name = 'spectrogram_' + operation + '_stack.pickle'
+output_name = name + '_animation_' + operation
 
 t_start = 0.
 t_end = 3.
@@ -34,7 +35,7 @@ stack = np.load(str(load_path), allow_pickle=True)
 n_frames = min(n_frames, stack.shape[0])
 
 # Plot
-figure, ax = plt.subplots(figsize=(10, 4))
+figure, ax = plt.subplots(figsize=(10, 4), dpi=300)
 
 plot_stft(stack[0, :, :], v_min=MIN_DB, v_max=0, ax=ax)
 
@@ -65,6 +66,6 @@ if video_format == 'mp4':
     FFwriter = FFMpegWriter(fps=fps)
     animation.save(str(output_path), writer=FFwriter)
 elif video_format == 'gif':
-    animation.save(str(output_path),  writer='imagemagick', fps=24)
+    animation.save(str(output_path),  writer='imagemagick', fps=fps)
 else:
     raise ValueError('Unknown video format.')

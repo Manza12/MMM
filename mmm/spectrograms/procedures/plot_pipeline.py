@@ -262,33 +262,54 @@ def plot_sinusoids(lines, spectrograms, images_folder, settings):
 def plot_transient(lines, spectrograms, images_folder, settings):
     # Horizontal thinning spectrogram
     if settings.get('horizontal_thin', None) is not None:
-        plot_compare(spectrograms['reconstruction_erosion'], spectrograms['horizontal_thin'],
-                     'horizontal_thin', 'Horizontal thinning',
-                     images_folder,
-                     paper=settings['horizontal_thin'])
+        if settings['horizontal_thin'].get('single', False):
+            plot_single(spectrograms['horizontal_thin'],
+                        'horizontal_thin', 'Horizontal thinning', images_folder,
+                        paper=settings['horizontal_thin'])
+        else:
+            plot_compare(spectrograms['reconstruction_erosion'], spectrograms['horizontal_thin'],
+                         'horizontal_thin', 'Horizontal thinning',
+                         images_folder,
+                         paper=settings['horizontal_thin'])
 
     # Horizontal top-hat spectrogram
     if settings.get('horizontal_top_hat', None) is not None:
-        plot_compare(spectrograms['horizontal_thin'], spectrograms['horizontal_top_hat'],
-                     'horizontal_top_hat', 'Horizontal top-hat',
-                     images_folder,
-                     v_min_2=0, v_max_2=None, c_map_2='Greys',
-                     paper=settings['horizontal_top_hat'])
+        if settings['horizontal_top_hat'].get('single', False):
+            plot_single(spectrograms['horizontal_top_hat'],
+                        'horizontal_top_hat', 'Horizontal top-hat', images_folder,
+                        v_min=0, v_max=None, c_map='Greys',
+                        paper=settings['horizontal_top_hat'])
+        else:
+            plot_compare(spectrograms['horizontal_thin'], spectrograms['horizontal_top_hat'],
+                         'horizontal_top_hat', 'Horizontal top-hat',
+                         images_folder,
+                         v_min_2=0, v_max_2=None, c_map_2='Greys',
+                         paper=settings['horizontal_top_hat'])
 
     # Horizontal threshold spectrogram
     if settings.get('horizontal_threshold', None) is not None:
-        plot_compare(spectrograms['horizontal_top_hat'], spectrograms['horizontal_threshold'],
-                     'horizontal_threshold', 'Horizontal threshold',
-                     images_folder,
-                     v_min_1=0, v_max_1=None, c_map_1='Greys',
-                     paper=settings['horizontal_threshold'])
+        if settings['horizontal_threshold'].get('single', False):
+            plot_single(spectrograms['horizontal_threshold'],
+                        'horizontal_threshold', 'Horizontal threshold', images_folder,
+                        paper=settings['horizontal_threshold'])
+        else:
+            plot_compare(spectrograms['horizontal_top_hat'], spectrograms['horizontal_threshold'],
+                         'horizontal_threshold', 'Horizontal threshold',
+                         images_folder,
+                         v_min_1=0, v_max_1=None, c_map_1='Greys',
+                         paper=settings['horizontal_threshold'])
 
     # Vertical filtered
     if settings.get('vertical_filtered', None) is not None:
-        plot_compare(spectrograms['horizontal_threshold'], spectrograms['vertical_filtered'],
-                     'vertical_filtered', 'Vertical filtered',
-                     images_folder,
-                     paper=settings['vertical_filtered'])
+        if settings['vertical_filtered'].get('single', False):
+            plot_single(spectrograms['vertical_filtered'],
+                        'vertical_filtered', 'Vertical filtered', images_folder,
+                        paper=settings['vertical_filtered'])
+        else:
+            plot_compare(spectrograms['horizontal_threshold'], spectrograms['vertical_filtered'],
+                         'vertical_filtered', 'Vertical filtered',
+                         images_folder,
+                         paper=settings['vertical_filtered'])
 
     # Lines - Transient
     if settings.get('lines_transient', None) is not None:
