@@ -168,7 +168,7 @@ def plot_piano_roll(piano_roll: PianoRoll,
             time_label = 'Time (wholes)'
     elif time_label in ['Time (m, b)', 'Temps (mesure, temps)']:
         TimePoint.__str__ = lambda self: f'({self.measure}, {self.beat})'
-    elif time_label in ['Time (m)', 'Temps (mesure)']:
+    elif time_label in ['Time (m)', 'Time (measure)', 'Temps (measure)']:
         TimePoint.__str__ = lambda self: f'{self.measure}'
 
     if freq_label is None:
