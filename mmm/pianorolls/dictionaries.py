@@ -246,6 +246,7 @@ roman_numeral_to_factors_dict = {
         '1': 11,
         '3': 2,
         '5': 5,
+        '6': 7,
         '7': 8
     },
     'viiº/V': {
