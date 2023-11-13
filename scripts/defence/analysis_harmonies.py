@@ -5,18 +5,14 @@ import networkx as nx
 from mmm.pianorolls.graphs import TonalGraph
 from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.music import Rhythm, Hit, Texture, Harmony, Chord, PianoRoll, PianoRollStack, ActivationsStack, \
-    Activations, TimeFrequency, TimePoint, TimeShift, FrequencyPoint, RomanNumeral, Chroma
+    Activations, TimeFrequency, TimePoint, TimeShift, FrequencyPoint, RomanNumeral
 from mmm.pianorolls.morphology import dilation, erosion
 from mmm.pianorolls.plot import plot_activations_stack, plot_tonal_graph, plot_piano_roll
-from mmm.pianorolls.utils import midi_number_to_pitch, midi_number_to_chroma
 
-FrequencyPoint.__str__ = lambda self: midi_number_to_pitch(self.value, language='french')
-Chroma.__str__ = lambda self: midi_number_to_chroma(self.value, language='french')
 
 # Path
-
 piece = 'moonlight_3rd_53-56'
-folder = Path('..') / Path('..') / Path('phd') / Path('chapter_5') / Path('harmony') / Path(piece)
+folder = Path('..') / Path('..') / Path('phd') / Path('defence')
 folder.mkdir(parents=True, exist_ok=True)
 
 # Textures
@@ -150,23 +146,17 @@ tonal_graph_path = TonalGraph(activations_harmony, harmony, activations, termina
 # Shortest path
 shortest_path = nx.shortest_path(tonal_graph_path, 'S', 'E', weight='weight')
 
-# # Plot activations input
-# plot_piano_roll(activations, time_label='Time (m, b)', tight_frame=False,
-#                 x_tick_start=TimePoint(0), x_tick_step=TimeShift('1'),
-#                 fig_size=(460, 260), marker_size=10)
-# plt.savefig(folder / Path('activations.pdf'))
-
-plot_piano_roll(activations_chroma, time_label='Temps (mesure)', tight_frame=False,
+plot_piano_roll(activations_chroma, time_label='Time (measure)', tight_frame=False,
                 x_tick_start=TimePoint(0), x_tick_step=TimeShift('1'),
-                fig_size=(460, 260), marker_size=10)
+                fig_size=(1000, 500))
 plt.savefig(folder / Path('activations_chroma.svg'))
 
 
 # Plot activations harmony
-plot_activations_stack(activations_harmony, time_label='Temps (mesure)',
+plot_activations_stack(activations_harmony, time_label='Time (measure)',
                        tight_frame=False,
                        x_tick_start=TimePoint(0), x_tick_step=TimeShift('1'),
-                       fig_size=(600, 300), marker_size=10,
+                       fig_size=(1000, 500),
                        legend=True,
                        legend_params={
                            'columnspacing': 0.2,
@@ -176,12 +166,13 @@ plot_activations_stack(activations_harmony, time_label='Temps (mesure)',
                            'outside': True,
                        })
 plt.savefig(folder / Path('activations_harmony.svg'))
+plt.tight_layout()
 
 # Plot graph
 # plot_tonal_graph(tonal_graph)
 # plt.savefig(folder / Path('tonal_graph.pdf'))
 
-plot_tonal_graph(tonal_graph_path, shortest_path=shortest_path, weighted=True)
+plot_tonal_graph(tonal_graph_path, shortest_path=shortest_path, weighted=True, fig_size=(10., 5.))
 plt.savefig(folder / Path('tonal_graph-shortest_path.svg'))
 
 plt.show()
