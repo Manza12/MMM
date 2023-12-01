@@ -119,6 +119,210 @@
                 </hit>
             </rhythm>
         </texture>
+        <texture id="Melody 1 bis">
+            <rhythm>
+                <hit>
+                    <start num="0" den="16"/>
+                    <duration num="1" den="8"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="2" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="3" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="4" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="5" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="9" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="6" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="10" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="7" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="11" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="8" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="12" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="13" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="14" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="15" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="Melody 2">
+            <rhythm>
+                <hit>
+                    <start num="7" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="6" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="5" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="0" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="4" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="1" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="3" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="2" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="2 corcheas">
+            <rhythm>
+                <hit>
+                    <start num="0" den="8"/>
+                    <duration num="1" den="8"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="1" den="8"/>
+                    <duration num="1" den="8"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="3 negras">
+            <rhythm>
+                <hit>
+                    <start num="0" den="4"/>
+                    <duration num="1" den="4"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="1" den="4"/>
+                    <duration num="1" den="4"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="2" den="4"/>
+                    <duration num="1" den="4"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="Negra con puntillo corchea">
+            <rhythm>
+                <hit>
+                    <start num="0" den="8"/>
+                    <duration num="3" den="8"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="3" den="8"/>
+                    <duration num="1" den="8"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="Arpegio semicorcheas">
+            <rhythm>
+                <hit>
+                    <start num="0" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="1" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="2" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="3" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+        </texture>
     </textures>
     <component-tree>
         <activations>
@@ -529,11 +733,13 @@
                         </texture>
                         <harmony>
                             <chord>
-                                <pitch value="5"/>
+                                <degree>IV</degree>
+                                <factor value="1"/>
                             </chord>
                             <chord>
-                                <pitch value="-7"/>
-                                <pitch value="0"/>
+                                <degree>IV</degree>
+                                <factor value="1" octave="-1"/>
+                                <factor value="5"/>
                             </chord>
                         </harmony>
                     </harmonic-texture>
@@ -567,12 +773,14 @@
                         </texture>
                         <harmony>
                             <chord>
-                                <pitch value="-8"/>
-                                <pitch value="0"/>
+                                <degree>I</degree>
+                                <factor value="3" octave="-1"/>
+                                <factor value="1"/>
                             </chord>
                             <chord>
-                                <pitch value="-8"/>
-                                <pitch value="0"/>
+                                <degree>I</degree>
+                                <factor value="3" octave="-1"/>
+                                <factor value="1"/>
                             </chord>
                         </harmony>
                     </harmonic-texture>
@@ -606,12 +814,14 @@
                         </texture>
                         <harmony>
                             <chord>
-                                <pitch value="-10"/>
-                                <pitch value="0"/>
+                                <degree>ii</degree>
+                                <factor value="1" octave="-1"/>
+                                <factor value="7"/>
                             </chord>
                             <chord>
-                                <pitch value="-10"/>
-                                <pitch value="-1"/>
+                                <degree>viiº</degree>
+                                <factor value="3" octave="-1"/>
+                                <factor value="1" octave="-1"/>
                             </chord>
                         </harmony>
                     </harmonic-texture>
@@ -645,12 +855,323 @@
                         </texture>
                         <harmony>
                             <chord>
-                                <pitch value="-12"/>
-                                <pitch value="0"/>
+                                <degree>I</degree>
+                                <factor value="1" octave="-1"/>
+                                <factor value="1"/>
                             </chord>
                             <chord>
-                                <pitch value="-12"/>
-                                <pitch value="-8"/>
+                                <degree>I</degree>
+                                <factor value="1" octave="-1"/>
+                                <factor value="3" octave="-1"/>
+                            </chord>
+                        </harmony>
+                    </harmonic-texture>
+                </component-tree>
+            </component-tree>
+            <component-tree id="A3">
+                <activations>
+                    <activation>
+                        <time num="8" den="1"/>
+                        <frequency value="0"/>
+                    </activation>
+                </activations>
+                <component-tree id="A3-1">
+                    <activations>
+                        <activation>
+                            <time num="0" den="1"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <chord-texture>
+                        <texture>
+                            <id>Melody 1 bis</id>
+                        </texture>
+                        <chord>
+                            <degree>ii</degree>
+                            <factor value="1"/>
+                            <factor value="2"/>
+                            <factor value="3"/>
+                            <factor value="4"/>
+                            <factor value="5"/>
+                            <factor value="6"/>
+                            <factor value="7+" octave="1"/>
+                            <factor value="1" octave="1"/>
+                            <factor value="2" octave="1"/>
+                            <factor value="3" octave="1"/>
+                            <factor value="4" octave="1"/>
+                        </chord>
+                    </chord-texture>
+                    <harmonic-texture>
+                        <texture>
+                            <rhythm>
+                                <hit>
+                                    <start num="0" den="1"/>
+                                    <duration num="1" den="1"/>
+                                </hit>
+                            </rhythm>
+                        </texture>
+                        <harmony>
+                            <chord>
+                                <degree>ii</degree>
+                                <factor value="3" octave="-1"/>
+                                <factor value="5" octave="-1"/>
+                            </chord>
+                        </harmony>
+                    </harmonic-texture>
+                </component-tree>
+                <component-tree id="A3-2">
+                    <activations>
+                        <activation>
+                            <time num="1" den="1"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <component-tree id="A3-2.1">
+                        <activations>
+                            <activation>
+                                <time num="0" den="1"/>
+                                <frequency value="12"/>
+                            </activation>
+                        </activations>
+                        <chord-texture>
+                            <texture>
+                                <id>Melody 2</id>
+                            </texture>
+                            <chord>
+                                <degree>IV</degree>
+                                <factor value="7"/>
+                                <factor value="1"/>
+                                <factor value="2"/>
+                                <factor value="3"/>
+                                <factor value="4"/>
+                                <factor value="5" octave="1"/>
+                            </chord>
+                        </chord-texture>
+                        <chord-texture>
+                            <texture>
+                                <id>Negra con puntillo corchea</id>
+                            </texture>
+                            <chord>
+                                <degree>IV</degree>
+                                <factor value="1" octave="-2"/>
+                                <factor value="2" octave="-2"/>
+                            </chord>
+                        </chord-texture>
+                    </component-tree>
+                    <component-tree id="A3-2.2">
+                        <activations>
+                            <activation>
+                                <time num="1" den="2"/>
+                                <frequency value="12"/>
+                            </activation>
+                        </activations>
+                        <chord-texture>
+                            <texture>
+                                <id>Melody 2</id>
+                            </texture>
+                            <chord>
+                                <degree>IV</degree>
+                                <factor value="5"/>
+                                <factor value="6"/>
+                                <factor value="7"/>
+                                <factor value="1"/>
+                                <factor value="2"/>
+                                <factor value="3"/>
+                            </chord>
+                        </chord-texture>
+                        <harmonic-texture>
+                            <texture>
+                                <id>Negra con puntillo corchea</id>
+                            </texture>
+                            <harmony>
+                                <chord>
+                                    <degree>IV</degree>
+                                    <factor value="3" octave="-2"/>
+                                </chord>
+                                <chord>
+                                    <degree>V/V</degree>
+                                    <factor value="3" octave="-2"/>
+                                </chord>
+                            </harmony>
+                        </harmonic-texture>
+                    </component-tree>
+                </component-tree>
+                <component-tree id="A3-3">
+                    <activations>
+                        <activation>
+                            <time num="2" den="1"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <component-tree id="A3-3.1">
+                        <activations>
+                            <activation>
+                                <time num="0" den="4"/>
+                                <frequency value="0"/>
+                            </activation>
+                        </activations>
+                        <harmonic-texture>
+                            <texture>
+                                <id>2 corcheas</id>
+                            </texture>
+                            <harmony>
+                                <chord>
+                                    <degree>V</degree>
+                                    <factor value="3"/>
+                                </chord>
+                                <chord>
+                                    <degree>V</degree>
+                                    <factor value="1" octave="1"/>
+                                </chord>
+                            </harmony>
+                        </harmonic-texture>
+                        <chord-texture>
+                            <texture>
+                                <id>Arpegio semicorcheas</id>
+                            </texture>
+                            <chord>
+                                <degree>V</degree>
+                                <factor value="1" octave="-2"/>
+                                <factor value="3" octave="-2"/>
+                                <factor value="5" octave="-1"/>
+                                <factor value="1" octave="-1"/>
+                            </chord>
+                        </chord-texture>
+                    </component-tree>
+                    <component-tree id="A3-3.2">
+                        <activations>
+                            <activation>
+                                <time num="1" den="4"/>
+                                <frequency value="0"/>
+                            </activation>
+                        </activations>
+                        <harmonic-texture>
+                            <texture>
+                                <id>2 corcheas</id>
+                            </texture>
+                            <harmony>
+                                <chord>
+                                    <degree>I</degree>
+                                    <factor value="3" octave="1"/>
+                                </chord>
+                                <chord>
+                                    <degree>I</degree>
+                                    <factor value="1" octave="1"/>
+                                </chord>
+                            </harmony>
+                        </harmonic-texture>
+                        <chord-texture>
+                            <texture>
+                                <id>Arpegio semicorcheas</id>
+                            </texture>
+                            <chord>
+                                <degree>I</degree>
+                                <factor value="5" octave="-2"/>
+                                <factor value="1" octave="-1"/>
+                                <factor value="3" octave="-1"/>
+                                <factor value="5" octave="-1"/>
+                            </chord>
+                        </chord-texture>
+                    </component-tree>
+                    <component-tree id="A3-3.3">
+                        <activations>
+                            <activation>
+                                <time num="2" den="4"/>
+                                <frequency value="0"/>
+                            </activation>
+                        </activations>
+                        <harmonic-texture>
+                            <texture>
+                                <id>2 corcheas</id>
+                            </texture>
+                            <harmony>
+                                <chord>
+                                    <degree>V</degree>
+                                    <factor value="5" octave="1"/>
+                                </chord>
+                                <chord>
+                                    <degree>V</degree>
+                                    <factor value="1" octave="1"/>
+                                </chord>
+                            </harmony>
+                        </harmonic-texture>
+                        <chord-texture>
+                            <texture>
+                                <id>Arpegio semicorcheas</id>
+                            </texture>
+                            <chord>
+                                <degree>V</degree>
+                                <factor value="1" octave="-2"/>
+                                <factor value="3" octave="-2"/>
+                                <factor value="5" octave="-1"/>
+                                <factor value="1" octave="-1"/>
+                            </chord>
+                        </chord-texture>
+                    </component-tree>
+                    <component-tree id="A3-3.4">
+                        <activations>
+                            <activation>
+                                <time num="3" den="4"/>
+                                <frequency value="0"/>
+                            </activation>
+                        </activations>
+                        <harmonic-texture>
+                            <texture>
+                                <id>2 corcheas</id>
+                            </texture>
+                            <harmony>
+                                <chord>
+                                    <degree>I</degree>
+                                    <factor value="3" octave="1"/>
+                                </chord>
+                                <chord>
+                                    <degree>I</degree>
+                                    <factor value="1" octave="1"/>
+                                </chord>
+                            </harmony>
+                        </harmonic-texture>
+                        <chord-texture>
+                            <texture>
+                                <id>Arpegio semicorcheas</id>
+                            </texture>
+                            <chord>
+                                <degree>I</degree>
+                                <factor value="5" octave="-2"/>
+                                <factor value="1" octave="-1"/>
+                                <factor value="3" octave="-1"/>
+                                <factor value="5" octave="-1"/>
+                            </chord>
+                        </chord-texture>
+                    </component-tree>
+                </component-tree>
+                <component-tree id="A4">
+                    <activations>
+                        <activation>
+                            <time num="3" den="1"/>
+                            <frequency value="-12"/>
+                        </activation>
+                    </activations>
+                    <harmonic-texture>
+                        <texture>
+                            <id>3 negras</id>
+                        </texture>
+                        <harmony>
+                            <chord>
+                                <degree>V</degree>
+                                <factor value="1" octave="-1"/>
+                                <factor value="5" octave="2"/>
+                            </chord>
+                            <chord>
+                                <degree>V</degree>
+                                <factor value="1"/>
+                                <factor value="3" octave="1"/>
+                                <factor value="5" octave="2"/>
+                                <factor value="1" octave="2"/>
+                            </chord>
+                            <chord>
+                                <degree>V</degree>
+                                <factor value="1" octave="-1"/>
+                                <factor value="1" octave="1"/>
                             </chord>
                         </harmony>
                     </harmonic-texture>

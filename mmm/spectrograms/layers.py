@@ -9,7 +9,6 @@ def create_cqt_layer(verbose=False):
     cqt_layer = cqt.CQT(sr=FS,
                         hop_length=HOP_LENGTH,
                         fmin=F_MIN,
-                        fmax=F_MAX,
                         n_bins=N_BINS,
                         bins_per_octave=BINS_PER_OCTAVE,
                         filter_scale=FILTER_SCALE,

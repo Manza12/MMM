@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
 import numpy as np
-
+from pathlib import Path
 from mmm.spectrograms.plot import plot_stft
 
 stack = np.load('spectrogram_reconstruction_stack.pickle', allow_pickle=True)
@@ -31,6 +31,5 @@ animation = FuncAnimation(figure,
                           frames=np.arange(40),
                           interval=50)
 
-animation.save('animation.gif',  writer='imagemagick', fps=10)
-
-# plt.show()
+animation_path = Path('animations') / Path('animation_reconstruction_erosion.gif')
+animation.save(str(animation_path),  writer='imagemagick', fps=10)

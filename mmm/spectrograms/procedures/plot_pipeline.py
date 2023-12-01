@@ -3,7 +3,12 @@ from mmm.spectrograms.plot import plot_stft, plot_lines, plot_two_spectrogram
 from mmm.spectrograms.parameters import MIN_DB
 
 
-def plot_single(spectrogram, name, title, images_folder, v_min=MIN_DB, v_max=0, c_map='afmhot', paper=None):
+def plot_single(spectrogram, name, title, images_folder, v_min: Optional[float] = MIN_DB, v_max: Optional[float] = 0,
+                c_map='afmhot', paper=None):
+    if v_min is None:
+        v_min = spectrogram.min()
+    if v_max is None:
+        v_max = spectrogram.max()
     fig = plot_stft(spectrogram.cpu().numpy(), v_min=v_min, v_max=v_max, c_map=c_map, title=title,
                     fig_size=paper.get('fig_size', (6., 4.)) if paper is not None else (6., 4.))
 
@@ -13,7 +18,8 @@ def plot_single(spectrogram, name, title, images_folder, v_min=MIN_DB, v_max=0, 
             fig.axes[0].set_xlim(paper['x_lim'][0] / TIME_RESOLUTION, paper['x_lim'][1] / TIME_RESOLUTION)
         if paper.get('y_lim', None) is not None:
             fig.axes[0].set_ylim(paper['y_lim'][0] / FREQUENCY_PRECISION, paper['y_lim'][1] / FREQUENCY_PRECISION)
-        fig.savefig(images_folder / (paper['name'] + '.pdf'), dpi=300)
+        extension = paper.get('extension', 'pdf')
+        fig.savefig(images_folder / (paper['name'] + '.' + extension), dpi=300)
     else:
         fig.savefig(images_folder / (name + '.pdf'), dpi=300)
 
@@ -134,15 +140,24 @@ def plot_input(spectrograms, images_folder, settings):
 
     # Closing spectrogram
     if settings.get('closing', None) is not None:
-        plot_compare(spectrograms['input'], spectrograms['closing'],
-                     'closing', 'Closing', images_folder,
-                     paper=settings['closing'])
+        if settings['closing'].get('single', False):
+            plot_single(spectrograms['closing'], 'closing', 'Closing',
+                        images_folder, paper=settings['closing'])
+        else:
+            plot_compare(spectrograms['input'], spectrograms['closing'],
+                         'closing', 'Closing', images_folder,
+                         paper=settings['closing'])
 
     # Reconstruction by erosion spectrogram
     if settings.get('reconstruction_erosion', None) is not None:
-        plot_compare(spectrograms['closing'], spectrograms['reconstruction_erosion'],
-                     'reconstruction_erosion', 'Reconstruction by erosion', images_folder,
-                     paper=settings['reconstruction_erosion'])
+        if settings['reconstruction_erosion'].get('single', False):
+            plot_single(spectrograms['reconstruction_erosion'],
+                        'reconstruction_erosion', 'Reconstruction by erosion',
+                        images_folder, paper=settings['reconstruction_erosion'])
+        else:
+            plot_compare(spectrograms['input'], spectrograms['reconstruction_erosion'],
+                         'reconstruction_erosion', 'Reconstruction by erosion',
+                         images_folder, paper=settings['reconstruction_erosion'])
 
 
 def plot_input_defence(spectrograms, images_folder, settings):
@@ -167,9 +182,13 @@ def plot_input_defence(spectrograms, images_folder, settings):
 def plot_noise(spectrograms, images_folder, settings):
     # Opening spectrogram
     if settings.get('opening', None) is not None:
-        plot_compare(spectrograms['reconstruction_erosion'], spectrograms['opening'],
-                     'opening', 'Opening', images_folder,
-                     paper=settings['opening'])
+        if settings['opening'].get('single', False):
+            plot_single(spectrograms['opening'], 'opening', 'Opening',
+                        images_folder, paper=settings['opening'])
+        else:
+            plot_compare(spectrograms['reconstruction_erosion'], spectrograms['opening'],
+                         'opening', 'Opening', images_folder,
+                         paper=settings['opening'])
 
     # Filtered noise spectrogram
     if settings.get('filtered_noise', None) is not None:
@@ -190,23 +209,39 @@ def plot_noise(spectrograms, images_folder, settings):
 def plot_sinusoids(lines, spectrograms, images_folder, settings):
     # Vertical thinning spectrogram
     if settings.get('vertical_thin', None) is not None:
-        plot_compare(spectrograms['reconstruction_erosion'], spectrograms['vertical_thin'],
-                     'vertical_thin', 'Vertical thinning', images_folder,
-                     paper=settings['vertical_thin'])
+        if settings['vertical_thin'].get('single', False):
+            plot_single(spectrograms['vertical_thin'],
+                        'vertical_thin', 'Vertical thinning', images_folder,
+                        paper=settings['vertical_thin'])
+        else:
+            plot_compare(spectrograms['reconstruction_erosion'], spectrograms['vertical_thin'],
+                         'vertical_thin', 'Vertical thinning', images_folder,
+                         paper=settings['vertical_thin'])
 
     # Vertical top-hat spectrogram
     if settings.get('vertical_top_hat', None) is not None:
-        plot_compare(spectrograms['vertical_thin'], spectrograms['vertical_top_hat'],
-                     'vertical_top_hat', 'Vertical top-hat', images_folder,
-                     v_min_2=0, v_max_2=None, c_map_2='Greys',
-                     paper=settings['vertical_top_hat'])
+        if settings['vertical_top_hat'].get('single', False):
+            plot_single(spectrograms['vertical_top_hat'],
+                        'vertical_top_hat', 'Vertical top-hat', images_folder,
+                        v_min=0, v_max=None, c_map='Greys',
+                        paper=settings['vertical_top_hat'])
+        else:
+            plot_compare(spectrograms['vertical_thin'], spectrograms['vertical_top_hat'],
+                         'vertical_top_hat', 'Vertical top-hat', images_folder,
+                         v_min_2=0, v_max_2=None, c_map_2='Greys',
+                         paper=settings['vertical_top_hat'])
 
     # Vertical threshold spectrogram
     if settings.get('vertical_threshold', None) is not None:
-        plot_compare(spectrograms['vertical_top_hat'], spectrograms['vertical_threshold'],
-                     'vertical_threshold', 'Vertical threshold', images_folder,
-                     v_min_1=0, v_max_1=None, c_map_1='Greys',
-                     paper=settings['vertical_threshold'])
+        if settings['vertical_threshold'].get('single', False):
+            plot_single(spectrograms['vertical_threshold'],
+                        'vertical_threshold', 'Vertical threshold', images_folder,
+                        paper=settings['vertical_threshold'])
+        else:
+            plot_compare(spectrograms['vertical_top_hat'], spectrograms['vertical_threshold'],
+                         'vertical_threshold', 'Vertical threshold', images_folder,
+                         v_min_1=0, v_max_1=None, c_map_1='Greys',
+                         paper=settings['vertical_threshold'])
 
     # Horizontal filtered
     if settings.get('horizontal_filtered', None) is not None:
@@ -231,33 +266,54 @@ def plot_sinusoids(lines, spectrograms, images_folder, settings):
 def plot_transient(lines, spectrograms, images_folder, settings):
     # Horizontal thinning spectrogram
     if settings.get('horizontal_thin', None) is not None:
-        plot_compare(spectrograms['reconstruction_erosion'], spectrograms['horizontal_thin'],
-                     'horizontal_thin', 'Horizontal thinning',
-                     images_folder,
-                     paper=settings['horizontal_thin'])
+        if settings['horizontal_thin'].get('single', False):
+            plot_single(spectrograms['horizontal_thin'],
+                        'horizontal_thin', 'Horizontal thinning', images_folder,
+                        paper=settings['horizontal_thin'])
+        else:
+            plot_compare(spectrograms['reconstruction_erosion'], spectrograms['horizontal_thin'],
+                         'horizontal_thin', 'Horizontal thinning',
+                         images_folder,
+                         paper=settings['horizontal_thin'])
 
     # Horizontal top-hat spectrogram
     if settings.get('horizontal_top_hat', None) is not None:
-        plot_compare(spectrograms['horizontal_thin'], spectrograms['horizontal_top_hat'],
-                     'horizontal_top_hat', 'Horizontal top-hat',
-                     images_folder,
-                     v_min_2=0, v_max_2=None, c_map_2='Greys',
-                     paper=settings['horizontal_top_hat'])
+        if settings['horizontal_top_hat'].get('single', False):
+            plot_single(spectrograms['horizontal_top_hat'],
+                        'horizontal_top_hat', 'Horizontal top-hat', images_folder,
+                        v_min=0, v_max=None, c_map='Greys',
+                        paper=settings['horizontal_top_hat'])
+        else:
+            plot_compare(spectrograms['horizontal_thin'], spectrograms['horizontal_top_hat'],
+                         'horizontal_top_hat', 'Horizontal top-hat',
+                         images_folder,
+                         v_min_2=0, v_max_2=None, c_map_2='Greys',
+                         paper=settings['horizontal_top_hat'])
 
     # Horizontal threshold spectrogram
     if settings.get('horizontal_threshold', None) is not None:
-        plot_compare(spectrograms['horizontal_top_hat'], spectrograms['horizontal_threshold'],
-                     'horizontal_threshold', 'Horizontal threshold',
-                     images_folder,
-                     v_min_1=0, v_max_1=None, c_map_1='Greys',
-                     paper=settings['horizontal_threshold'])
+        if settings['horizontal_threshold'].get('single', False):
+            plot_single(spectrograms['horizontal_threshold'],
+                        'horizontal_threshold', 'Horizontal threshold', images_folder,
+                        paper=settings['horizontal_threshold'])
+        else:
+            plot_compare(spectrograms['horizontal_top_hat'], spectrograms['horizontal_threshold'],
+                         'horizontal_threshold', 'Horizontal threshold',
+                         images_folder,
+                         v_min_1=0, v_max_1=None, c_map_1='Greys',
+                         paper=settings['horizontal_threshold'])
 
     # Vertical filtered
     if settings.get('vertical_filtered', None) is not None:
-        plot_compare(spectrograms['horizontal_threshold'], spectrograms['vertical_filtered'],
-                     'vertical_filtered', 'Vertical filtered',
-                     images_folder,
-                     paper=settings['vertical_filtered'])
+        if settings['vertical_filtered'].get('single', False):
+            plot_single(spectrograms['vertical_filtered'],
+                        'vertical_filtered', 'Vertical filtered', images_folder,
+                        paper=settings['vertical_filtered'])
+        else:
+            plot_compare(spectrograms['horizontal_threshold'], spectrograms['vertical_filtered'],
+                         'vertical_filtered', 'Vertical filtered',
+                         images_folder,
+                         paper=settings['vertical_filtered'])
 
     # Lines - Transient
     if settings.get('lines_transient', None) is not None:

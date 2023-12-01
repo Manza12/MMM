@@ -1,11 +1,11 @@
 from pathlib import Path
 
 # File
-name = 'sonata_16_2nd'  # 'sonata_16', 'hungarian', 'moonlight'
+name = 'sonata_16'  # 'sonata_16', 'hungarian', 'moonlight'
 file_path = Path(name + '.xml')
 
 # Change
-change = 'major_to_minor_N'  # 'minor_to_major'
+change = 'major_to_minor_H'  # 'minor_to_major'
 name += '_' + 'minor'
 
 # Paths

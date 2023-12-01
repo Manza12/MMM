@@ -5,8 +5,8 @@ import numpy as np
 from matplotlib.patches import FancyArrowPatch
 from matplotlib.text import Annotation
 
-
 class Arrow3D(FancyArrowPatch):
+
     def __init__(self, x, y, z, dx, dy, dz, *args, **kwargs):
         super().__init__((0, 0), (0, 0), *args, **kwargs)
         self._xyz = (x, y, z)
@@ -30,7 +30,6 @@ class Arrow3D(FancyArrowPatch):
         self.set_positions((xs[0], ys[0]), (xs[1], ys[1]))
 
         return np.min(zs) 
-
 
 def _arrow3D(ax, x, y, z, dx, dy, dz, *args, **kwargs):
     '''Add an 3d arrow to an `Axes3D` instance.'''
@@ -61,48 +60,6 @@ def _annotate3D(ax, text, xyz, *args, **kwargs):
 
 setattr(Axes3D, 'annotate3D', _annotate3D)
 
-
-def create_figure_axes_3d():
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.set_xlim(0, 4)
-    ax.set_ylim(-2, 2)
-    ax.set_zlim(-2, 2)
-    ax.grid(False)
-    plt.axis('off')
-
-    ax.scatter(0, 0, 0, s=30, marker='o')
-
-    ax.scatter(0, 0, 1, s=30, marker='o', color='black')
-    ax.scatter(0, 1, 0, s=30, marker='o', color='black')
-
-    # ax.scatter([1, 0, 0], [1, 0, 0], s=30, marker='o', color='black')
-
-    ax.annotate3D('$\overline{0}$', (0, 0, 0), xytext=(3, 3), textcoords='offset points')
-    ax.annotate3D('$t$ (s)', (4, 0, 0), xytext=(3, 3), textcoords='offset points')
-    ax.annotate3D('$1$', (0, 1, 0), xytext=(3, 3), textcoords='offset points')
-    ax.annotate3D('$i$', (0, 0, 1), xytext=(3, 3), textcoords='offset points')
-
-    ax.arrow3D(0, 0, -2,
-               0, 0, 4,
-               mutation_scale=20,
-               arrowstyle="-|>",
-               linestyle='dashed')
-    ax.arrow3D(0, -2, 0,
-               0, 4, 0,
-               mutation_scale=20,
-               arrowstyle="-|>",
-               linestyle='dashed')
-    ax.arrow3D(0, 0, 0,
-               4, 0, 0,
-               mutation_scale=20,
-               arrowstyle="-|>",
-               linestyle='dashed')
-    ax.set_title('3D Arrows Demo')
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
-    ax.set_zlabel('z')
-    fig.tight_layout()
 
 
 if __name__ == '__main__':
