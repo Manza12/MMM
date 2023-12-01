@@ -3,3 +3,6 @@
 data/objects/*
 phd/defence/results/*
 sandbox/spectrogram_reconstruction_stack.pickle
+build/*
+dist/*
+*.egg-info/*
