@@ -3,4 +3,6 @@
 data/objects/*
 phd/defence/results/*
 sandbox/spectrogram_reconstruction_stack.pickle
-phd/chapter_3/music_instruments/luis_alonso_10ms_10Hz/*
+build/*
+dist/*
+*.egg-info/*
