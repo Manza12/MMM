@@ -91,7 +91,10 @@ def erosion(piano_roll: PianoRoll, texture: Texture):
 def erosion(chroma_roll: ChromaRoll, harmony: Harmony):
     result = ActivationsStack()
     for chord in harmony:
-        result.append(erosion_cylindrical(chroma_roll, chord))
+        if isinstance(chord, ChromaChord):
+            result.append(erosion_cylindrical(chroma_roll, chord))
+        else:
+            raise ValueError('Chord should be a ChromaChord')
     return result
 
 

@@ -1,7 +1,6 @@
 import time
 import logging
 
-from mmm.pianorolls.algorithms import find_minimal_activations
 from mmm.pianorolls.music import *
 from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.morphology import erosion, dilation
@@ -14,7 +13,7 @@ sparse = True
 
 load = False
 log = True
-TimePoint.__str__ = lambda self: '(%s, %s)' % (self.beat, self.offset)
+# TimePoint.__str__ = lambda self: '(%s, %s)' % (self.measure, self.beat, self.offset)
 
 # Path
 piece = 'moonlight_3rd' + ('_53-56' if full else '_54') + ('_sync' if sync else '') + ('_sparse' if sparse else '')
@@ -155,19 +154,16 @@ activations_texture.change_extension(piano_roll.extension)
 
 # Contract
 activations_texture_contracted = activations_texture.contract()
+harmonies_contracted = Harmony(*[harmony.contract() for harmony in harmonies])
 
 # Erosion harmony
-activations_harmonies = []
-for harmony in harmonies:
-    activations_contracted = activations_texture.contract()
-    activations_harmony: ActivationsStack = erosion(activations_contracted, harmony)
-    activations_harmony.change_tatum(piano_roll.tatum, True)
-    activations_harmony.change_extension(piano_roll.extension)
-    activations_harmonies.append(activations_harmony)
+activations_harmony: ActivationsStack = erosion(activations_texture_contracted, harmonies_contracted)
+activations_harmony.change_tatum(piano_roll.tatum, inplace=True)
+activations_harmony.change_extension(piano_roll.extension)
 
+# Plots
+plot_piano_roll(activations_texture_contracted)
 plot_activations_stack(activations_texture)
-
-for activations_harmony in activations_harmonies:
-    plot_activations_stack(activations_harmony)
+plot_activations_stack(activations_harmony, time_label='Time (m, b, o)')
 
 plt.show()

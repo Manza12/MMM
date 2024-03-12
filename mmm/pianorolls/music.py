@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import warnings
+
 from . import *
 from .dictionaries import roman_numeral_to_factors_dict
 from .utils import midi_number_to_pitch, midi_number_to_chroma, gcd
@@ -126,6 +128,7 @@ class TimeShift(Time):
         assert isinstance(other, TimeShift) or isinstance(other, int)
         if isinstance(other, TimeShift):
             if other.value == 0:
+                warnings.warn('Floor division by zero.')
                 return 0
             return self.value // other.value
         else:
@@ -627,6 +630,11 @@ class FrequencyVector:
 
 # Time-Frequency
 class TimeFrequency:
+    @multimethod
+    def __init__(self):
+        self.time = None
+        self.frequency = None
+
     @multimethod
     def __init__(self, time: Time, frequency: Frequency):
         self.time = time
@@ -1332,6 +1340,12 @@ class Harmony(PianoRollStack):
             result = result.union(c.extension)
         return result
 
+    def contract(self) -> Chord:
+        result = Chord()
+        for c in self:
+            result = result.supremum(c)
+        return result
+
 
 class HarmonicTexture(PianoRoll):
     def __init__(self, texture: Texture, harmony: Harmony):
@@ -1389,9 +1403,16 @@ class Activations(list, PianoRoll):
 
         # Time-Frequency
         origin = TimeFrequency(origin_time, origin_frequency)
-        array = np.zeros((ambitus // step + 1, duration // tatum + 1), dtype=bool)
+        if duration == tatum == TimeShift(0):
+            t_shape = 1
+        else:
+            t_shape = duration // tatum + 1
+        array = np.zeros((ambitus // step + 1, t_shape), dtype=bool)
         for a in values:
-            idx_t = (a.time - origin_time) // tatum
+            if a.time - origin_time == TimeShift(0) == tatum:
+                idx_t = 0
+            else:
+                idx_t = (a.time - origin_time) // tatum
             idx_f = (a.frequency - origin_frequency) // step
             array[idx_f, idx_t] = True
 
