@@ -6,7 +6,6 @@ from mmm.pianorolls.music import *
 from mmm.pianorolls.midi import create_midi
 from mmm.pianorolls.morphology import erosion, dilation
 from mmm.pianorolls.plot import plot_piano_roll, plot_activations_graph, plot_activations_stack
-from mmm.pianorolls.graphs import ActivationsGraph, DerivedActivationsGraph
 
 # Parameters
 full = True
@@ -153,6 +152,9 @@ midi_file.save(midi_path)
 # Erosion texture
 activations_texture: ActivationsStack = erosion(piano_roll, texture)
 activations_texture.change_extension(piano_roll.extension)
+
+# Contract
+activations_texture_contracted = activations_texture.contract()
 
 # Erosion harmony
 activations_harmonies = []
