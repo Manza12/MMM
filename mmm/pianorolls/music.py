@@ -633,7 +633,8 @@ class TimeFrequency:
         self.frequency = frequency
 
     @multimethod
-    def __init__(self, time: Union[frac, str, int], frequency: int, time_nature: str, frequency_nature: str):
+    def __init__(self, time: Union[frac, str, int], frequency: int,
+                 time_nature: str = 'shift', frequency_nature: str = 'shift'):
         if time_nature == 'point':
             self.time = TimePoint(time)
         elif time_nature == 'shift':
@@ -1190,11 +1191,11 @@ class Texture(PianoRollStack):
         return self[0].tatum.gcd(*[r.tatum for r in self[1:]])
 
     @multimethod
-    def __mul__(self, harmony: Harmony) -> PianoRoll:
+    def __mul__(self, harmony: Harmony) -> HarmonicTexture:
         return HarmonicTexture(self, harmony)
 
     @multimethod
-    def __mul__(self, chord: Chord) -> PianoRoll:
+    def __mul__(self, chord: Chord) -> ChordTexture:
         return ChordTexture(self, chord)
 
 
@@ -1435,9 +1436,13 @@ class Activations(list, PianoRoll):
         raise NotImplementedError('Change of array not implemented yet.')
 
     def __add__(self, other):
-        assert isinstance(other, PianoRoll)
-        from .morphology import dilation
-        return dilation(self, other)
+        if isinstance(other, PianoRoll):
+            from .morphology import dilation
+            return dilation(self, other)
+        elif isinstance(other, tuple):
+            return self + (other[0] + other[1])
+        else:
+            return self + other.to_piano_roll()
 
 
 class ActivationsChroma(Activations, ChromaRoll):
