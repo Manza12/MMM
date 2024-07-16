@@ -1,7 +1,7 @@
-from . import *
 import xml.etree.ElementTree as ET
-
+from typing import Optional, Union, List
 from .music import TimeShift
+import warnings
 from .utils import pitch_to_note_number, beat_unit_to_tuple
 
 

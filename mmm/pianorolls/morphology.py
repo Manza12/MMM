@@ -1,7 +1,5 @@
-import torch
 import numpy as np
 from multimethod import multimethod
-from nnMorpho.binary_operators import erosion as binary_erosion
 from .music import Activations, PianoRoll, PianoRollStack, TimeFrequency, ActivationsStack, Texture, Harmony, \
     TimeShift, ChromaRoll, ChromaChord, ActivationsChroma
 
@@ -34,6 +32,9 @@ def dilation(activations_list: ActivationsStack, texture: Texture):
 
 @multimethod
 def erosion(piano_roll: PianoRoll, structuring_element: PianoRoll):
+    import torch
+    from nnMorpho.binary_operators import erosion as binary_erosion
+
     # Tatum
     if structuring_element.tatum != piano_roll.tatum and structuring_element.tatum != TimeShift(0):
         new_tatum = piano_roll.tatum.gcd(structuring_element.tatum,

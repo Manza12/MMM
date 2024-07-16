@@ -1,5 +1,6 @@
-from . import *
-
+from typing import Optional, Union
+from fractions import Fraction as frac
+import math
 from .dictionaries import number_to_chroma_spanish_dict, number_to_chroma_french_dict, number_to_chroma_english_dict, \
     pitch_to_note_number_dict, note_value_to_denominator_dict
 

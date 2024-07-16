@@ -1,6 +1,9 @@
 from __future__ import annotations
-
-from . import *
+from fractions import Fraction as frac
+from typing import Union, Tuple, Optional, Dict, Any, Type, List
+from multimethod import multimethod
+import numpy as np
+from copy import deepcopy
 from .dictionaries import roman_numeral_to_factors_dict
 from .utils import midi_number_to_pitch, midi_number_to_chroma, gcd
 

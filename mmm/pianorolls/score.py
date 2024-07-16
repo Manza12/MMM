@@ -1,3 +1,6 @@
+from typing import Dict
+import numpy as np
+from pathlib import Path
 from .music import FrequencyPoint, Time, TimePoint, FrequencyExtension, TimeExtension, PianoRoll, \
     TimeFrequency, FrequencyShift, TimeSignature
 from .utils import duration_whole_to_unicode, gcd

@@ -1,5 +1,7 @@
 import mido
-from . import *
+import numpy as np
+from typing import Optional
+from pathlib import Path
 from .music import PianoRoll, TimeShift, FrequencyShift, TimeFrequency, TimePoint, FrequencyPoint, TimeSeconds, \
     TimeSignature
 
