@@ -1,7 +1,5 @@
-import torch
 import numpy as np
 from multimethod import multimethod
-from nnMorpho.binary_operators import erosion as binary_erosion
 from .music import Activations, PianoRoll, PianoRollStack, TimeFrequency, ActivationsStack, Texture, Harmony, \
     TimeShift, ChromaRoll, ChromaChord, ActivationsChroma
 
@@ -34,6 +32,16 @@ def dilation(activations_list: ActivationsStack, texture: Texture):
 
 @multimethod
 def erosion(piano_roll: PianoRoll, structuring_element: PianoRoll):
+    import torch
+    from nnMorpho.binary_operators import erosion as binary_erosion
+
+    # Tatum
+    if structuring_element.tatum != piano_roll.tatum and structuring_element.tatum != TimeShift(0):
+        new_tatum = piano_roll.tatum.gcd(structuring_element.tatum,
+                                         piano_roll.origin.time - structuring_element.origin.time)
+        piano_roll = piano_roll.change_tatum(new_tatum)
+        structuring_element = structuring_element.change_tatum(new_tatum)
+
     # Origin
     if structuring_element.frequency_nature == 'shift':
         origin_frequency = - structuring_element.origin.frequency // structuring_element.step
@@ -44,13 +52,6 @@ def erosion(piano_roll: PianoRoll, structuring_element: PianoRoll):
         origin_time = - structuring_element.origin.time // structuring_element.tatum
     else:
         raise NotImplementedError
-
-    # Tatum
-    if structuring_element.tatum != piano_roll.tatum and structuring_element.tatum != TimeShift(0):
-        new_tatum = piano_roll.tatum.gcd(structuring_element.tatum,
-                                         piano_roll.origin.time - structuring_element.origin.time)
-        piano_roll = piano_roll.change_tatum(new_tatum)
-        structuring_element = structuring_element.change_tatum(new_tatum)
 
     # To PyTorch tensors
     piano_roll_tensor = torch.from_numpy(piano_roll.array)
@@ -91,7 +92,10 @@ def erosion(piano_roll: PianoRoll, texture: Texture):
 def erosion(chroma_roll: ChromaRoll, harmony: Harmony):
     result = ActivationsStack()
     for chord in harmony:
-        result.append(erosion_cylindrical(chroma_roll, chord))
+        if isinstance(chord, ChromaChord):
+            result.append(erosion_cylindrical(chroma_roll, chord))
+        else:
+            raise ValueError('Chord should be a ChromaChord')
     return result
 
 

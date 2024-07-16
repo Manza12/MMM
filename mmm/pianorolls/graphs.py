@@ -1,8 +1,5 @@
-from __future__ import annotations
-
 import networkx as nx
-
-from . import *
+from multimethod import multimethod
 from .music import PianoRoll, Texture, Rhythm, TimePoint, FrequencyPoint, ActivationsStack, Activations, Harmony, \
     RomanNumeral
 from .dictionaries import chord_to_roman_numeral_dict

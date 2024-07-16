@@ -1,7 +1,10 @@
 import time
 import os
 import logging
-from mmm.pianorolls import *
+from multimethod import multimethod
+from typing import List
+import numpy as np
+import networkx as nx
 from mmm.pianorolls.graphs import DerivedActivationsGraph
 from mmm.pianorolls.music import PianoRoll, PianoRollStack, Activations, Texture, ActivationsStack, TimeFrequency
 from mmm.pianorolls.morphology import erosion

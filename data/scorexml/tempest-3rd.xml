@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<score-tree xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance" xsd:noNamespaceSchemaLocation="score.xsd">
+    <name>Tempest 3rd</name>
+    <composer>Beethoven</composer>
+    <textures>
+        <texture id="T1">
+            <rhythm>
+                <hit>
+                    <start num="0" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="1" den="16"/>
+                    <duration num="5" den="16"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="T2">
+            <rhythm>
+                <hit>
+                    <start num="0" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="1" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="2" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="3" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="T3">
+            <rhythm>
+                <hit>
+                    <start num="-3" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="-2" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="-1" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="0" den="16"/>
+                    <duration num="2" den="16"/>
+                </hit>
+            </rhythm>
+        </texture>
+    </textures>
+    <component-tree id="phrase-1">
+        <activations>
+            <activation>
+                <time num="0" den="1" nat="point"/>
+                <frequency value="62" nat="point"/>
+            </activation>
+        </activations>
+        <component-tree id="demi-phrase-1">
+            <activations>
+                <activation>
+                    <time num="0" den="8"/>
+                    <frequency value="0"/>
+                </activation>
+            </activations>
+            <component-tree id="B1">
+                <activations>
+                    <activation>
+                        <time num="0" den="8"/>
+                        <frequency value="0"/>
+                    </activation>
+                    <activation>
+                        <time num="3" den="8"/>
+                        <frequency value="0"/>
+                    </activation>
+                    <activation>
+                        <time num="6" den="8"/>
+                        <frequency value="0"/>
+                    </activation>
+                </activations>
+                <component-tree>
+                    <activations>
+                        <activation>
+                            <time num="0" den="8"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <harmonic-texture>
+                        <texture>
+                            <id>T1</id>
+                        </texture>
+                        <harmony>
+                            <chord>
+                                <pitch value="-12"/>
+                            </chord>
+                            <chord>
+                                <pitch value="-5"/>
+                            </chord>
+                        </harmony>
+                    </harmonic-texture>
+                </component-tree>
+                <component-tree>
+                    <activations>
+                        <activation>
+                            <time num="0" den="8"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <harmonic-texture>
+                        <texture>
+                            <id>T2</id>
+                        </texture>
+                        <harmony>
+                            <chord>
+                                <pitch value="-12"/>
+                            </chord>
+                            <chord>
+                                <pitch value="-5"/>
+                            </chord>
+                            <chord>
+                                <pitch value="0"/>
+                            </chord>
+                            <chord>
+                                <pitch value="3"/>
+                            </chord>
+                        </harmony>
+                    </harmonic-texture>
+                </component-tree>
+                <component-tree>
+                    <activations>
+                        <activation>
+                            <time num="0" den="8"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <harmonic-texture>
+                        <texture>
+                            <id>T3</id>
+                        </texture>
+                        <harmony>
+                            <chord>
+                                <pitch value="7"/>
+                            </chord>
+                            <chord>
+                                <pitch value="15"/>
+                            </chord>
+                            <chord>
+                                <pitch value="14"/>
+                            </chord>
+                            <chord>
+                                <pitch value="12"/>
+                            </chord>
+                        </harmony>
+                    </harmonic-texture>
+                </component-tree>
+            </component-tree>
+            <component-tree id="B2">
+                <activations>
+                    <activation>
+                        <time num="9" den="8"/>
+                        <frequency value="0"/>
+                    </activation>
+                </activations>
+                <component-tree>
+                    <activations>
+                        <activation>
+                            <time num="0" den="8"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <harmonic-texture>
+                        <texture>
+                            <id>T1</id>
+                        </texture>
+                        <harmony>
+                            <chord>
+                                <pitch value="-17"/>
+                            </chord>
+                            <chord>
+                                <pitch value="-5"/>
+                            </chord>
+                        </harmony>
+                    </harmonic-texture>
+                </component-tree>
+                <component-tree>
+                    <activations>
+                        <activation>
+                            <time num="0" den="8"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <harmonic-texture>
+                        <texture>
+                            <id>T2</id>
+                        </texture>
+                        <harmony>
+                            <chord>
+                                <pitch value="-17"/>
+                            </chord>
+                            <chord>
+                                <pitch value="-5"/>
+                            </chord>
+                            <chord>
+                                <pitch value="-1"/>
+                            </chord>
+                            <chord>
+                                <pitch value="2"/>
+                            </chord>
+                        </harmony>
+                    </harmonic-texture>
+                </component-tree>
+                <component-tree>
+                    <activations>
+                        <activation>
+                            <time num="0" den="8"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <harmonic-texture>
+                        <texture>
+                            <id>T3</id>
+                        </texture>
+                        <harmony>
+                            <chord>
+                                <pitch value="7"/>
+                            </chord>
+                            <chord>
+                                <pitch value="15"/>
+                            </chord>
+                            <chord>
+                                <pitch value="12"/>
+                            </chord>
+                            <chord>
+                                <pitch value="14"/>
+                            </chord>
+                        </harmony>
+                    </harmonic-texture>
+                </component-tree>
+            </component-tree>
+        </component-tree>
+        <component-tree id="demi-phrase-2">
+            <activations>
+                <activation>
+                    <time num="12" den="8"/>
+                    <frequency value="0"/>
+                </activation>
+            </activations>
+            <component-tree id="B1">
+                <activations>
+                    <activation>
+                        <time num="0" den="8"/>
+                        <frequency value="0"/>
+                    </activation>
+                    <activation>
+                        <time num="3" den="8"/>
+                        <frequency value="0"/>
+                    </activation>
+                    <activation>
+                        <time num="6" den="8"/>
+                        <frequency value="0"/>
+                    </activation>
+                </activations>
+                <component-tree>
+                    <activations>
+                        <activation>
+                            <time num="0" den="8"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <harmonic-texture>
+                        <texture>
+                            <id>T1</id>
+                        </texture>
+                        <harmony>
+                            <chord>
+                                <pitch value="-17"/>
+                            </chord>
+                            <chord>
+                                <pitch value="-5"/>
+                            </chord>
+                        </harmony>
+                    </harmonic-texture>
+                </component-tree>
+                <component-tree>
+                    <activations>
+                        <activation>
+                            <time num="0" den="8"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <harmonic-texture>
+                        <texture>
+                            <id>T2</id>
+                        </texture>
+                        <harmony>
+                            <chord>
+                                <pitch value="-17"/>
+                            </chord>
+                            <chord>
+                                <pitch value="-5"/>
+                            </chord>
+                            <chord>
+                                <pitch value="-1"/>
+                            </chord>
+                            <chord>
+                                <pitch value="2"/>
+                            </chord>
+                        </harmony>
+                    </harmonic-texture>
+                </component-tree>
+                <component-tree>
+                    <activations>
+                        <activation>
+                            <time num="0" den="8"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <harmonic-texture>
+                        <texture>
+                            <id>T3</id>
+                        </texture>
+                        <harmony>
+                            <chord>
+                                <pitch value="7"/>
+                            </chord>
+                            <chord>
+                                <pitch value="17"/>
+                            </chord>
+                            <chord>
+                                <pitch value="15"/>
+                            </chord>
+                            <chord>
+                                <pitch value="14"/>
+                            </chord>
+                        </harmony>
+                    </harmonic-texture>
+                </component-tree>
+            </component-tree>
+            <component-tree id="B2">
+                <activations>
+                    <activation>
+                        <time num="9" den="8"/>
+                        <frequency value="0"/>
+                    </activation>
+                </activations>
+                <component-tree>
+                    <activations>
+                        <activation>
+                            <time num="0" den="8"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <harmonic-texture>
+                        <texture>
+                            <id>T1</id>
+                        </texture>
+                        <harmony>
+                            <chord>
+                                <pitch value="-12"/>
+                            </chord>
+                            <chord>
+                                <pitch value="-5"/>
+                            </chord>
+                        </harmony>
+                    </harmonic-texture>
+                </component-tree>
+                <component-tree>
+                    <activations>
+                        <activation>
+                            <time num="0" den="8"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <harmonic-texture>
+                        <texture>
+                            <id>T2</id>
+                        </texture>
+                        <harmony>
+                            <chord>
+                                <pitch value="-12"/>
+                            </chord>
+                            <chord>
+                                <pitch value="-5"/>
+                            </chord>
+                            <chord>
+                                <pitch value="0"/>
+                            </chord>
+                            <chord>
+                                <pitch value="3"/>
+                            </chord>
+                        </harmony>
+                    </harmonic-texture>
+                </component-tree>
+                <component-tree>
+                    <activations>
+                        <activation>
+                            <time num="0" den="8"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <harmonic-texture>
+                        <texture>
+                            <id>T3</id>
+                        </texture>
+                        <harmony>
+                            <chord>
+                                <pitch value="7"/>
+                            </chord>
+                            <chord>
+                                <pitch value="17"/>
+                            </chord>
+                            <chord>
+                                <pitch value="14"/>
+                            </chord>
+                            <chord>
+                                <pitch value="15"/>
+                            </chord>
+                        </harmony>
+                    </harmonic-texture>
+                </component-tree>
+            </component-tree>
+        </component-tree>
+    </component-tree>
+</score-tree>

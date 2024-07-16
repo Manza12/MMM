@@ -223,14 +223,14 @@ for i in range(2):
     axs[i].set_ylim([-1.7, 2.5])
 
 axs[0].legend([fill_u, fill_int, (str_el_fill, str_el_line), origin],
-              ['$A$', '$A \\ominus B$', '$B$', 'origine'],
+              ['$A$', '$A \\ominus B$', '$B$', '$0$'],
               handler_map={fill_int: DashedFilledRectangleHandler(colour_dilation),
                            fill_u: FilledRectangleHandler('tab:blue'),
                            str_el_fill: FilledCircleHandler(),
                            str_el_line: FilledCircleHandler()},
               loc='upper right')
 axs[1].legend([fill_u, fill_ext, (str_el_fill, str_el_line), origin],
-              ['$A$', '$A \\oplus B$', '$A$', 'origine'],
+              ['$A$', '$A \\oplus B$', '$A$', '$0$'],
               handler_map={fill_ext: DashedFilledRectangleHandler(colour_dilation),
                            fill_u: FilledRectangleHandler('tab:blue'),
                            str_el_fill: FilledCircleHandler(),

@@ -1,9 +1,13 @@
 import xml.etree.ElementTree as ET
-from .music import *
+from multimethod import multimethod
+from .music import Activations, TimeFrequency, PianoRoll, HarmonicTexture, ChordTexture, Texture, Rhythm, Hit, \
+    TimeShift, TimePoint, Chord, Harmony, FrequencyShift, Frequency, FrequencyPoint
+from typing import Union, List, Tuple
+from pathlib import Path
 
 
 class ComponentTree:
-    def __init__(self, activations: Activations, *components: PianoRoll):
+    def __init__(self, activations: Activations, *components: Union['ComponentTree', PianoRoll]):
         self.activations: Activations = activations
         self.components: List[Union[ComponentTree, PianoRoll]] = list(components)
 
@@ -19,6 +23,14 @@ class ComponentTree:
 
 
 class ScoreTree:
+    @multimethod
+    def __init__(self, *components: Tuple[Activations, Union[ComponentTree, HarmonicTexture]]):
+        self.name = None
+        self.composer = None
+        self.components = list(components)
+        self.component_tree = ComponentTree(Activations(TimeFrequency(0, 0)), *components)
+
+    @multimethod
     def __init__(self, file_path: Path):
         self.file_path = file_path
 

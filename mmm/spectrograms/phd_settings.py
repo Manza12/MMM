@@ -101,6 +101,94 @@ woodblock = {
     }
 }
 
+
+anastasia_excerpt = {
+    'start': None,
+    'end': None,
+    'parameters': {},
+    'plot': {
+        # 'input': {
+        #     'name': 'input',
+        #     'x_lim': (0., 3.),
+        #     'y_lim': (0, 2000),
+        #     'fig_size': (10., 4.),
+        #     'extension': 'svg',
+        # },
+        # 'closing': {
+        #     'name': 'closing',
+        #     'x_lim': (0., 3.),
+        #     'y_lim': (0, 2000),
+        #     'fig_size': (10., 4.),
+        #     'single': True,
+        #     'extension': 'svg',
+        # },
+        # 'reconstruction_erosion': {
+        #     'name': 'reconstruction_erosion',
+        #     'x_lim': (0., 3.),
+        #     'y_lim': (0, 2000),
+        #     'fig_size': (10., 4.),
+        #     'single': True,
+        #     'extension': 'svg',
+        # },
+        # 'vertical_thinning': {
+        #     'name': 'vertical_thinning',
+        #     'x_lim': (0., 3.),
+        #     'y_lim': (0, 2000),
+        #     'fig_size': (10., 4.),
+        #     'single': True,
+        #     'extension': 'svg',
+        # },
+        # 'vertical_top_hat': {
+        #     'name': 'vertical_top_hat',
+        #     'x_lim': (0., 3.),
+        #     'y_lim': (0, 2000),
+        #     'fig_size': (10., 4.),
+        #     'single': True,
+        #     'extension': 'svg',
+        # },
+        # 'vertical_threshold': {
+        #     'name': 'vertical_threshold',
+        #     'x_lim': (0., 3.),
+        #     'y_lim': (0, 2000),
+        #     'fig_size': (10., 4.),
+        #     'single': True,
+        #     'extension': 'svg',
+        # },
+        # 'horizontal_top_hat': {
+        #     'name': 'horizontal_top_hat',
+        #     'x_lim': (0., 3.),
+        #     'y_lim': (0, 2000),
+        #     'fig_size': (10., 4.),
+        #     'single': True,
+        #     'extension': 'svg',
+        # },
+        # 'horizontal_threshold': {
+        #     'name': 'horizontal_threshold',
+        #     'x_lim': (0., 3.),
+        #     'y_lim': (0, 2000),
+        #     'fig_size': (10., 4.),
+        #     'single': True,
+        #     'extension': 'svg',
+        # },
+        # 'vertical_filtered': {
+        #     'name': 'vertical_filtered',
+        #     'x_lim': (0., 3.),
+        #     'y_lim': (0, 2000),
+        #     'fig_size': (10., 4.),
+        #     'single': True,
+        #     'extension': 'svg',
+        # },
+        'opening': {
+            'name': 'opening',
+            'x_lim': (0., 3.),
+            'y_lim': (0, 2000),
+            'fig_size': (10., 4.),
+            'single': True,
+            'extension': 'svg',
+        },
+    }
+}
+
 marimba = {
     'lines_sinusoids': {
         'x_lim': (0.05, 0.6),

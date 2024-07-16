@@ -1,6 +1,9 @@
 from __future__ import annotations
-
-from . import *
+from fractions import Fraction as frac
+from typing import Union, Tuple, Optional, Dict, Any, Type, List
+from multimethod import multimethod
+import numpy as np
+from copy import deepcopy
 from .dictionaries import roman_numeral_to_factors_dict
 from .utils import midi_number_to_pitch, midi_number_to_chroma, gcd
 
@@ -633,7 +636,8 @@ class TimeFrequency:
         self.frequency = frequency
 
     @multimethod
-    def __init__(self, time: Union[frac, str, int], frequency: int, time_nature: str, frequency_nature: str):
+    def __init__(self, time: Union[frac, str, int], frequency: int,
+                 time_nature: str = 'shift', frequency_nature: str = 'shift'):
         if time_nature == 'point':
             self.time = TimePoint(time)
         elif time_nature == 'shift':
@@ -725,7 +729,7 @@ class PianoRoll:
         self.step: FrequencyShift = kwargs.get('step', FrequencyShift(0))
 
         self.dynamics: Optional[Dict[Any, int]] = kwargs.get('dynamics', None)
-        self.time_signature: TimeSignature = TimeSignature(4, 4)
+        self._time_signature: Optional[TimeSignature] = kwargs.get('time_signature', None)
         if 'time_signature' in kwargs:
             self.time_signature = TimeSignature(kwargs['time_signature'])
 
@@ -902,6 +906,17 @@ class PianoRoll:
     @property
     def frequency_vector(self):
         return FrequencyVector(self.origin.frequency, self.step)
+
+    @property
+    def time_signature(self):
+        if self._time_signature is None:
+            self._time_signature = TimeSignature(4, 4)
+        return self._time_signature
+
+    @time_signature.setter
+    def time_signature(self, time_signature: TimeSignature):
+        self._time_signature = time_signature
+        self.origin.time.time_signature = time_signature
 
     def measure(self, c: dict):
         assert isinstance(c, dict) and len(c) == 2, 'c must be a dict of 2 integers.'
@@ -1179,11 +1194,11 @@ class Texture(PianoRollStack):
         return self[0].tatum.gcd(*[r.tatum for r in self[1:]])
 
     @multimethod
-    def __mul__(self, harmony: Harmony) -> PianoRoll:
+    def __mul__(self, harmony: Harmony) -> HarmonicTexture:
         return HarmonicTexture(self, harmony)
 
     @multimethod
-    def __mul__(self, chord: Chord) -> PianoRoll:
+    def __mul__(self, chord: Chord) -> ChordTexture:
         return ChordTexture(self, chord)
 
 
@@ -1228,8 +1243,13 @@ class Chord(PianoRoll):
     def from_degree(cls, degree: str, factors: List[Dict[str, str]]):
         degree_dict = roman_numeral_to_factors_dict[degree]
         note_numbers = []
-        for factor in factors:
-            note_numbers.append(degree_dict[factor['value']] + 12 * int(factor.get('octave', 0)))
+        factor = None
+        try:
+            for factor in factors:
+                value = degree_dict[factor['value']] + 12 * int(factor.get('octave', 0))
+                note_numbers.append(value)
+        except KeyError:
+            raise ValueError("Factor '%s' of '%s' not found." % (factor['value'], degree))
         return cls(*note_numbers, nature='shift')
 
     def __len__(self):
@@ -1329,6 +1349,8 @@ class HarmonicTexture(PianoRoll):
         for rhythm, chord in zip(texture, harmony):
             rhythm: Rhythm
             chord: Chord
+            if rhythm.array.size == 0:
+                continue
             rhythmed_chord = PianoRoll(chord.array * rhythm.array,
                                        TimeFrequency(rhythm.origin.time, chord.origin.frequency),
                                        rhythm.tatum, chord.step)
@@ -1417,9 +1439,13 @@ class Activations(list, PianoRoll):
         raise NotImplementedError('Change of array not implemented yet.')
 
     def __add__(self, other):
-        assert isinstance(other, PianoRoll)
-        from .morphology import dilation
-        return dilation(self, other)
+        if isinstance(other, PianoRoll):
+            from .morphology import dilation
+            return dilation(self, other)
+        elif isinstance(other, tuple):
+            return self + (other[0] + other[1])
+        else:
+            return self + other.to_piano_roll()
 
 
 class ActivationsChroma(Activations, ChromaRoll):

@@ -183,13 +183,13 @@ for i in range(2):
     axs[i].set_ylim([-1.7, 2.5])
 
 axs[0].legend([fill_u, (str_el_fill, str_el_line), origin],
-              ['opening', 'structuring\nelement', 'origin'],
+              ['opening', 'structuring\nelement', '$0$'],
               handler_map={fill_u: FilledRectangleHandler('tab:blue'),
                            str_el_fill: FilledCircleHandler(),
                            str_el_line: FilledCircleHandler()},
               loc='upper right')
 axs[1].legend([fill_u, (str_el_fill, str_el_line), origin],
-              ['closing', 'structuring\nelement', 'origin'],
+              ['closing', 'structuring\nelement', '$0$'],
               handler_map={fill_u: FilledRectangleHandler('tab:blue'),
                            str_el_fill: FilledCircleHandler(),
                            str_el_line: FilledCircleHandler()},

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<score-tree xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance" xsd:noNamespaceSchemaLocation="score.xsd">
+    <name>Once Upon a December</name>
+    <composer>Stephen Flaherty</composer>
+    <textures>
+        <texture id="Texture 1">
+            <rhythm>
+                <hit>
+                    <start num="0" den="8"/>
+                    <duration num="1" den="8"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="1" den="8"/>
+                    <duration num="1" den="8"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="2" den="8"/>
+                    <duration num="1" den="8"/>
+                </hit>
+            </rhythm>
+        </texture>
+    </textures>
+    <component-tree>
+        <activations>
+            <activation>
+                <time num="0" den="8" nat="point"/>
+                <frequency value="71" nat="point"/>
+            </activation>
+        </activations>
+        <component-tree>
+            <activations>
+                <activation>
+                    <time num="0" den="8"/>
+                    <frequency value="0"/>
+                </activation>
+            </activations>
+            <chord-texture>
+                <texture>
+                    <id>Texture 1</id>
+                </texture>
+                <chord>
+                    <degree>i</degree>
+                    <factor value="1"/>
+                    <factor value="3"/>
+                    <factor value="5"/>
+                </chord>
+            </chord-texture>
+        </component-tree>
+        <component-tree>
+            <activations>
+                <activation>
+                    <time num="3" den="8"/>
+                    <frequency value="0"/>
+                </activation>
+            </activations>
+            <chord-texture>
+                <texture>
+                    <id>Texture 1</id>
+                </texture>
+                <chord>
+                    <degree>i</degree>
+                    <factor value="5" octave="-1"/>
+                    <factor value="3"/>
+                    <factor value="5"/>
+                </chord>
+            </chord-texture>
+        </component-tree>
+        <component-tree>
+            <activations>
+                <activation>
+                    <time num="6" den="8"/>
+                    <frequency value="0"/>
+                </activation>
+            </activations>
+            <chord-texture>
+                <texture>
+                    <id>Texture 1</id>
+                </texture>
+                <chord>
+                    <degree>i</degree>
+                    <factor value="1"/>
+                    <factor value="3"/>
+                    <factor value="5"/>
+                </chord>
+            </chord-texture>
+        </component-tree>
+        <component-tree>
+            <activations>
+                <activation>
+                    <time num="9" den="8"/>
+                    <frequency value="0"/>
+                </activation>
+            </activations>
+            <chord-texture>
+                <texture>
+                    <id>Texture 1</id>
+                </texture>
+                <chord>
+                    <degree>i</degree>
+                    <factor value="5" octave="-1"/>
+                    <factor value="3"/>
+                    <factor value="5"/>
+                </chord>
+            </chord-texture>
+        </component-tree>
+    </component-tree>
+</score-tree>

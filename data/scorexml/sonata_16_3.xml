@@ -1,0 +1,702 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<score-tree xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance" xsd:noNamespaceSchemaLocation="score.xsd">
+    <name>Sonata nº16</name>
+    <composer>Mozart</composer>
+    <textures>
+        <texture id="Alberti bass">
+            <rhythm>
+                <hit>
+                    <start num="0" den="8"/>
+                    <duration num="1" den="8"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="2" den="8"/>
+                    <duration num="1" den="8"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="1" den="8"/>
+                    <duration num="1" den="8"/>
+                </hit>
+                <hit>
+                    <start num="3" den="8"/>
+                    <duration num="1" den="8"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="Bass 1">
+            <rhythm>
+                <hit>
+                    <start num="0" den="4"/>
+                    <duration num="1" den="4"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="3" den="4"/>
+                    <duration num="1" den="4"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="Melody 1">
+            <rhythm>
+                <hit>
+                    <start num="0" den="16"/>
+                    <duration num="1" den="8"/>
+                </hit>
+                <hit>
+                    <start num="15" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="2" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="14" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="3" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="13" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="4" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="12" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="5" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="11" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="6" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="10" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="7" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="9" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="8" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="Melody 1 bis">
+            <rhythm>
+                <hit>
+                    <start num="0" den="16"/>
+                    <duration num="1" den="8"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="2" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="3" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="4" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="5" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="9" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="6" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="10" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="7" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="11" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="8" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="12" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="13" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="14" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="15" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="Melody 2">
+            <rhythm>
+                <hit>
+                    <start num="7" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="6" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="5" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="0" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="4" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="1" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+                <hit>
+                    <start num="3" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="2" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="2 corcheas">
+            <rhythm>
+                <hit>
+                    <start num="0" den="8"/>
+                    <duration num="1" den="8"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="1" den="8"/>
+                    <duration num="1" den="8"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="3 negras">
+            <rhythm>
+                <hit>
+                    <start num="0" den="4"/>
+                    <duration num="1" den="4"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="1" den="4"/>
+                    <duration num="1" den="4"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="2" den="4"/>
+                    <duration num="1" den="4"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="Negra con puntillo corchea">
+            <rhythm>
+                <hit>
+                    <start num="0" den="8"/>
+                    <duration num="3" den="8"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="3" den="8"/>
+                    <duration num="1" den="8"/>
+                </hit>
+            </rhythm>
+        </texture>
+        <texture id="Arpegio semicorcheas">
+            <rhythm>
+                <hit>
+                    <start num="0" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="1" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="2" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+            <rhythm>
+                <hit>
+                    <start num="3" den="16"/>
+                    <duration num="1" den="16"/>
+                </hit>
+            </rhythm>
+        </texture>
+    </textures>
+    <component-tree>
+        <activations>
+            <activation>
+                <time num="0" den="1" nat="point"/>
+                <frequency value="60" nat="point"/>
+            </activation>
+        </activations>
+        <component-tree id="A">
+            <activations>
+                <activation>
+                    <time num="0" den="1"/>
+                    <frequency value="0"/>
+                </activation>
+            </activations>
+            <component-tree id="A1">
+                <activations>
+                    <activation>
+                        <time num="0" den="1"/>
+                        <frequency value="0"/>
+                    </activation>
+                </activations>
+                <component-tree id="A1-LH">
+                    <activations>
+                        <activation>
+                            <time num="0" den="1"/>
+                            <frequency value="0"/>
+                        </activation>
+                    </activations>
+                    <component-tree id="1">
+                        <activations>
+                            <activation>
+                                <time num="0" den="1"/>
+                                <frequency value="0"/>
+                            </activation>
+                        </activations>
+                        <chord-texture>
+                            <texture>
+                                <id>Alberti bass</id>
+                            </texture>
+                            <chord>
+                                <degree>I</degree>
+                                <factor value="1"/>
+                                <factor value="3"/>
+                                <factor value="5"/>
+                            </chord>
+                        </chord-texture>
+                    </component-tree>
+                    <component-tree id="2">
+                        <activations>
+                            <activation>
+                                <time num="1" den="2"/>
+                                <frequency value="0"/>
+                            </activation>
+                        </activations>
+                        <chord-texture>
+                            <texture>
+                                <id>Alberti bass</id>
+                            </texture>
+                            <chord>
+                                <degree>I</degree>
+                                <factor value="1"/>
+                                <factor value="3"/>
+                                <factor value="5"/>
+                            </chord>
+                        </chord-texture>
+                    </component-tree>
+                    <component-tree id="2">
+                        <activations>
+                            <activation>
+                                <time num="1" den="2"/>
+                                <frequency value="0"/>
+                            </activation>
+                        </activations>
+                        <chord-texture>
+                            <texture>
+                                <id>Alberti bass</id>
+                            </texture>
+                            <chord>
+                                <degree>I</degree>
+                                <factor value="1"/>
+                                <factor value="3"/>
+                                <factor value="5"/>
+                            </chord>
+                        </chord-texture>
+                    </component-tree>
+                    <component-tree id="3">
+                        <activations>
+                            <activation>
+                                <time num="1" den="1"/>
+                                <frequency value="0"/>
+                            </activation>
+                        </activations>
+                        <chord-texture>
+                            <texture>
+                                <id>Alberti bass</id>
+                            </texture>
+                            <chord>
+                                <degree>V</degree>
+                                <factor value="5"/>
+                                <factor value="7"/>
+                                <factor value="1"/>
+                            </chord>
+                        </chord-texture>
+                    </component-tree>
+                    <component-tree id="4">
+                        <activations>
+                            <activation>
+                                <time num="3" den="2"/>
+                                <frequency value="0"/>
+                            </activation>
+                        </activations>
+                        <chord-texture>
+                            <texture>
+                                <id>Alberti bass</id>
+                            </texture>
+                            <chord>
+                                <degree>I</degree>
+                                <factor value="1"/>
+                                <factor value="3"/>
+                                <factor value="5"/>
+                            </chord>
+                        </chord-texture>
+                    </component-tree>
+                    <component-tree id="5">
+                        <activations>
+                            <activation>
+                                <time num="2" den="1"/>
+                                <frequency value="0"/>
+                            </activation>
+                        </activations>
+                        <chord-texture>
+                            <texture>
+                                <id>Alberti bass</id>
+                            </texture>
+                            <chord>
+                                <degree>IV</degree>
+                                <factor value="5"/>
+                                <factor value="1"/>
+                                <factor value="3"/>
+                            </chord>
+                        </chord-texture>
+                    </component-tree>
+                    <component-tree id="6">
+                        <activations>
+                            <activation>
+                                <time num="5" den="2"/>
+                                <frequency value="0"/>
+                            </activation>
+                        </activations>
+                        <chord-texture>
+                            <texture>
+                                <id>Alberti bass</id>
+                            </texture>
+                            <chord>
+                                <degree>I</degree>
+                                <factor value="1"/>
+                                <factor value="3"/>
+                                <factor value="5"/>
+                            </chord>
+                        </chord-texture>
+                    </component-tree>
+                    <component-tree id="7">
+                        <activations>
+                            <activation>
+                                <time num="3" den="1"/>
+                                <frequency value="0"/>
+                            </activation>
+                        </activations>
+                        <chord-texture>
+                            <texture>
+                                <id>Alberti bass</id>
+                            </texture>
+                            <chord>
+                                <degree>V</degree>
+                                <factor value="3" octave="-1"/>
+                                <factor value="5"/>
+                                <factor value="1"/>
+                            </chord>
+                        </chord-texture>
+                    </component-tree>
+                    <component-tree id="8">
+                        <activations>
+                            <activation>
+                                <time num="7" den="2"/>
+                                <frequency value="0"/>
+                            </activation>
+                        </activations>
+                        <chord-texture>
+                            <texture>
+                                <id>Alberti bass</id>
+                            </texture>
+                            <chord>
+                                <degree>I</degree>
+                                <factor value="1"/>
+                                <factor value="3"/>
+                                <factor value="5"/>
+                            </chord>
+                        </chord-texture>
+                    </component-tree>
+                </component-tree>
+<!--                <component-tree id="A1-RH">-->
+<!--                    <activations>-->
+<!--                        <activation>-->
+<!--                            <time num="0" den="1"/>-->
+<!--                            <frequency value="12"/>-->
+<!--                        </activation>-->
+<!--                    </activations>-->
+<!--                    <component-tree>-->
+<!--                        <activations>-->
+<!--                            <activation>-->
+<!--                                <time num="0" den="1"/>-->
+<!--                                <frequency value="0"/>-->
+<!--                            </activation>-->
+<!--                        </activations>-->
+<!--                        <chord-texture>-->
+<!--                            <texture>-->
+<!--                                <rhythm>-->
+<!--                                    <hit>-->
+<!--                                        <start num="0" den="1"/>-->
+<!--                                        <duration num="1" den="2"/>-->
+<!--                                    </hit>-->
+<!--                                </rhythm>-->
+<!--                                <rhythm>-->
+<!--                                    <hit>-->
+<!--                                        <start num="1" den="2"/>-->
+<!--                                        <duration num="1" den="4"/>-->
+<!--                                    </hit>-->
+<!--                                </rhythm>-->
+<!--                                <rhythm>-->
+<!--                                    <hit>-->
+<!--                                        <start num="3" den="4"/>-->
+<!--                                        <duration num="1" den="4"/>-->
+<!--                                    </hit>-->
+<!--                                </rhythm>-->
+<!--                            </texture>-->
+<!--                            <chord>-->
+<!--                                <degree>I</degree>-->
+<!--                                <factor value="1"/>-->
+<!--                                <factor value="3"/>-->
+<!--                                <factor value="5"/>-->
+<!--                            </chord>-->
+<!--                        </chord-texture>-->
+<!--                    </component-tree>-->
+<!--                    <component-tree>-->
+<!--                        <activations>-->
+<!--                            <activation>-->
+<!--                                <time num="1" den="1"/>-->
+<!--                                <frequency value="0"/>-->
+<!--                            </activation>-->
+<!--                        </activations>-->
+<!--                        <chord-texture>-->
+<!--                            <texture>-->
+<!--                                <rhythm>-->
+<!--                                    <hit>-->
+<!--                                        <start num="0" den="1"/>-->
+<!--                                        <duration num="3" den="8"/>-->
+<!--                                    </hit>-->
+<!--                                </rhythm>-->
+<!--                                <rhythm>-->
+<!--                                    <hit>-->
+<!--                                        <start num="3" den="8"/>-->
+<!--                                        <duration num="1" den="16"/>-->
+<!--                                    </hit>-->
+<!--                                    <hit>-->
+<!--                                        <start num="1" den="2"/>-->
+<!--                                        <duration num="1" den="4"/>-->
+<!--                                    </hit>-->
+<!--                                </rhythm>-->
+<!--                                <rhythm>-->
+<!--                                    <hit>-->
+<!--                                        <start num="7" den="16"/>-->
+<!--                                        <duration num="1" den="16"/>-->
+<!--                                    </hit>-->
+<!--                                </rhythm>-->
+<!--                            </texture>-->
+<!--                            <chord>-->
+<!--                                <degree>Maj</degree>-->
+<!--                                <factor value="7" octave="-1"/>-->
+<!--                                <factor value="1"/>-->
+<!--                                <factor value="2"/>-->
+<!--                            </chord>-->
+<!--                        </chord-texture>-->
+<!--                    </component-tree>-->
+<!--                    <component-tree>-->
+<!--                        <activations>-->
+<!--                            <activation>-->
+<!--                                <time num="2" den="1"/>-->
+<!--                                <frequency value="0"/>-->
+<!--                            </activation>-->
+<!--                        </activations>-->
+<!--                        <chord-texture>-->
+<!--                            <texture>-->
+<!--                                <rhythm>-->
+<!--                                    <hit>-->
+<!--                                        <start num="1" den="2"/>-->
+<!--                                        <duration num="1" den="4"/>-->
+<!--                                    </hit>-->
+<!--                                </rhythm>-->
+<!--                                <rhythm>-->
+<!--                                    <hit>-->
+<!--                                        <start num="0" den="1"/>-->
+<!--                                        <duration num="1" den="2"/>-->
+<!--                                    </hit>-->
+<!--                                </rhythm>-->
+<!--                                <rhythm>-->
+<!--                                    <hit>-->
+<!--                                        <start num="3" den="4"/>-->
+<!--                                        <duration num="1" den="4"/>-->
+<!--                                    </hit>-->
+<!--                                </rhythm>-->
+<!--                            </texture>-->
+<!--                            <chord>-->
+<!--                                <degree>Maj</degree>-->
+<!--                                <factor value="5"/>-->
+<!--                                <factor value="6"/>-->
+<!--                                <factor value="1" octave="1"/>-->
+<!--                            </chord>-->
+<!--                        </chord-texture>-->
+<!--                    </component-tree>-->
+<!--                    <component-tree>-->
+<!--                        <activations>-->
+<!--                            <activation>-->
+<!--                                <time num="3" den="1"/>-->
+<!--                                <frequency value="0"/>-->
+<!--                            </activation>-->
+<!--                        </activations>-->
+<!--                        <chord-texture>-->
+<!--                            <texture>-->
+<!--                                <rhythm>-->
+<!--                                    <hit>-->
+<!--                                        <start num="1" den="2"/>-->
+<!--                                        <duration num="1" den="4"/>-->
+<!--                                    </hit>-->
+<!--                                    <hit>-->
+<!--                                        <start num="3" den="8"/>-->
+<!--                                        <duration num="1" den="16"/>-->
+<!--                                    </hit>-->
+<!--                                </rhythm>-->
+<!--                                <rhythm>-->
+<!--                                    <hit>-->
+<!--                                        <start num="1" den="4"/>-->
+<!--                                        <duration num="1" den="24"/>-->
+<!--                                    </hit>-->
+<!--                                    <hit>-->
+<!--                                        <start num="1" den="3"/>-->
+<!--                                        <duration num="1" den="24"/>-->
+<!--                                    </hit>-->
+<!--                                    <hit>-->
+<!--                                        <start num="7" den="16"/>-->
+<!--                                        <duration num="1" den="16"/>-->
+<!--                                    </hit>-->
+<!--                                </rhythm>-->
+<!--                                <rhythm>-->
+<!--                                    <hit>-->
+<!--                                        <start num="0" den="4"/>-->
+<!--                                        <duration num="1" den="4"/>-->
+<!--                                    </hit>-->
+<!--                                    <hit>-->
+<!--                                        <start num="7" den="24"/>-->
+<!--                                        <duration num="1" den="24"/>-->
+<!--                                    </hit>-->
+<!--                                </rhythm>-->
+<!--                            </texture>-->
+<!--                            <chord>-->
+<!--                                <degree>Maj</degree>-->
+<!--                                <factor value="3"/>-->
+<!--                                <factor value="4"/>-->
+<!--                                <factor value="5"/>-->
+<!--                            </chord>-->
+<!--                        </chord-texture>-->
+<!--                    </component-tree>-->
+<!--                </component-tree>-->
+            </component-tree>
+        </component-tree>
+    </component-tree>
+</score-tree>

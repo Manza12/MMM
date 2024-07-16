@@ -1,4 +1,9 @@
-from . import *
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+from typing import Optional
+import numpy as np
+import networkx as nx
+import matplotlib.ticker as tick
 from .graphs import ActivationsGraph, TonalGraph
 from .music import TimePoint, PianoRoll, ChromaRoll, ActivationsStack, TimeSeconds
 from .utils import round_half_up
@@ -166,8 +171,10 @@ def plot_piano_roll(piano_roll: PianoRoll,
             time_label = 'Time (s)'
         else:
             time_label = 'Time (wholes)'
-    elif time_label == 'Time (m, b)':
+    elif time_label in ['Time (m, b)', 'Temps (mesure, temps)']:
         TimePoint.__str__ = lambda self: f'({self.measure}, {self.beat})'
+    elif time_label in ['Time (m)', 'Time (measure)', 'Temps (measure)']:
+        TimePoint.__str__ = lambda self: f'{self.measure}'
 
     if freq_label is None:
         if piano_roll.frequency_nature == 'point':
@@ -196,12 +203,11 @@ def plot_piano_roll(piano_roll: PianoRoll,
                                       colorbar_labels=colorbar_labels,
                                       **kwargs)
             y, x = np.where(piano_roll.array[0, :, :] == 2)
-            onsets = plt.scatter(x-0.5, y, s=30, c='r', marker="|")
-            fig.__dict__['onsets'] = onsets
+            plt.vlines(x-0.5, y-0.5, y+0.5, colors='r', linestyles='solid')
 
     if x_tick_step is not None:
         if x_tick_start is None:
-            x_tick_start = TimePoint(0, 1)
+            x_tick_start = TimePoint(0, 1, time_signature=piano_roll.time_signature)
         # For Activations with zero tatum
         if x_tick_step / piano_roll.tatum == 0:
             ticks = np.array([0.])
@@ -228,11 +234,11 @@ def plot_piano_roll(piano_roll: PianoRoll,
 
     # Update the limits
     if tight_frame:
-        plt.xlim([-0.5, piano_roll.array.shape[1] - 0.5])
-        plt.ylim([-0.5, piano_roll.array.shape[0] - 0.5])
+        plt.xlim([-0.5, piano_roll.array.shape[-1] - 0.5])
+        plt.ylim([-0.5, piano_roll.array.shape[-2] - 0.5])
     else:
-        plt.xlim([-1.5, piano_roll.array.shape[1] + 0.5])
-        plt.ylim([-1.5, piano_roll.array.shape[0] + 0.5])
+        plt.xlim([-1.5, piano_roll.array.shape[-1] + 0.5])
+        plt.ylim([-1.5, piano_roll.array.shape[-2] + 0.5])
 
     # Tight layout
     plt.tight_layout()
@@ -261,7 +267,7 @@ def plot_activations_stack(activations_stack: ActivationsStack,
         time_label = 'Time (wholes)'
     elif time_label == 'Time (m, b)':
         TimePoint.__str__ = lambda self: f'({self.measure}, {self.beat})'
-    elif time_label == 'Time (measure)':
+    elif time_label in ['Time (measure)', 'Temps (mesure)']:
         TimePoint.__str__ = lambda self: f'{self.measure}'
 
     if freq_label is None:

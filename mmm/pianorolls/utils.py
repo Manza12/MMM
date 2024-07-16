@@ -1,5 +1,6 @@
-from . import *
-
+from typing import Optional, Union
+from fractions import Fraction as frac
+import math
 from .dictionaries import number_to_chroma_spanish_dict, number_to_chroma_french_dict, number_to_chroma_english_dict, \
     pitch_to_note_number_dict, note_value_to_denominator_dict
 
@@ -53,6 +54,8 @@ def midi_number_to_pitch(number: Optional[int], language: str = 'english') -> Op
         return None
     chroma = midi_number_to_chroma(number % 12, language=language)
     octave = number // 12 - 1
+    if language in ['french', 'spanish']:
+        octave = octave - 1
 
     return chroma + str(octave)
 
