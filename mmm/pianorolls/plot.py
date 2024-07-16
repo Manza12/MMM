@@ -203,8 +203,7 @@ def plot_piano_roll(piano_roll: PianoRoll,
                                       colorbar_labels=colorbar_labels,
                                       **kwargs)
             y, x = np.where(piano_roll.array[0, :, :] == 2)
-            onsets = plt.scatter(x-0.5, y, s=30, c='r', marker="|")
-            fig.__dict__['onsets'] = onsets
+            plt.vlines(x-0.5, y-0.5, y+0.5, colors='r', linestyles='solid')
 
     if x_tick_step is not None:
         if x_tick_start is None:
@@ -235,11 +234,11 @@ def plot_piano_roll(piano_roll: PianoRoll,
 
     # Update the limits
     if tight_frame:
-        plt.xlim([-0.5, piano_roll.array.shape[1] - 0.5])
-        plt.ylim([-0.5, piano_roll.array.shape[0] - 0.5])
+        plt.xlim([-0.5, piano_roll.array.shape[-1] - 0.5])
+        plt.ylim([-0.5, piano_roll.array.shape[-2] - 0.5])
     else:
-        plt.xlim([-1.5, piano_roll.array.shape[1] + 0.5])
-        plt.ylim([-1.5, piano_roll.array.shape[0] + 0.5])
+        plt.xlim([-1.5, piano_roll.array.shape[-1] + 0.5])
+        plt.ylim([-1.5, piano_roll.array.shape[-2] + 0.5])
 
     # Tight layout
     plt.tight_layout()
