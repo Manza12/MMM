@@ -203,7 +203,8 @@ def plot_piano_roll(piano_roll: PianoRoll,
                                       colorbar_labels=colorbar_labels,
                                       **kwargs)
             y, x = np.where(piano_roll.array[0, :, :] == 2)
-            plt.vlines(x-0.5, y-0.5, y+0.5, colors='r', linestyles='solid')
+            onsets = plt.vlines(x-0.5, y-0.5, y+0.5, colors='r', linestyles='solid')
+            plt.legend([onsets], ['Note attack'], loc='upper right')
 
     if x_tick_step is not None:
         if x_tick_start is None:
