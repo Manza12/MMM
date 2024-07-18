@@ -1114,9 +1114,9 @@ class ChromaRoll(PianoRoll):
         return Extension(time_extension, frequency_extension)
 
 
-class PianoRollStack(List[PianoRoll]):
+class PianoRollStack:
     def __init__(self, *piano_rolls: PianoRoll):
-        super().__init__(piano_rolls)
+        self.piano_rolls = list(piano_rolls)
 
 
 class Hit(PianoRoll):
@@ -1174,24 +1174,30 @@ class Texture(PianoRollStack):
             raise WrongNature('Rhythms must be of the same nature')
         super().__init__(*rhythms)
 
+    def __len__(self):
+        return len(self.piano_rolls)
+
+    def __iter__(self):
+        return iter(self.piano_rolls)
+
     @property
     def nature(self):
-        if len(self) == 0:
+        if len(self.piano_rolls) == 0:
             return 'shift'
         else:
-            return self[0].time_nature
+            return self.piano_rolls[0].time_nature
 
     @property
     def extension(self):
-        max_time = max([rhythm.extension.time.end for rhythm in self])
-        min_time = min([rhythm.extension.time.start for rhythm in self])
+        max_time = max([rhythm.extension.time.end for rhythm in self.piano_rolls])
+        min_time = min([rhythm.extension.time.start for rhythm in self.piano_rolls])
         return TimeExtension(min_time, max_time)
 
     @property
     def tatum(self):
-        if len(self) == 0:
+        if len(self.piano_rolls) == 0:
             return TimeShift(0)
-        return self[0].tatum.gcd(*[r.tatum for r in self[1:]])
+        return self.piano_rolls[0].tatum.gcd(*[r.tatum for r in self.piano_rolls[1:]])
 
     @multimethod
     def __mul__(self, harmony: Harmony) -> HarmonicTexture:
@@ -1312,12 +1318,18 @@ class Harmony(PianoRollStack):
             raise WrongNature('Chords must be of the same nature')
         super().__init__(*chords)
 
+    def __len__(self):
+        return len(self.piano_rolls)
+
+    def __iter__(self):
+        return iter(self.piano_rolls)
+
     @property
     def nature(self):
-        if len(self) == 0:
+        if len(self.piano_rolls) == 0:
             return 'shift'
         else:
-            return self[0].frequency_nature
+            return self.piano_rolls[0].frequency_nature
 
     def __mul__(self, other):
         assert isinstance(other, Texture), 'Product should be done between a Texture and a Harmony.'
@@ -1329,10 +1341,10 @@ class Harmony(PianoRollStack):
 
     @property
     def extension(self):
-        if len(self) == 0:
+        if len(self.piano_rolls) == 0:
             return None
-        result: Extension = self[0].extension
-        for c in self[1:]:
+        result: Extension = self.piano_rolls[0].extension
+        for c in self.piano_rolls[1:]:
             result = result.union(c.extension)
         return result
 
@@ -1367,40 +1379,46 @@ class ChordTexture(HarmonicTexture):
         HarmonicTexture.__init__(self, texture, harmony)
 
 
-class Activations(list, PianoRoll):
-    def __init__(self, *values: TimeFrequency):
-        if len(values) == 0:
+class Activations(PianoRoll):
+    def __init__(self, *activations: TimeFrequency):
+        if len(activations) == 0:
             PianoRoll.__init__(self)
-            list.__init__(self, [])
+            self.activations = []
             return
 
-        if len({type(v.time) for v in values}) > 1:
+        self.activations = activations
+
+        if len({type(v.time) for v in activations}) > 1:
             raise WrongNature('Activations must be of the same time type')
-        if len({type(v.frequency) for v in values}) > 1:
+        if len({type(v.frequency) for v in activations}) > 1:
             raise WrongNature('Activations must be of the same frequency type')
 
-        list.__init__(self, values)
-
         # Time
-        origin_time = min([a.time for a in values])
-        tatum = TimeShift.gcd(*[(a.time - origin_time) for a in values])
-        duration = max([a.time for a in values]) - origin_time
+        origin_time = min([a.time for a in activations])
+        tatum = TimeShift.gcd(*[(a.time - origin_time) for a in activations])
+        duration = max([a.time for a in activations]) - origin_time
 
         # Frequency
-        origin_frequency = min([a.frequency for a in values])
+        origin_frequency = min([a.frequency for a in activations])
         step = FrequencyShift(1)
-        ambitus = max([a.frequency for a in values]) - origin_frequency
+        ambitus = max([a.frequency for a in activations]) - origin_frequency
 
         # Time-Frequency
         origin = TimeFrequency(origin_time, origin_frequency)
         array = np.zeros((ambitus // step + 1, duration // tatum + 1), dtype=bool)
-        for a in values:
+        for a in activations:
             idx_t = (a.time - origin_time) // tatum
             idx_f = (a.frequency - origin_frequency) // step
             array[idx_f, idx_t] = True
 
         # PianoRoll
         PianoRoll.__init__(self, array, origin, tatum, step)
+
+    def __len__(self):
+        return len(self.activations)
+
+    def __iter__(self):
+        return iter(self.activations)
 
     def measure(self, c=None):
         return np.sum(self.array)
@@ -1429,7 +1447,7 @@ class Activations(list, PianoRoll):
                 PianoRoll.change_tatum(self, new_tatum, inplace, True)
         else:
             if self.tatum.value == 0:
-                new_activations = Activations(*self)
+                new_activations = Activations(*self.activations)
                 new_activations.tatum = new_tatum
                 return new_activations
             else:
@@ -1531,20 +1549,30 @@ class ActivationsChroma(Activations, ChromaRoll):
         raise NotImplementedError('Change of array not implemented yet.')
 
 
-class ActivationsStack(List[Activations]):
+class ActivationsStack:
     def __init__(self, *activations_list: Activations):
-        super().__init__(activations_list)
+        self.activations_list = list(activations_list)
+
+    def __add__(self, other: PianoRollStack):
+        assert isinstance(other, PianoRollStack)
+        assert len(self.activations_list) == len(other.piano_rolls)
+
+        result = PianoRoll()
+        for a, p in zip(self.activations_list, other.piano_rolls):
+            result += a + p
+
+        return result
 
     def change_tatum(self, new_tatum=None, inplace=False):
         if new_tatum is None:
-            new_tatum = self[0].tatum.gcd(*[a.tatum for a in self[1:]])
-        for a in self:
-            if len(a) != 0:
+            new_tatum = self.activations_list[0].tatum.gcd(*[a.tatum for a in self[1:]])
+        for a in self.activations_list:
+            if len(a.activations) != 0:
                 a.change_tatum(new_tatum, inplace=inplace)
 
     def change_extension(self, extension: Extension):
-        for i, a in enumerate(self):
-            if len(a) == 0:
+        for i, a in enumerate(self.activations_list):
+            if len(a.activations) == 0:
                 continue
             a.change_extension(extension)
 
@@ -1557,18 +1585,18 @@ class ActivationsStack(List[Activations]):
         i, m, n = np.where(activations_stack_array)
 
         activations_list = []
-        for k in range(len(self)):
-            t = np.array([self[k].origin.time]) + n[i == k] * self[k].tatum
-            f = np.array([self[k].origin.frequency]) + m[i == k] * self[k].step
+        for k in range(len(self.activations_list)):
+            t = np.array([self.activations_list[k].origin.time]) + n[i == k] * self.activations_list[k].tatum
+            f = np.array([self.activations_list[k].origin.frequency]) + m[i == k] * self.activations_list[k].step
             activations_list.append(Activations(*[TimeFrequency(ti, fi) for ti, fi in zip(t, f)]))
 
         return ActivationsStack(*activations_list)
 
     def to_array(self):
-        if len({a.tatum for a in self}) != 1:
-            new_tatum = self[0].tatum.gcd(*[a.tatum for a in self[1:]])
+        if len({a.tatum for a in self.activations_list}) != 1:
+            new_tatum = self.activations_list[0].tatum.gcd(*[a.tatum for a in self[1:]])
             a_list = []
-            for a in self:
+            for a in self.activations_list:
                 a_list.append(a.change_tatum(new_tatum))
         else:
             a_list = self
@@ -1589,7 +1617,7 @@ class ActivationsStack(List[Activations]):
 
     def contract(self) -> Activations:
         result = Activations()
-        for a in self:
+        for a in self.activations_list:
             result = PianoRoll.__add__(result, a)
         return result
 
