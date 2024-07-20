@@ -1207,6 +1207,26 @@ class Texture(PianoRollStack):
     def __mul__(self, chord: Chord) -> ChordTexture:
         return ChordTexture(self, chord)
 
+    def to_array(self):
+        time_extension = self.extension
+        extension = Extension(time_extension, FrequencyExtension(FrequencyShift(0), FrequencyShift(1)))
+        tatum = self.tatum
+        arrays = []
+        for rhythm in self.piano_rolls:
+            rhythm_adapted = rhythm.change_tatum(tatum, inplace=False)
+            rhythm_adapted.change_extension(extension)
+            array = rhythm_adapted.array
+            arrays.append(array)
+        array = np.concatenate(arrays, axis=0)
+        return array
+
+    def change_tatum(self, new_tatum: TimeShift, inplace=True):
+        if inplace:
+            for rhythm in self.piano_rolls:
+                rhythm.change_tatum(new_tatum, inplace=True)
+        else:
+            return Texture(*[rhythm.change_tatum(new_tatum, inplace=False) for rhythm in self.piano_rolls])
+
 
 class Chord(PianoRoll):
     # @multimethod
