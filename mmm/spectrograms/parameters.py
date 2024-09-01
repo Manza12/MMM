@@ -1,4 +1,4 @@
-from . import *
+import numpy as np
 
 # STFT parameters
 FS = 44100  # Hz

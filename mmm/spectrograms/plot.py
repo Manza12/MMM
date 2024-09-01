@@ -1,6 +1,12 @@
 import matplotlib.pyplot as plt
+import matplotlib.ticker as tick
+import matplotlib as mpl
+import matplotlib.widgets as wid
+import numpy as np
+import nnAudio.features.cqt as cqt
+from typing import Optional
 
-from . import *
+
 from .parameters import TIME_RESOLUTION, FREQUENCY_PRECISION
 from .tfst import TFST
 from .parameters import N_FFT, FS

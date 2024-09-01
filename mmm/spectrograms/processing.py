@@ -1,3 +1,6 @@
+import scipy.signal.windows as win
+import scipy.ndimage as image
+import scipy.signal as sig
 from .morphology import *
 from .parameters import *
 from .utils import from_db, to_db
