@@ -156,7 +156,7 @@ class ScoreWhole(Score):
             part = score_xml.part_list[key]
             self.parts[key] = []
 
-            current_point = TimePoint(0, time_signature=TimeSignature(12, 8))
+            current_point = TimePoint(0, time_signature=TimeSignature(4, 4))
             divisions = None
             for measure in part.measures:
                 measure: XMLMeasure
@@ -203,7 +203,7 @@ class ScoreWhole(Score):
                         if note_xml.duration is None:
                             warnings.warn('Ornement has been skiped.')
                         else:
-                            if note_xml.rest and note_xml.type == 'whole':
+                            if note_xml.rest and note_xml.type in [None, 'whole']:
                                 duration_wholes = TimeShift(note_xml.duration // divisions) / 4
                             else:
                                 duration_wholes = note_xml.to_duration_wholes()
@@ -225,7 +225,7 @@ class ScoreWhole(Score):
                     else:
                         raise ValueError('Variable note_xml should be a XMLNote.')
 
-    def to_piano_roll(self, part_ids: Union[str, List[str]] = 'all', dynamics=False) -> PianoRoll:
+    def to_piano_roll(self, part_ids: Union[str, List[str]] = 'all', dynamics=False, entagle=False) -> PianoRoll:
         if dynamics:
             raise NotImplementedError('Dynamics is not supported yet.')
 
@@ -234,7 +234,11 @@ class ScoreWhole(Score):
         origin = TimeFrequency(self.time_extension.start, self.frequency_extension.lower)
 
         array_shape = (self.range.value + 1, self.duration // self.tatum)
-        array = np.zeros(array_shape, dtype=np.uint8)
+
+        if not entagle:
+            array = np.zeros(array_shape, dtype=np.uint8)
+        else:
+            array = np.zeros(array_shape, dtype=np.float32)
 
         for part_id in self.parts.keys():
             if part_ids != 'all':
@@ -249,7 +253,13 @@ class ScoreWhole(Score):
                     n_0 = (note.start - self.time_extension.start) // tatum
                     n_1 = (note.end - self.time_extension.start) // tatum
 
-                    array[k, n_0: n_1] = np.maximum(array[k, n_0: n_1], np.ones_like(array[k, n_0: n_1]))
+                    if not entagle:
+                        amplitudes = np.ones_like(array[k, n_0: n_1])
+                    else:
+                        tatum_ratio = int(note.duration / tatum)
+                        amplitudes = np.ones_like(array[k, n_0: n_1]) / tatum_ratio
+
+                    array[k, n_0: n_1] = np.maximum(array[k, n_0: n_1], amplitudes)
                     if not note.tied:
                         array[k, n_0] = 2
 
