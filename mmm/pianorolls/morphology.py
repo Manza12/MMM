@@ -1,7 +1,7 @@
 import numpy as np
 from multimethod import multimethod
 from .music import Activations, PianoRoll, PianoRollStack, TimeFrequency, ActivationsStack, Texture, Harmony, \
-    TimeShift, ChromaRoll, ChromaChord, ActivationsChroma
+    TimeShift, ChromaRoll, ChromaChord, ActivationsChroma, EntangledTexture
 
 
 @multimethod
@@ -17,7 +17,7 @@ def dilation(activations: Activations, structuring_element: PianoRoll):
 @multimethod
 def dilation(activations_list: ActivationsStack, structuring_elements: PianoRollStack):
     result = PianoRoll()
-    for activations, structuring_element in zip(activations_list, structuring_elements):
+    for activations, structuring_element in zip(activations_list.activations_list, structuring_elements.piano_rolls):
         result += dilation(activations, structuring_element)
     return result
 
@@ -25,7 +25,7 @@ def dilation(activations_list: ActivationsStack, structuring_elements: PianoRoll
 @multimethod
 def dilation(activations_list: ActivationsStack, texture: Texture):
     result = PianoRoll()
-    for activations, structuring_element in zip(activations_list, texture):
+    for activations, structuring_element in zip(activations_list.activations_list, texture):
         result += dilation(activations, structuring_element)
     return result
 
@@ -74,28 +74,40 @@ def erosion(piano_roll: PianoRoll, structuring_element: PianoRoll):
 
 @multimethod
 def erosion(piano_roll: PianoRoll, structuring_elements: PianoRollStack):
-    result = ActivationsStack()
-    for structuring_element in structuring_elements:
-        result.append(erosion(piano_roll, structuring_element))
+    e_list = []
+    for structuring_element in structuring_elements.piano_rolls:
+        e_list.append(erosion(piano_roll, structuring_element))
+    result = ActivationsStack(*e_list)
     return result
 
 
 @multimethod
 def erosion(piano_roll: PianoRoll, texture: Texture):
-    result = ActivationsStack()
+    e_list = []
     for rhythm in texture:
-        result.append(erosion(piano_roll, rhythm))
+        e_list.append(erosion(piano_roll, rhythm))
+    result = ActivationsStack(*e_list)
+    return result
+
+
+@multimethod
+def erosion(piano_roll: PianoRoll, texture: EntangledTexture):
+    e_list = []
+    for rhythm in texture:
+        e_list.append(erosion(piano_roll, rhythm))
+    result = ActivationsStack(*e_list)
     return result
 
 
 @multimethod
 def erosion(chroma_roll: ChromaRoll, harmony: Harmony):
-    result = ActivationsStack()
+    e_list = []
     for chord in harmony:
         if isinstance(chord, ChromaChord):
-            result.append(erosion_cylindrical(chroma_roll, chord))
+            e_list.append(erosion_cylindrical(chroma_roll, chord))
         else:
             raise ValueError('Chord should be a ChromaChord')
+    result = ActivationsStack(*e_list)
     return result
 
 

@@ -258,11 +258,13 @@ def plot_activations_stack(activations_stack: ActivationsStack,
                            **kwargs):
     if legend_params is None:
         legend_params = {}
-    assert len(activations_stack) >= 1
-    assert len({a.tatum for a in activations_stack if len(a) != 0}) == 1
-    assert len({a.extension for a in activations_stack if len(a) != 0}) == 1
-    assert len({a.frequency_nature for a in activations_stack if len(a) != 0}) == 1
-    a_master = activations_stack[0]
+
+    activations_list = activations_stack.activations_list
+
+    assert len(activations_list) >= 1
+    assert len({a.tatum for a in activations_list if len(a) != 0}) == 1
+    assert len({a.extension for a in activations_list if len(a) != 0}) == 1
+    assert len({a.frequency_nature for a in activations_list if len(a) != 0}) == 1
 
     if time_label is None:
         time_label = 'Time (wholes)'
@@ -271,16 +273,18 @@ def plot_activations_stack(activations_stack: ActivationsStack,
     elif time_label in ['Time (measure)', 'Temps (mesure)']:
         TimePoint.__str__ = lambda self: f'{self.measure}'
 
+    activations_type = type(activations_list[0])
+
     if freq_label is None:
-        if a_master.frequency_nature == 'point':
-            if isinstance(a_master, ChromaRoll):
+        if activations_stack.frequency_nature == 'point':
+            if issubclass(activations_type, ChromaRoll):
                 freq_label = 'Chroma'
             else:
                 freq_label = 'Pitch'
         else:
             freq_label = 'Shift (semitones)'
 
-    assert a_master.array.dtype == bool
+    assert activations_stack.array.dtype == bool
     fig = plt.figure(figsize=(fig_size[0] / dpi, fig_size[1] / dpi), dpi=dpi)
 
     if fig_title:
@@ -288,10 +292,10 @@ def plot_activations_stack(activations_stack: ActivationsStack,
 
     ax = fig.add_subplot(111)
     cm = plt.get_cmap('gist_rainbow')
-    n_colors = len(activations_stack)
+    n_colors = len(activations_list)
     ax.set_prop_cycle(color=[cm(1. * i / n_colors) for i in range(n_colors)])
 
-    for activations in activations_stack:
+    for activations in activations_list:
         if len(activations) == 0:
             continue
         plot_activations(activations.array, activations.time_vector, activations.frequency_vector,
@@ -303,7 +307,7 @@ def plot_activations_stack(activations_stack: ActivationsStack,
         if x_tick_start is None:
             x_tick_start = TimePoint(0, 1)
         # For Activations with zero tatum
-        if x_tick_step / activations_stack[0].tatum == 0:
+        if x_tick_step / activations_list[0].tatum == 0:
             ticks = np.array([0.])
         else:
             ticks = np.arange((x_tick_start - a_master.extension.time.start) / a_master.tatum,
@@ -329,7 +333,7 @@ def plot_activations_stack(activations_stack: ActivationsStack,
     if legend:
         if legend_params is None:
             legend_params = {}
-        labels = legend_params.pop('labels', [r'$A_{%d}$' % (j + 1) for j in range(len(activations_stack))])
+        labels = legend_params.pop('labels', [r'$A_{%d}$' % (j + 1) for j in range(len(activations_list))])
 
         if legend_params.pop('outside', False):
             # Put a legend to the right of the current axis
