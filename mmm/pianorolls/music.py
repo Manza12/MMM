@@ -1138,7 +1138,7 @@ class PianoRollStack:
             new_tatum = self.piano_rolls[0].tatum
             p_list = self.piano_rolls
 
-        assert len({p.step for p in p_list if p.step.value != 0}) == 1, 'All piano rolls must have the same step'
+        assert len({p.step for p in p_list if p.step.value != 0}) in [0, 1], 'All piano rolls must have the same step'
 
         if len({p.extension for p in p_list}) != 1:
             new_extension = p_list[0].extension
@@ -1158,6 +1158,8 @@ class PianoRollStack:
         self.tatum = new_tatum
         self.step = p_list[0].step
         self.origin = p_list[0].origin
+
+        self.piano_rolls = p_list
 
 
 class Hit(PianoRoll):
@@ -1289,8 +1291,53 @@ class EntangledHit(Hit):
 
 
 class EntangledRhythm(Rhythm):
+    @multimethod
     def __init__(self, *hits: EntangledHit):
         super().__init__(*hits)
+
+    def change_tatum(self, new_tatum: TimeShift, inplace=False, sparse=False):
+        if self.tatum != new_tatum:
+            # Compute ratio
+            ratio = self.tatum / new_tatum
+            if ratio < 1:
+                ratio_int = int(1 / ratio)
+                assert ratio_int == 1 / ratio
+
+                # Change array
+                new_shape = (self.array.shape[0], self.array.shape[1] // ratio_int)
+                new_array = np.zeros(new_shape, dtype=self.array.dtype)
+
+                # Compute array
+                for k in range(ratio_int):
+                    a = self.array[:, k::ratio_int]
+                    new_array = np.maximum(new_array, a[:, :new_array.shape[1]])
+
+            else:
+                ratio_int = int(ratio)
+                assert ratio_int == ratio
+
+                # Change array
+                new_shape = (self.array.shape[0], self.array.shape[1] * ratio_int)
+                new_array = np.zeros(new_shape, dtype=self.array.dtype)
+
+                # Compute array
+                if sparse:
+                    new_array[:, ::ratio_int] = self.array
+                else:
+                    for k in range(ratio_int):
+                        if k == 0:
+                            new_array[:, k::ratio_int] = self.array
+                        else:
+                            new_array[:, k::ratio_int] = self.array.astype(bool).astype(self.array.dtype) / ratio_int
+
+            if inplace:
+                self.array = new_array
+                self.tatum = new_tatum
+            else:
+                return PianoRoll(new_array, self.origin, new_tatum, self.step)
+        else:
+            if not inplace:
+                return PianoRoll(self.array, self.origin, self.tatum, self.step)
 
 
 class EntangledTexture(Texture):
@@ -1648,6 +1695,25 @@ class ActivationsChroma(Activations, ChromaRoll):
 class ActivationsStack(PianoRollStack):
     def __init__(self, *activations_list: Activations):
         super(ActivationsStack, self).__init__(*activations_list)
+
+        # Change dtype to bool
+        self.array = self.array.astype(bool)
+
+        # Synchronize tatums
+        if len({a.tatum for a in activations_list}) != 1:
+            new_tatum = activations_list[0].tatum.gcd(*[a.tatum for a in activations_list[1:]])
+            for a in activations_list:
+                a.change_tatum(new_tatum, inplace=True)
+
+        # Synchronize extensions
+        if len({a.extension for a in activations_list}) != 1:
+            new_extension = activations_list[0].extension
+            for a in activations_list[1:]:
+                a_ext = a.extension
+                new_extension = new_extension.union(a_ext)
+            for a in activations_list:
+                a.change_extension(new_extension)
+
         self.activations_list = activations_list
 
     def __add__(self, other: PianoRollStack):

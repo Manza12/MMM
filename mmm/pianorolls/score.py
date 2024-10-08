@@ -32,6 +32,8 @@ class NoteWhole(Note):
         Note.__init__(self, note_number, start, duration)
         self.dynamic = dynamic
         self.tied = False
+        self.voice = None
+        self.part = None
 
 
 class TempoMark:
@@ -210,6 +212,7 @@ class ScoreWhole(Score):
                             note = NoteWhole(note_number, current_point, duration_wholes, note_xml.dynamic)
 
                             note.voice = note_xml.voice
+                            note.part = key
 
                             if note_xml.tie is not None:
                                 if 'stop' in note_xml.tie:
@@ -224,6 +227,28 @@ class ScoreWhole(Score):
                         current_point = current_point - duration_wholes
                     else:
                         raise ValueError('Variable note_xml should be a XMLNote.')
+
+    def merge_tied_notes(self):
+        notes = self.notes
+        notes_to_remove = []
+        notes_to_merge = {}
+        for note in notes:
+            if note.tied:
+                matching_notes = [n for n in notes if
+                                  note.start == n.end and note.frequency == n.frequency and note.part == n.part]
+                assert len(matching_notes) == 1, 'There should be only one matching note.'
+                matching_note = matching_notes[0]
+
+                notes_to_remove.append(note)
+                notes_to_merge[matching_note] = note
+
+        # Merge notes
+        for note, tied_note in notes_to_merge.items():
+            note.duration = note.duration + tied_note.duration
+
+        # Remove tied notes
+        for n in notes_to_remove:
+            self.notes.remove(n)
 
     def to_piano_roll(self, part_ids: Union[str, List[str]] = 'all', dynamics=False, entagle=False) -> PianoRoll:
         if dynamics:
@@ -245,8 +270,8 @@ class ScoreWhole(Score):
                 if part_id not in part_ids:
                     continue
 
-            notes = self.parts[part_id]
-            for note in notes:
+            # notes = self.parts[part_id]
+            for note in self.notes:
                 note: NoteWhole
                 if note.frequency is not None:
                     k = (note.frequency - self.frequency_extension.lower) // step

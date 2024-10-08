@@ -260,11 +260,12 @@ def plot_activations_stack(activations_stack: ActivationsStack,
         legend_params = {}
 
     activations_list = activations_stack.activations_list
+    a_master = activations_list[0]
 
     assert len(activations_list) >= 1
-    assert len({a.tatum for a in activations_list if len(a) != 0}) == 1
-    assert len({a.extension for a in activations_list if len(a) != 0}) == 1
-    assert len({a.frequency_nature for a in activations_list if len(a) != 0}) == 1
+    assert len({a.tatum for a in activations_list if len(a) != 0}) in [0, 1]
+    assert len({a.extension for a in activations_list if len(a) != 0}) in [0, 1]
+    assert len({a.frequency_nature for a in activations_list if len(a) != 0}) in [0, 1]
 
     if time_label is None:
         time_label = 'Time (wholes)'

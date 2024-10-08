@@ -15,6 +15,9 @@ def create_midi(piano_roll: PianoRoll, velocity: int = 64, tempo: int = 60, tick
         if int(ratio) == float(ratio):
             ticks_per_beat = int(ratio)
             factor = 1
+        elif ratio < 1:
+            ticks_per_beat = 1
+            factor = int(1 / ratio)
         else:
             ticks_per_beat = ratio.denominator
             factor = ratio.numerator

@@ -1,5 +1,7 @@
 import numpy as np
 from multimethod import multimethod
+from numpy.ma.core import minimum
+
 from .music import Activations, PianoRoll, PianoRollStack, TimeFrequency, ActivationsStack, Texture, Harmony, \
     TimeShift, ChromaRoll, ChromaChord, ActivationsChroma, EntangledTexture
 
@@ -31,45 +33,91 @@ def dilation(activations_list: ActivationsStack, texture: Texture):
 
 
 @multimethod
-def erosion(piano_roll: PianoRoll, structuring_element: PianoRoll):
-    import torch
-    from nnMorpho.binary_operators import erosion as binary_erosion
+def erosion(piano_roll: PianoRoll, structuring_element: PianoRoll, engine='numpy'):
+    if engine == 'torch':
+        import torch
+        from nnMorpho.binary_operators import erosion as binary_erosion
 
-    # Tatum
-    if structuring_element.tatum != piano_roll.tatum and structuring_element.tatum != TimeShift(0):
-        new_tatum = piano_roll.tatum.gcd(structuring_element.tatum,
-                                         piano_roll.origin.time - structuring_element.origin.time)
-        piano_roll = piano_roll.change_tatum(new_tatum)
-        structuring_element = structuring_element.change_tatum(new_tatum)
+        # Tatum
+        if structuring_element.tatum != piano_roll.tatum and structuring_element.tatum != TimeShift(0):
+            new_tatum = piano_roll.tatum.gcd(structuring_element.tatum,
+                                             piano_roll.origin.time - structuring_element.origin.time)
+            piano_roll = piano_roll.change_tatum(new_tatum)
+            structuring_element = structuring_element.change_tatum(new_tatum)
 
-    # Origin
-    if structuring_element.frequency_nature == 'shift':
-        origin_frequency = - structuring_element.origin.frequency // structuring_element.step
+        # Origin
+        if structuring_element.frequency_nature == 'shift':
+            origin_frequency = - structuring_element.origin.frequency // structuring_element.step
+        else:
+            raise NotImplementedError
+
+        if structuring_element.time_nature == 'shift':
+            origin_time = - structuring_element.origin.time // structuring_element.tatum
+        else:
+            raise NotImplementedError
+
+        # To PyTorch tensors
+        piano_roll_tensor = torch.from_numpy(piano_roll.array)
+        str_el_tensor = torch.from_numpy(structuring_element.array)
+
+        # Erosion
+        eroded_tensor = binary_erosion(piano_roll_tensor, str_el_tensor, origin=(origin_frequency, origin_time))
+
+        # To numpy array
+        eroded_array = eroded_tensor.numpy()
+
+        # To Activations
+        f, t = np.where(eroded_array)
+        activations = Activations(*[TimeFrequency(
+            piano_roll.origin.time + t[i] * piano_roll.tatum,
+            piano_roll.origin.frequency + f[i] * piano_roll.step) for i in range(len(f))])
+
+        return activations
+    elif engine == 'numpy':
+        # Tatum
+        if structuring_element.tatum != piano_roll.tatum and structuring_element.tatum != TimeShift(0):
+            new_tatum = piano_roll.tatum.gcd(structuring_element.tatum,
+                                             piano_roll.origin.time - structuring_element.origin.time)
+            piano_roll = piano_roll.change_tatum(new_tatum)
+            structuring_element = structuring_element.change_tatum(new_tatum)
+
+        # Origin
+        if structuring_element.frequency_nature == 'shift':
+            origin_frequency = - structuring_element.origin.frequency // structuring_element.step
+        else:
+            raise NotImplementedError
+
+        if structuring_element.time_nature == 'shift':
+            origin_time = - structuring_element.origin.time // structuring_element.tatum
+        else:
+            raise NotImplementedError
+
+        # Erosion
+        eroded_array = np.zeros_like(piano_roll.array, dtype=bool)
+        str_el = structuring_element.array
+        str_el_n = str_el.shape[-1]
+        str_el_m = str_el.shape[-2]
+        for n in range(piano_roll.array.shape[-1] - str_el_n + 1):
+            for m in range(piano_roll.array.shape[-2] - str_el_m + 1):
+                segment = piano_roll.array[
+                          m - origin_frequency: m - origin_frequency + str_el_m,
+                          n - origin_time: n - origin_time + str_el_n]
+                if segment.shape != str_el.shape:
+                    continue
+                value = np.min(segment - str_el)
+                eroded_array[m, n] = value >= 0
+
+        # Activations
+        f, t = np.where(eroded_array)
+        values = [TimeFrequency(
+            piano_roll.origin.time + t[i] * piano_roll.tatum,
+            piano_roll.origin.frequency + f[i] * piano_roll.step) for i in range(len(f))]
+        activations = Activations(*values)
+
+        return activations
     else:
-        raise NotImplementedError
+        raise ValueError('Engine should be either "numpy" or "torch"')
 
-    if structuring_element.time_nature == 'shift':
-        origin_time = - structuring_element.origin.time // structuring_element.tatum
-    else:
-        raise NotImplementedError
-
-    # To PyTorch tensors
-    piano_roll_tensor = torch.from_numpy(piano_roll.array)
-    str_el_tensor = torch.from_numpy(structuring_element.array)
-
-    # Erosion
-    eroded_tensor = binary_erosion(piano_roll_tensor, str_el_tensor, origin=(origin_frequency, origin_time))
-
-    # To numpy array
-    eroded_array = eroded_tensor.numpy()
-
-    # To Activations
-    f, t = np.where(eroded_array)
-    activations = Activations(*[TimeFrequency(
-        piano_roll.origin.time + t[i] * piano_roll.tatum,
-        piano_roll.origin.frequency + f[i] * piano_roll.step) for i in range(len(f))])
-
-    return activations
 
 
 @multimethod
